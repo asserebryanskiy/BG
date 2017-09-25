@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.pdfeditor.PdfEditorController">
+   <children>
+      <GridPane fx:id="pdfRedactorRoot" alignment="CENTER_LEFT" hgap="20.0" vgap="10.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="LEFT" minWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="106.0" minHeight="0.0" />
+            <RowConstraints maxHeight="160.0" minHeight="2.9440317153930664" />
+            <RowConstraints maxHeight="173.18446159362793" minHeight="1.3192596435546875" />
+            <RowConstraints maxHeight="171.86979293823242" minHeight="18.314678192138672" />
+            <RowConstraints fillHeight="false" maxHeight="182.55511474609375" minHeight="0.0" />
+            <RowConstraints fillHeight="false" />
+            <RowConstraints minHeight="10.0" />
+            <RowConstraints fillHeight="false" />
+         </rowConstraints>
+         <children>
+            <StackPane fx:id="editingArea" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowSpan="8" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+               <children>
+                  <ImageView fx:id="pdfPreview" fitHeight="500.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="ALWAYS" GridPane.rowSpan="7" GridPane.valignment="TOP" StackPane.alignment="TOP_LEFT">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <Label layoutX="353.0" layoutY="48.0" text="1. Расположи поля на бейдже" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Label>
+            <Label text="2. Загрузи свой шрифт &#10;(по умолчанию будет использоваться Helvetica)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" text="Обзор" />
+                  <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="260.0" />
+               </children>
+            </HBox>
+            <Label text="3. Настрой размер шрифта, цвет и выравнивание.&#10;(зажав клавишу Ctrl можно выделить сразу несколько полей)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <children>
+                  <Label layoutX="359.0" layoutY="176.0" text="Размер шрифта" />
+                  <TextField fx:id="fontSizeField" layoutX="475.0" layoutY="169.0" onAction="#handleChangeFieldFontSize" prefHeight="27.0" prefWidth="41.0" />
+                  <Label layoutX="527.0" layoutY="175.0" text="Цвет" />
+                  <ColorPicker fx:id="fontColorPicker" layoutX="592.0" layoutY="171.0" onAction="#handleChangeFontColor" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </HBox>
+            <Button fx:id="saveBadgesButton" mnemonicParsing="false" onMouseClicked="#handleSaveBadges" text="Сохранить готовые бейджи" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="TOP" />
+            <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <children>
+                  <Button fx:id="leftAlignmentButton" mnemonicParsing="false" onAction="#handleSetAlignment" prefHeight="24.0" prefWidth="24.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Button fx:id="centerAlignmentButton" mnemonicParsing="false" onAction="#handleSetAlignment" prefHeight="24.0" prefWidth="24.0" />
+                  <Button fx:id="rightAlignmentButton" mnemonicParsing="false" onAction="#handleSetAlignment" prefHeight="24.0" prefWidth="24.0" />
+               </children>
+            </HBox>
+            <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Если в поле выше пропущена строка, поднимать все нижние поля?" wrappingWidth="398.0" />
+                  <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsTrue" selected="true" text="Да" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsFalse" text="Нет" toggleGroup="$toggleGroup" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </GridPane>
+      <Rectangle fx:id="progressIndicatorBackground" arcHeight="5.0" arcWidth="5.0" fill="#ffffff83" height="200.0" stroke="WHITE" strokeType="INSIDE" visible="false" width="200.0" />
+      <VBox fx:id="progressIndicatorBox" alignment="CENTER" spacing="5.0" visible="false">
+         <children>
+            <ProgressIndicator fx:id="progressIndicator" prefHeight="258.0" prefWidth="457.0" progress="0.0" visible="false" />
+            <Label fx:id="progressStatusLabel" text="Label" />
+            <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancelBadgeCreation" text="Отмена" visible="false" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>
