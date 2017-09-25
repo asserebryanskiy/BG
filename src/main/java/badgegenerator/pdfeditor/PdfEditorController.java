@@ -4,11 +4,7 @@ import badgegenerator.ModelSingleton;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,7 +19,6 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
@@ -162,7 +156,7 @@ public class PdfEditorController implements Initializable {
                 + pdfRedactorRoot.getPadding().getTop() * 2);
         font = fields.get(0).getFont();
         fontSizeField.setText(String.format("%d",
-                (int) (fields.get(0).getFont().getSize() * imageToPdfRatio)));
+                (int) (fields.get(0).getFont().getSize() / imageToPdfRatio)));
         fontNameField.setText(fields.get(0).getFont().getName());
     }
 
@@ -231,7 +225,7 @@ public class PdfEditorController implements Initializable {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("TTF files", "*.ttf"),
                 new FileChooser.ExtensionFilter("AFM files", "*.afm"),
-                new FileChooser.ExtensionFilter("PFM files", "*.pfm"),
+                new FileChooser.ExtensionFilter("OTF files", "*.otf"),
                 new FileChooser.ExtensionFilter("PFM files", "*.pfm"),
                 new FileChooser.ExtensionFilter("TTC files", "*.ttc"));
         File selectedFile = fileChooser.showOpenDialog(null);

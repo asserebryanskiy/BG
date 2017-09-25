@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 <StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fileloader.FileLoaderController">
    <children>
       <GridPane fx:id="fileLoaderRoot" vgap="5.0">
@@ -32,7 +26,7 @@
             <Label alignment="CENTER" layoutX="72.0" layoutY="37.0" nodeOrientation="LEFT_TO_RIGHT" text="Привет! Загрузи сюда свои файлы" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="TOP">
                <children>
-                  <Button fx:id="btnBrowsePdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" prefHeight="17.0" prefWidth="59.0" text="Обзор" GridPane.rowIndex="5" />
+                  <Button fx:id="btnBrowsePdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5" />
                   <VBox>
                      <children>
                         <TextField fx:id="pdfField" editable="false" prefHeight="27.0" prefWidth="218.0">

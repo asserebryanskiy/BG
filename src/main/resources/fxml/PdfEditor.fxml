@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.image.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
 <StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.pdfeditor.PdfEditorController">
    <children>
       <GridPane fx:id="pdfRedactorRoot" alignment="CENTER_LEFT" hgap="20.0" vgap="10.0">
          <columnConstraints>
             <ColumnConstraints halignment="LEFT" minWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="320.0" minWidth="10.0" />
          </columnConstraints>
          <rowConstraints>
+            <RowConstraints />
             <RowConstraints maxHeight="106.0" minHeight="0.0" />
             <RowConstraints maxHeight="160.0" minHeight="2.9440317153930664" />
             <RowConstraints maxHeight="173.18446159362793" minHeight="1.3192596435546875" />
@@ -25,10 +22,9 @@
             <RowConstraints fillHeight="false" maxHeight="182.55511474609375" minHeight="0.0" />
             <RowConstraints fillHeight="false" />
             <RowConstraints minHeight="10.0" />
-            <RowConstraints fillHeight="false" />
          </rowConstraints>
          <children>
-            <StackPane fx:id="editingArea" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowSpan="8" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+            <StackPane fx:id="editingArea" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="7" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
                <children>
                   <ImageView fx:id="pdfPreview" fitHeight="500.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="ALWAYS" GridPane.rowSpan="7" GridPane.valignment="TOP" StackPane.alignment="TOP_LEFT">
                      <GridPane.margin>
@@ -37,19 +33,13 @@
                   </ImageView>
                </children>
             </StackPane>
-            <Label layoutX="353.0" layoutY="48.0" text="1. Расположи поля на бейдже" GridPane.columnIndex="1">
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </Label>
-            <Label text="2. Загрузи свой шрифт &#10;(по умолчанию будет использоваться Helvetica)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <Label prefHeight="34.0" prefWidth="328.0" text="2. Загрузи свой шрифт &#10;(по умолчанию будет использоваться Helvetica)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="365.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
                   <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" text="Обзор" />
-                  <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="260.0" />
+                  <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="234.0" />
                </children>
             </HBox>
-            <Label text="3. Настрой размер шрифта, цвет и выравнивание.&#10;(зажав клавишу Ctrl можно выделить сразу несколько полей)" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <children>
                   <Label layoutX="359.0" layoutY="176.0" text="Размер шрифта" />
@@ -71,7 +61,7 @@
             </HBox>
             <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Если в поле выше пропущена строка, поднимать все нижние поля?" wrappingWidth="398.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Если в поле выше пропущена строка, поднимать все нижние поля?" wrappingWidth="316.0" />
                   <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsTrue" selected="true" text="Да" GridPane.columnIndex="1" GridPane.rowIndex="6">
                      <toggleGroup>
                         <ToggleGroup fx:id="toggleGroup" />
@@ -80,6 +70,8 @@
                   <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsFalse" text="Нет" toggleGroup="$toggleGroup" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                </children>
             </VBox>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="3. Настрой размер шрифта, цвет и выравнивание.(зажав клавишу Ctrl можно выделить сразу несколько полей)" wrappingWidth="320.09716796875" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="1. Расположи поля на бейдже" GridPane.columnIndex="1" />
          </children>
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

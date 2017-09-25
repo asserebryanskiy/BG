@@ -72,7 +72,7 @@ public class Field extends Pane{
                  double imageToPdfRatio) {
         super();
         // Common
-        font = Font.font("Helvetica");
+        font = Font.loadFont(getClass().getResourceAsStream("/fonts/Helvetica.otf"), 13);
         fontSize = new SimpleDoubleProperty(font.getSize());
         makeDraggableAndSelectable();
         text = new Text(value);
@@ -187,7 +187,7 @@ public class Field extends Pane{
         }
 
         if (fontSizeField != null) {
-            fontSizeField.setText(String.valueOf((int) getFontSize() / imageToPdfRatio));
+            fontSizeField.setText(String.valueOf((int) (getFontSize() / imageToPdfRatio)));
         }
     }
 
