@@ -211,8 +211,6 @@ public class Field extends Pane{
         bottomLayoutBorder = getParent().getBoundsInLocal().getHeight();
     }
 
-    // ToDo: make selectable
-
     private void makeDraggableAndSelectable() {
         setOnMousePressed(event -> {
             calculateLayoutBorders();
