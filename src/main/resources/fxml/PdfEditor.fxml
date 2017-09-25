@@ -11,7 +11,7 @@
       <GridPane fx:id="pdfRedactorRoot" alignment="CENTER_LEFT" hgap="20.0" vgap="10.0">
          <columnConstraints>
             <ColumnConstraints halignment="LEFT" minWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="320.0" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints />
@@ -24,7 +24,7 @@
             <RowConstraints minHeight="10.0" />
          </rowConstraints>
          <children>
-            <StackPane fx:id="editingArea" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="7" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+            <StackPane fx:id="editingArea" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowSpan="8" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
                <children>
                   <ImageView fx:id="pdfPreview" fitHeight="500.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="ALWAYS" GridPane.rowSpan="7" GridPane.valignment="TOP" StackPane.alignment="TOP_LEFT">
                      <GridPane.margin>
@@ -33,16 +33,15 @@
                   </ImageView>
                </children>
             </StackPane>
-            <Label prefHeight="34.0" prefWidth="328.0" text="2. Загрузи свой шрифт &#10;(по умолчанию будет использоваться Helvetica)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="365.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
                   <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" text="Обзор" />
-                  <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="234.0" />
+                  <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="319.0" />
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="358.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <children>
-                  <Label layoutX="359.0" layoutY="176.0" text="Размер шрифта" />
+                  <Label layoutX="359.0" layoutY="176.0" minWidth="100.0" text="Размер шрифта" />
                   <TextField fx:id="fontSizeField" layoutX="475.0" layoutY="169.0" onAction="#handleChangeFieldFontSize" prefHeight="27.0" prefWidth="41.0" />
                   <Label layoutX="527.0" layoutY="175.0" text="Цвет" />
                   <ColorPicker fx:id="fontColorPicker" layoutX="592.0" layoutY="171.0" onAction="#handleChangeFontColor" />
@@ -61,7 +60,7 @@
             </HBox>
             <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Если в поле выше пропущена строка, поднимать все нижние поля?" wrappingWidth="316.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Если в поле выше пропущена строка, поднимать все нижние поля?" wrappingWidth="398.0" />
                   <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsTrue" selected="true" text="Да" GridPane.columnIndex="1" GridPane.rowIndex="6">
                      <toggleGroup>
                         <ToggleGroup fx:id="toggleGroup" />
@@ -70,8 +69,9 @@
                   <RadioButton mnemonicParsing="false" onAction="#handleSetCompressFieldsFalse" text="Нет" toggleGroup="$toggleGroup" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                </children>
             </VBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="3. Настрой размер шрифта, цвет и выравнивание.(зажав клавишу Ctrl можно выделить сразу несколько полей)" wrappingWidth="320.09716796875" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="3. Настрой размер шрифта, цвет и выравнивание.(зажав клавишу Ctrl можно выделить сразу несколько полей)" wrappingWidth="398.09716796875" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="1. Расположи поля на бейдже" GridPane.columnIndex="1" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="2. Загрузи свой шрифт (по умолчанию будет использоваться Helvetica)" wrappingWidth="401.91650390625" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

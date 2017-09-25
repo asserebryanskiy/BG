@@ -39,7 +39,6 @@ public class Field extends Pane{
     private int blue;
 
     private TextFlow textFlow;
-    private Text text;
     private String[] words;
     private Font font;
     private DoubleProperty fontSize;
@@ -75,7 +74,8 @@ public class Field extends Pane{
         font = Font.loadFont(getClass().getResourceAsStream("/fonts/Helvetica.otf"), 13);
         fontSize = new SimpleDoubleProperty(font.getSize());
         makeDraggableAndSelectable();
-        text = new Text(value);
+        Text text = new Text(value);
+        text.setFont(font);
         textFlow = new TextFlow(text);
         textFlow.setManaged(false);
         getChildren().add(textFlow);
