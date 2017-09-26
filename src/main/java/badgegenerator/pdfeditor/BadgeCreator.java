@@ -13,7 +13,10 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class BadgeCreator {
@@ -57,7 +60,7 @@ public class BadgeCreator {
         PdfCanvas pdfCanvas = new PdfCanvas(page);
 
         String[] participantRow = participants[i];
-        int numberOfMissingLines = 0;
+        int sumOfMissingLines = 0;
         for (int j = 0; j < participantRow.length; j++) {
             Field field = fields.get(j);
             String value = participantRow[field.getNumberOfColumn()];
@@ -84,10 +87,8 @@ public class BadgeCreator {
             float fontSize = (float) ((field.getFont().getSize()) / ratio);
             float yCoordinate = transform(field.getLayoutY() / ratio)
                     - getFontMetrics(field).getMaxAscent() / ratio;
-            if(compressFieldIfLineMissing && numberOfMissingLines > 0) {
-                yCoordinate += numberOfMissingLines *
-                        (getFontMetrics(fields.get(j - 1)).getMaxAscent()
-                                + getFontMetrics(fields.get(j - 1)).getMaxDescent())/ ratio;
+            if(compressFieldIfLineMissing && sumOfMissingLines > 0) {
+                yCoordinate += sumOfMissingLines;
             }
 
             pdfCanvas.beginText()
@@ -131,7 +132,9 @@ public class BadgeCreator {
 
             pdfCanvas.endText();
             if(compressFieldIfLineMissing) {
-                numberOfMissingLines = field.getNumberOfLines() - numberOfLines;
+                sumOfMissingLines += (field.getNumberOfLines() - numberOfLines)
+                        * ((getFontMetrics(field).getMaxAscent()
+                        + getFontMetrics(field).getMaxDescent()) / ratio);
             }
         }
 
