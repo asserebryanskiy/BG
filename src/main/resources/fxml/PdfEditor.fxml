@@ -60,7 +60,7 @@
             </GridPane>
             <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="365.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
-                  <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" text="Обзор" />
+                  <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" prefWidth="70.0" text="Обзор" />
                   <TextField fx:id="fontNameField" editable="false" prefHeight="27.0" prefWidth="319.0" />
                </children>
             </HBox>

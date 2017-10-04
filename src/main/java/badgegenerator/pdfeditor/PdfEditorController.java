@@ -93,62 +93,6 @@ public class PdfEditorController {
     private String pdfPath;
     private ExcelReader excelReader;
 
-
-    /*private void addFields(List<FxFieldSave> fieldFiles) {
-        // chooses largest strings from list of all fxFields for every field
-        String[] fieldsValues = excelReader.getLargestFields();
-        String[] longestWords = excelReader.getLongestWords();
-
-        final double yCoordinate = editingArea.getBoundsInLocal().getHeight() / 2
-                - (fieldsValues.length * 20 / 2);
-
-        IntStream.range(0, fieldsValues.length).forEach(i -> {
-            FxField fxField;
-            if(fieldFiles != null) {
-                fieldFiles.get(i);
-                fxField = new FxField(fieldsValues[i],
-                        longestWords[i],
-                        i,
-                        editingArea.getBoundsInLocal().getWidth() - 48,
-                        imageToPdfRatio);
-            } else {
-                fxField = new FxField(fieldsValues[i],
-                        longestWords[i],
-                        i,
-                        editingArea.getBoundsInLocal().getWidth() - 48,
-                        imageToPdfRatio);
-
-                fxField.getTextFlow().setTextAlignment(TextAlignment.CENTER);
-                fxField.setLayoutX(editingArea.getBoundsInLocal().getWidth() / 2
-                        - fxField.getPrefWidth() / 2);
-                fxField.setLayoutY(yCoordinate + i * 20);
-            }
-
-            fxField.setManaged(false);
-            editingArea.getChildren().add(fxField);
-            fxFields.add(fxField);
-            fxField.setFontNameField(fontNameField);
-            fxField.setFontSizeField(fontSizeField);
-            fxField.setFontColorPicker(fontColorPicker);
-
-            *//*try {
-                fxField.addGuide(new Guide(fxField, Position.LEFT));
-                fxField.addGuide(new Guide(fxField, Position.RIGHT));
-            } catch (NoParentFoundException | NoIdFoundException e) {
-                e.printStackTrace();
-            }
-            if(fxField.mayHasHyphenation) {
-                ResizeableBorder leftBorder =
-                        new ResizeableBorder(fxField, Position.LEFT);
-                ResizeableBorder rightBorder =
-                        new ResizeableBorder(fxField, Position.RIGHT);
-                editingArea.getChildren().addAll(leftBorder, rightBorder);
-                leftBorder.setManaged(false);
-                rightBorder.setManaged(false);
-            }*//*
-        });
-    }*/
-
     public void init() {
         init(null);
     }
@@ -211,26 +155,6 @@ public class PdfEditorController {
         fontNameField.setText(fxFields.get(0).getFont().getName());
     }
 
-    /**
-     * Vertical guides are used to facilitate the process of field alignment.
-     * */
-    /*private void addVerticalGuides() {
-        double endY = editingArea.getBoundsInLocal().getHeight() - 1;
-        FxField.getGuides().forEach(guide -> {
-            editingArea.getChildren().add(guide);
-            guide.setManaged(false);
-            guide.setVisible(false);
-        });
-
-        Line verticalGuide = new Line(editingArea.getBoundsInLocal().getWidth() / 2,
-                0,
-                editingArea.getBoundsInLocal().getWidth() / 2,
-                endY);
-        verticalGuide.setVisible(false);
-        editingArea.getChildren().add(verticalGuide);
-        FxField.setVerticalGuide(verticalGuide);
-    }*/
-
     public void handleBrowseFont() throws InterruptedException, IOException {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("TTF files", "*.ttf"),
@@ -262,24 +186,6 @@ public class PdfEditorController {
                 .filter(field -> field.isSelected)
                 .forEach(field -> field.setFontSize(newFontSize));
     }
-
-    /**
-     * Method aids in aligning fxFields and preserving their initial color.
-     * */
-    /*private void setFontAligned(FxField fxField, Font newFont, double fontSize) {
-        double x = fxField.getLayoutX();
-        double oldWidth = fxField.getPrefWidth();
-        Paint color = fxField.getLines().get(0).getFill();
-        fxField.setFieldFont(newFont, fontSize);
-        fxField.getLines().forEach(line -> line.setFill(color));
-        switch (fxField.getTextFlow().getTextAlignment().name()) {
-            case("RIGHT"):
-                fxField.setLayoutX(x + oldWidth - fxField.getPrefWidth());
-                break;
-            case("CENTER"):
-                fxField.setLayoutX(x + oldWidth / 2 - fxField.getPrefWidth() / 2);
-        }
-    }*/
 
     public void handleChangeFontColor() {
         fxFields.stream()
@@ -319,10 +225,6 @@ public class PdfEditorController {
         progressIndicatorBackground.setVisible(show);
         progressIndicator.setVisible(show);
         cancelButton.setVisible(show);
-    }
-
-    public static FileChooser getFileChooser() {
-        return fileChooser;
     }
 
     public void handleCancelBadgeCreation() {

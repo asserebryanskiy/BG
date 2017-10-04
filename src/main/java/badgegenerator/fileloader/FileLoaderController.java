@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class FileLoaderController implements Initializable{
+    @FXML
+    private StackPane root;
     @FXML
     private Button btnBrowseXlsx;
     @FXML
@@ -64,6 +67,8 @@ public class FileLoaderController implements Initializable{
         buttons.add(btnLoadFields);
         buttons.forEach(btn -> btn.setMinWidth(
                 Main.computeStringWidth(btn.getText(), btn.getFont())));
+        progressIndicatorBackground.setWidth(root.getBoundsInLocal().getWidth());
+        progressIndicatorBackground.setHeight(root.getBoundsInLocal().getHeight());
     }
 
     public void handleBrowseXlsx(MouseEvent event) {

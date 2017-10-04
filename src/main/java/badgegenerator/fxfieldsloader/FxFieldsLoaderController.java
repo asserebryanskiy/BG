@@ -3,39 +3,56 @@ package badgegenerator.fxfieldsloader;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fileloader.LaunchPdfEditorTask;
 import badgegenerator.fileloader.SavesLoader;
+import com.sun.javafx.tk.Toolkit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class FxFieldsLoaderController {
+public class FxFieldsLoaderController implements Initializable{
     private final String PLACEHOLDER = "--Нет сохранения--";
 
+    @FXML
+    private StackPane root;
     @FXML
     private ListView<Text> savedFields;
     @FXML
     private Rectangle loaderBackground;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private VBox btnBox;
 
     private ExcelReader excelReader;
     private String pdfPath;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        final double longestBtnWidth = Toolkit.getToolkit().getFontLoader()
+                .computeStringWidth(((Button) btnBox.getChildren().get(0)).getText(),
+                        ((Button) btnBox.getChildren().get(0)).getFont()) + 40;
+        btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
+        loaderBackground.setWidth(root.getBoundsInLocal().getWidth());
+        loaderBackground.setHeight(root.getBoundsInLocal().getHeight());
+    }
 
     public void setSavedFieldsNames(List<String> savedFieldsNames) {
 //        ObservableList<Text> values = FXCollections.observableArrayList(savedFieldsNames);
