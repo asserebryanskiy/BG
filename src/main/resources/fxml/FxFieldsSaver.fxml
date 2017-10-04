@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<StackPane alignment="TOP_LEFT" prefWidth="295.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fxfieldssaver.FxFieldsSaverController">
+   <children>
+      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="294.0">
+         <children>
+            <VBox fx:id="savesBox" prefWidth="197.0">
+               <children>
+                  <TextField />
+                  <TextField />
+                  <TextField />
+                  <TextField />
+                  <TextField />
+               </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="100.0" spacing="5.0">
+               <children>
+                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#handleSaveBtn" prefWidth="90.0" text="Сохранить" />
+                  <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#handleDeleteSave" prefWidth="90.0" text="Удалить" textAlignment="CENTER" />
+                  <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#handleCancel" prefWidth="90.0" text="Отмена" textAlignment="CENTER" />
+               </children>
+               <padding>
+                  <Insets top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+      </HBox>
+      <Rectangle fx:id="loaderBackground" arcHeight="5.0" arcWidth="5.0" fill="#ffffff80" height="136.0" stroke="TRANSPARENT" strokeType="INSIDE" visible="false" width="295.0" />
+      <ProgressBar fx:id="progressBar" prefWidth="200.0" visible="false" StackPane.alignment="CENTER" />
+   </children>
+</StackPane>

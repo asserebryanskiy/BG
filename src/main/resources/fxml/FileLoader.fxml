@@ -5,9 +5,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 <StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fileloader.FileLoaderController">
    <children>
-      <GridPane fx:id="fileLoaderRoot" vgap="5.0">
+      <GridPane fx:id="commonGrid" vgap="5.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
             <ColumnConstraints />
@@ -34,11 +35,11 @@
                               <Insets />
                            </HBox.margin>
                         </TextField>
-                        <Label fx:id="pdfNotLoadedLabel" text="Необходимо загрузить pdf документ с макетом" textFill="#e40202" visible="false">
+                        <Text fx:id="pdfNotLoadedLabel" fill="#eb0000" strokeType="OUTSIDE" strokeWidth="0.0" text="Необходимо загрузить pdf документ с макетом" visible="false" wrappingWidth="210.0">
                            <font>
-                              <Font size="8.0" />
+                              <Font size="10.0" />
                            </font>
-                        </Label>
+                        </Text>
                      </children>
                   </VBox>
                </children>
@@ -53,11 +54,11 @@
                   <VBox>
                      <children>
                         <TextField editable="false" prefHeight="27.0" prefWidth="218.0" fx:id="xlsxField" />
-                        <Label text="Необходимо загрузить xlsx документ &#10;с данными об участниках" textFill="#e40202" visible="false" fx:id="xlsxNotLoadedLabel">
+                        <Text fill="#f20000" strokeType="OUTSIDE" strokeWidth="0.0" text="Необходимо загрузить xlsx документ с данными об участниках" visible="false" wrappingWidth="210.0" fx:id="xlsxNotLoadedLabel">
                            <font>
-                              <Font size="8.0" />
+                              <Font size="10.0" />
                            </font>
-                        </Label>
+                        </Text>
                      </children>
                   </VBox>
                </children>
@@ -76,11 +77,23 @@
                </GridPane.margin>
             </Label>
             <Label layoutX="20.0" layoutY="79.0" text="Список участинков мероприятия в формате .xlsx" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Button fx:id="btnNext" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Далее" AnchorPane.bottomAnchor="20.0" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </Button>
+            <GridPane fx:id="proceedGrid" GridPane.rowIndex="6">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Button fx:id="btnCreateNewFields" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Создать новые поля" AnchorPane.bottomAnchor="20.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </Button>
+                  <Button fx:id="btnLoadFields" mnemonicParsing="false" onAction="#handleOpenSavedFieldsScreen" text="Загрузить поля" />
+               </children>
+            </GridPane>
          </children>
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

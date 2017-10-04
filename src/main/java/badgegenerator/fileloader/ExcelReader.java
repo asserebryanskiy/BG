@@ -5,12 +5,14 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ExcelReader {
+    private final String srcPath;
     private boolean hasHeadings;
     private int numberOfColumns;
     private List<String> headings;
@@ -18,10 +20,13 @@ public class ExcelReader {
     private String[] longestWords;
     private String[][] values;
 
-    public ExcelReader(String src, boolean hasHeadings) throws IOException{
+    public ExcelReader(String srcPath, boolean hasHeadings) {
+        this.srcPath = srcPath;
         this.hasHeadings = hasHeadings;
+    }
 
-        XSSFWorkbook excelFile = new XSSFWorkbook(new FileInputStream(src));
+    public void processFile() throws IOException {
+        XSSFWorkbook excelFile = new XSSFWorkbook(new FileInputStream(srcPath));
         XSSFSheet sheet = excelFile.getSheetAt(0);
         // Missing cells will be replaced with ""
         int numberOfRows = sheet.getPhysicalNumberOfRows();
@@ -52,7 +57,6 @@ public class ExcelReader {
         if(hasHeadings) {
             Arrays.fill(values[0], "");
         }
-
     }
 
     private void getHeadingsFromTable(XSSFSheet sheet) {

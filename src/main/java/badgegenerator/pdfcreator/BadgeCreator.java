@@ -1,27 +1,22 @@
-package badgegenerator.pdfeditor;
+package badgegenerator.pdfcreator;
 
-import com.itextpdf.io.font.PdfEncodings;
-import com.itextpdf.kernel.color.DeviceRgb;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
+import badgegenerator.custompanes.FieldWithHyphenation;
+import badgegenerator.custompanes.FxField;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.sun.javafx.tk.FontMetrics;
-import com.sun.javafx.tk.Toolkit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 public class BadgeCreator {
 
-    private final List<Field> fields;
+    private final List<FxField> fxFields;
     private float ratio;
     private String[][] participants;
 
@@ -34,13 +29,13 @@ public class BadgeCreator {
     private int numberOfLines;
     private boolean compressFieldIfLineMissing;
 
-    public BadgeCreator(List<Field> fields,
+    public BadgeCreator(List<FxField> fxFields,
                         String srcPdfPath,
                         String[][] participants,
                         double imageToPdfRatio,
                         boolean compressFieldIfLineMissing) throws IOException {
         // in memory test
-        this.fields = fields;
+        this.fxFields = fxFields;
         srcPdf = new PdfDocument(new PdfReader(srcPdfPath));
         PdfPage srcPage = srcPdf.getFirstPage();
         pageSize = srcPage.getPageSize();
@@ -62,57 +57,36 @@ public class BadgeCreator {
         String[] participantRow = participants[i];
         int sumOfMissingLines = 0;
         for (int j = 0; j < participantRow.length; j++) {
-            Field field = fields.get(j);
-            String value = participantRow[field.getNumberOfColumn()];
-
-            PdfFont font;
-            if(field.getFontPath() == null) {
-                InputStream fontInputStream = getClass()
-                        .getResourceAsStream("/fonts/Helvetica.otf");
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[2048];
-                int a;
-                while((a = fontInputStream.read(buffer, 0, buffer.length)) != -1) {
-                    baos.write(buffer, 0, a);
-                }
-                baos.flush();
-                font = PdfFontFactory.createFont(baos.toByteArray(),
-                        PdfEncodings.IDENTITY_H, true);
-            } else {
-                font = PdfFontFactory.createFont(field.getFontPath(),
-                        PdfEncodings.IDENTITY_H, true);
-            }
-
-            String alignment = field.getTextFlow().getTextAlignment().name();
-            float fontSize = (float) ((field.getFont().getSize()) / ratio);
-            float yCoordinate = transform(field.getLayoutY() / ratio)
-                    - getFontMetrics(field).getMaxAscent() / ratio;
+            FxField fxField = fxFields.get(j);
+            FxToPdfFieldAdapter adapter = new FxToPdfFieldAdapter(fxFields.get(j),
+                    ratio, pageSize.getHeight());
+            String value = participantRow[fxFields.get(j).getNumberOfColumn()];
+            String alignment = adapter.getAlignment();
+            float yCoordinate = adapter.getY();
             if(compressFieldIfLineMissing && sumOfMissingLines > 0) {
                 yCoordinate += sumOfMissingLines;
             }
 
             pdfCanvas.beginText()
-                    .setFontAndSize(font, fontSize)
-                    .setColor(new DeviceRgb(field.getRed(),
-                            field.getGreen(),
-                            field.getBlue()), true)
-                    .setLeading(getFontMetrics(field).getMaxAscent() / ratio
-                            + getFontMetrics(field).getMaxDescent() / ratio)
-                    .moveText(field.getLayoutX() / ratio, yCoordinate);
+                    .setFontAndSize(adapter.getFont(), adapter.getFontSize())
+                    .setColor(adapter.getPdfColor(), true)
+                    .setLeading(adapter.getLeading())
+                    .moveText(adapter.getX(), yCoordinate);
 
             numberOfLines = 0;
             sumOfShifts = 0;
-            float maxWidth = (float) (field.getPrefWidth() / ratio);
-            if(field.mayHasHyphenation) {
+            float maxWidth = (float) (fxField.getPrefWidth() / ratio);
+            // ToDo: create HyphenationComputer interface to combine javaFX and Pdf realization.
+            if(fxField instanceof FieldWithHyphenation) {
                 String[] words = value.split("\\s");
                 StringBuilder line = new StringBuilder();
                 line.append(words[0]);
-                float spaceWidth = (float) field.computeStringWidth(" ") / ratio;
+                float spaceWidth = (float) fxField.computeStringWidth(" ") / ratio;
                 float lineWidth;
                 for (int index = 1; index < words.length; index++) {
                     String word = words[index];
-                    float wordWidth = (float) field.computeStringWidth(word) / ratio;
-                    lineWidth = (float) field.computeStringWidth(line.toString()) / ratio;
+                    float wordWidth = (float) fxField.computeStringWidth(word) / ratio;
+                    lineWidth = (float) fxField.computeStringWidth(line.toString()) / ratio;
                     if (lineWidth + spaceWidth + wordWidth <= maxWidth) {
                         line.append(" ").append(word);
                     } else {
@@ -122,19 +96,18 @@ public class BadgeCreator {
                     }
                 }
                 if(line.length() != 0) {
-                    lineWidth = (float) field.computeStringWidth(line.toString()) / ratio;
+                    lineWidth = (float) fxField.computeStringWidth(line.toString()) / ratio;
                     showTextAligned(alignment, pdfCanvas, line.toString(), lineWidth, maxWidth);
                 }
             } else {
-                float lineWidth = (float) field.computeStringWidth(value) / ratio;
+                float lineWidth = (float) fxField.computeStringWidth(value) / ratio;
                 showTextAligned(alignment, pdfCanvas, value, lineWidth, maxWidth);
             }
 
             pdfCanvas.endText();
             if(compressFieldIfLineMissing) {
-                sumOfMissingLines += (field.getNumberOfLines() - numberOfLines)
-                        * ((getFontMetrics(field).getMaxAscent()
-                        + getFontMetrics(field).getMaxDescent()) / ratio);
+                sumOfMissingLines += (adapter.getNumberOfLines() - numberOfLines)
+                        * adapter.getLeading();
             }
         }
 
@@ -142,6 +115,7 @@ public class BadgeCreator {
         PdfDocument temp = new PdfDocument(new PdfReader(
                 new ByteArrayInputStream(out.toByteArray())));
         temp.copyPagesTo(1,1,commonPdf);
+        temp.close();
         numberOfLines = 0;
         return out.toByteArray();
     }
@@ -177,19 +151,6 @@ public class BadgeCreator {
                 numberOfLines++;
                 break;
         }
-    }
-
-
-    private FontMetrics getFontMetrics(Field field) {
-        return Toolkit.getToolkit().getFontLoader().getFontMetrics(field.getFont());
-    }
-
-    /**
-     * Is used to transform javaFx field coordinates (which originate from upper-left corner)
-     * to pdf coordinates (which originate from lower-left corner).
-     * */
-    private float transform(double coordinate) {
-        return (float) (pageSize.getHeight() - coordinate);
     }
 
     /**

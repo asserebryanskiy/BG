@@ -1,37 +1,38 @@
 package badgegenerator.pdfeditor;
 
-import badgegenerator.ModelSingleton;
+import badgegenerator.custompanes.FxField;
+import badgegenerator.fileloader.ExcelReader;
+import badgegenerator.fxfieldssaver.FxFieldsSaverController;
+import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.IntStream;
 
 
-public class PdfEditorController implements Initializable {
+public class PdfEditorController {
 
     @FXML
     private GridPane pdfRedactorRoot;
@@ -41,6 +42,12 @@ public class PdfEditorController implements Initializable {
 
     @FXML
     private StackPane editingArea;
+
+    @FXML
+    private Pane verticalScaleBar;
+
+    @FXML
+    private Pane horizontalScaleBar;
 
     @FXML
     private TextField fontNameField;
@@ -66,78 +73,122 @@ public class PdfEditorController implements Initializable {
     @FXML
     private Label progressStatusLabel;
 
+    @FXML
+    private Rectangle horizontalScaleBack;
+
+    @FXML
+    private Rectangle verticalScaleBack;
+
     @FXML private Button leftAlignmentButton;
     @FXML private Button centerAlignmentButton;
     @FXML private Button rightAlignmentButton;
 
-    private static final List<Field> fields = new ArrayList<>();
+    private List<FxField> fxFields;
     private Font font;
-    private static Line verticalGuide;
 
     private double imageToPdfRatio;
     private Task createBadgesArchiveTask;
     private static FileChooser fileChooser = new FileChooser();
     private boolean compressFieldIfLineMissing = true;
+    private String pdfPath;
+    private ExcelReader excelReader;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // displays the png instance of loaded pdf document
-        //ToDo: add Back button to return to loading documents page
-        boolean firstLaunch = ModelSingleton.getInstance().getPdfEditorFirstLaunch();
-        if(firstLaunch) {
-            ModelSingleton.getInstance().setPdfEditorFirstLaunch(false);
-            try {
-                ModelSingleton.getInstance().createImageFromPdf();
-            } catch (IOException e) {
+
+    /*private void addFields(List<FxFieldSave> fieldFiles) {
+        // chooses largest strings from list of all fxFields for every field
+        String[] fieldsValues = excelReader.getLargestFields();
+        String[] longestWords = excelReader.getLongestWords();
+
+        final double yCoordinate = editingArea.getBoundsInLocal().getHeight() / 2
+                - (fieldsValues.length * 20 / 2);
+
+        IntStream.range(0, fieldsValues.length).forEach(i -> {
+            FxField fxField;
+            if(fieldFiles != null) {
+                fieldFiles.get(i);
+                fxField = new FxField(fieldsValues[i],
+                        longestWords[i],
+                        i,
+                        editingArea.getBoundsInLocal().getWidth() - 48,
+                        imageToPdfRatio);
+            } else {
+                fxField = new FxField(fieldsValues[i],
+                        longestWords[i],
+                        i,
+                        editingArea.getBoundsInLocal().getWidth() - 48,
+                        imageToPdfRatio);
+
+                fxField.getTextFlow().setTextAlignment(TextAlignment.CENTER);
+                fxField.setLayoutX(editingArea.getBoundsInLocal().getWidth() / 2
+                        - fxField.getPrefWidth() / 2);
+                fxField.setLayoutY(yCoordinate + i * 20);
+            }
+
+            fxField.setManaged(false);
+            editingArea.getChildren().add(fxField);
+            fxFields.add(fxField);
+            fxField.setFontNameField(fontNameField);
+            fxField.setFontSizeField(fontSizeField);
+            fxField.setFontColorPicker(fontColorPicker);
+
+            *//*try {
+                fxField.addGuide(new Guide(fxField, Position.LEFT));
+                fxField.addGuide(new Guide(fxField, Position.RIGHT));
+            } catch (NoParentFoundException | NoIdFoundException e) {
                 e.printStackTrace();
             }
+            if(fxField.mayHasHyphenation) {
+                ResizeableBorder leftBorder =
+                        new ResizeableBorder(fxField, Position.LEFT);
+                ResizeableBorder rightBorder =
+                        new ResizeableBorder(fxField, Position.RIGHT);
+                editingArea.getChildren().addAll(leftBorder, rightBorder);
+                leftBorder.setManaged(false);
+                rightBorder.setManaged(false);
+            }*//*
+        });
+    }*/
+
+    public void init() {
+        init(null);
+    }
+
+    public void init(String savesPath) {
+        AbstractFieldsLayouter layouter;
+        if(savesPath != null) {
+            layouter = new SavedFieldsLayouter(editingArea,
+                    verticalScaleBar,
+                    horizontalScaleBar,
+                    excelReader.getLargestFields(),
+                    excelReader.getLongestWords(),
+                    imageToPdfRatio,
+                    savesPath);
+        } else {
+            layouter = new NewFieldsLayouter(editingArea,
+                    verticalScaleBar,
+                    horizontalScaleBar,
+                    excelReader.getLargestFields(),
+                    excelReader.getLongestWords(),
+                    imageToPdfRatio);
         }
-        Image image = new Image(
-                new ByteArrayInputStream(ModelSingleton.getInstance().getPdfImageByteArray()));
-
-        pdfPreview.setImage(image);
-        pdfPreview.setPreserveRatio(true);
-
-        imageToPdfRatio = ModelSingleton.getInstance()
-                .calculatePdfToImageRatio(pdfPreview.getFitHeight());
-
-        // fix the height of pdf editing area
-        editingArea.setMaxHeight(pdfPreview.getFitHeight());
-
-
-        if(firstLaunch) {
-            // places largest fields on the pdf-document image
-            addFields();
-            // adds fieldGuides on the screen to help in fields manipulations
-            addVerticalGuides();
-        }
-        else {
-//            fontPath = ModelSingleton.getInstance().getFontPath();
-            editingArea.getChildren().addAll(fields);
-            editingArea.getChildren().addAll(Field.getGuides());
-            editingArea.getChildren().add(verticalGuide);
-            fields.stream()
-                    .filter(field -> field.mayHasHyphenation)
-                    .forEach(field -> editingArea.getChildren()
-                            .addAll(field.getResizeableBorders()));
-        }
+        layouter.positionFields();
+        layouter.addScaleMarks(verticalScaleBack, horizontalScaleBack);
+        fxFields = layouter.getFxFields();
+        fxFields.forEach(fxField -> {
+            fxField.setFontNameField(fontNameField);
+            fxField.setFontSizeField(fontSizeField);
+            fxField.setFontColorPicker(fontColorPicker);
+        });
         // adds possibility to remove selection
         pdfRedactorRoot.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (fields.stream()
+            if (fxFields.stream()
                     .anyMatch(field -> event.getSceneX() >= field.getMouseX()
                             && event.getSceneX() <= field.getMouseX() + field.getPrefWidth()
                             && event.getSceneY() <= field.getMouseY()
-                            && event.getSceneY() >= field.getMouseY() - field.getHeight())) {
+                            && event.getSceneY() >= field.getMouseY() - field.getMaxHeight())) {
                 return;
             }
-            fields.forEach(f -> f.setSelected(false));
-        });
-
-        // binds fields to fields' values
-        fields.forEach(field -> {
-            field.setFontNameField(fontNameField);
-            field.setFontSizeField(fontSizeField);
-            field.setFontColorPicker(fontColorPicker);
+            fxFields.forEach(f -> f.setSelected(false));
         });
 
         // sets default values
@@ -154,72 +205,31 @@ public class PdfEditorController implements Initializable {
                 + pdfRedactorRoot.getPadding().getLeft() * 2);
         progressIndicatorBackground.setHeight(pdfRedactorRoot.getBoundsInParent().getHeight()
                 + pdfRedactorRoot.getPadding().getTop() * 2);
-        font = fields.get(0).getFont();
+        font = fxFields.get(0).getFont();
         fontSizeField.setText(String.format("%d",
-                (int) (fields.get(0).getFont().getSize() / imageToPdfRatio)));
-        fontNameField.setText(fields.get(0).getFont().getName());
+                (int) (fxFields.get(0).getFont().getSize() / imageToPdfRatio)));
+        fontNameField.setText(fxFields.get(0).getFont().getName());
     }
 
-    private void addFields() {
-        // chooses largest strings from list of all fields for every field
-        String[] fieldsValues = ModelSingleton.getInstance()
-                .getExcelReader().getLargestFields();
-        String[] longestWords = ModelSingleton.getInstance()
-                .getExcelReader().getLongestWords();
-
-        final double yCoordinate = editingArea.getBoundsInLocal().getHeight() / 2
-                - (fieldsValues.length * 20 / 2);
-
-        IntStream.range(0, fieldsValues.length).forEach(i -> {
-            Field field = new Field(fieldsValues[i],
-                    longestWords[i],
-                    i,
-                    editingArea.getBoundsInLocal().getWidth() - 48,
-                    imageToPdfRatio);
-
-            field.getTextFlow().setTextAlignment(TextAlignment.CENTER);
-            field.setLayoutX(editingArea.getBoundsInLocal().getWidth() / 2
-                    - field.getPrefWidth() / 2);
-            field.setLayoutY(yCoordinate + i * 20);
-
-            field.setManaged(false);
-            editingArea.getChildren().add(field);
-            fields.add(field);
-
-            try {
-                field.addGuide(new Guide(field, Position.LEFT));
-                field.addGuide(new Guide(field, Position.RIGHT));
-            } catch (NoParentFoundException | NoIdFoundException e) {
-                e.printStackTrace();
-            }
-            if(field.mayHasHyphenation) {
-                ResizeableBorder leftBorder =
-                        new ResizeableBorder(field, Position.LEFT);
-                ResizeableBorder rightBorder =
-                        new ResizeableBorder(field, Position.RIGHT);
-                editingArea.getChildren().addAll(leftBorder, rightBorder);
-                leftBorder.setManaged(false);
-                rightBorder.setManaged(false);
-            }
-        });
-    }
-
-    private void addVerticalGuides() {
+    /**
+     * Vertical guides are used to facilitate the process of field alignment.
+     * */
+    /*private void addVerticalGuides() {
         double endY = editingArea.getBoundsInLocal().getHeight() - 1;
-        Field.getGuides().forEach(guide -> {
+        FxField.getGuides().forEach(guide -> {
             editingArea.getChildren().add(guide);
             guide.setManaged(false);
             guide.setVisible(false);
         });
 
-        verticalGuide = new Line(editingArea.getBoundsInLocal().getWidth() / 2,
+        Line verticalGuide = new Line(editingArea.getBoundsInLocal().getWidth() / 2,
                 0,
                 editingArea.getBoundsInLocal().getWidth() / 2,
                 endY);
         verticalGuide.setVisible(false);
         editingArea.getChildren().add(verticalGuide);
-        Field.setVerticalGuide(verticalGuide);
-    }
+        FxField.setVerticalGuide(verticalGuide);
+    }*/
 
     public void handleBrowseFont() throws InterruptedException, IOException {
         fileChooser.getExtensionFilters().addAll(
@@ -235,10 +245,10 @@ public class PdfEditorController implements Initializable {
             Font newFont = Font.loadFont(fontInputStream,
                     Double.valueOf(fontSizeField.getText()) * imageToPdfRatio);
             fontNameField.setText(font.getName());
-            fields.stream()
+            fxFields.stream()
                     .filter(field -> field.isSelected)
                     .forEach(field -> {
-                        setFontAligned(field, newFont, field.getFontSize());
+                        field.setFont(newFont);
                         field.setFontPath(selectedFile.getAbsolutePath());
                     });
         } else {
@@ -247,37 +257,34 @@ public class PdfEditorController implements Initializable {
     }
 
     public void handleChangeFieldFontSize() {
-        double newFontSize;
-        try {
-            newFontSize = Double.valueOf(fontSizeField.getText()) * imageToPdfRatio;
-        } catch (RuntimeException re) {
-            return;
-        }
-        fields.stream()
+        double newFontSize = Double.valueOf(fontSizeField.getText()) * imageToPdfRatio;
+        fxFields.stream()
                 .filter(field -> field.isSelected)
-                .forEach(field -> setFontAligned(field, field.getFont(), newFontSize));
+                .forEach(field -> field.setFontSize(newFontSize));
     }
 
-    private void setFontAligned(Field field, Font newFont, double fontSize) {
-        double x = field.getLayoutX();
-        double oldWidth = field.getPrefWidth();
-        Paint color = field.getLines().get(0).getFill();
-        field.setFieldFont(newFont, fontSize);
-        field.getLines().forEach(line -> line.setFill(color));
-        switch (field.getTextFlow().getTextAlignment().name()) {
+    /**
+     * Method aids in aligning fxFields and preserving their initial color.
+     * */
+    /*private void setFontAligned(FxField fxField, Font newFont, double fontSize) {
+        double x = fxField.getLayoutX();
+        double oldWidth = fxField.getPrefWidth();
+        Paint color = fxField.getLines().get(0).getFill();
+        fxField.setFieldFont(newFont, fontSize);
+        fxField.getLines().forEach(line -> line.setFill(color));
+        switch (fxField.getTextFlow().getTextAlignment().name()) {
             case("RIGHT"):
-                field.setLayoutX(x + oldWidth - field.getPrefWidth());
+                fxField.setLayoutX(x + oldWidth - fxField.getPrefWidth());
                 break;
             case("CENTER"):
-                field.setLayoutX(x + oldWidth / 2 - field.getPrefWidth() / 2);
+                fxField.setLayoutX(x + oldWidth / 2 - fxField.getPrefWidth() / 2);
         }
-    }
+    }*/
 
     public void handleChangeFontColor() {
-        fields.stream()
+        fxFields.stream()
                 .filter(field -> field.isSelected)
-                .forEach(field -> field.getLines().forEach(line ->
-                        line.setFill(fontColorPicker.getValue())));
+                .forEach(field -> field.setFill(fontColorPicker.getValue()));
     }
 
     public void handleSaveBadges(MouseEvent event) throws IOException, InterruptedException {
@@ -286,8 +293,10 @@ public class PdfEditorController implements Initializable {
 
         if(selectedDirectory != null) {
             showProgressScreen(true);
-            createBadgesArchiveTask = new CreateBadgeArchiveTask(fields,
+            createBadgesArchiveTask = new CreateBadgeArchiveTask(fxFields,
                     imageToPdfRatio,
+                    excelReader,
+                    pdfPath,
                     selectedDirectory.getAbsolutePath() + ".zip",
                     compressFieldIfLineMissing);
             createBadgesArchiveTask.setOnSucceeded(event1 -> {
@@ -328,10 +337,9 @@ public class PdfEditorController implements Initializable {
             alignment = "CENTER";
         } else alignment = "RIGHT";
 
-        fields.stream()
+        fxFields.stream()
                 .filter(field -> field.isSelected)
-                .forEach(field -> field.getTextFlow()
-                        .setTextAlignment(TextAlignment.valueOf(alignment)));
+                .forEach(field -> field.setAlignment(alignment));
     }
 
     public void handleSetCompressFieldsTrue(ActionEvent event) {
@@ -340,5 +348,38 @@ public class PdfEditorController implements Initializable {
 
     public void handleSetCompressFieldsFalse(ActionEvent event) {
         compressFieldIfLineMissing = false;
+    }
+
+    public void setPdfPreview(byte[] imageFromPdf, double height) {
+        pdfPreview.setImage(new Image(new ByteArrayInputStream(imageFromPdf)));
+        pdfPreview.setFitHeight(height);
+        pdfPreview.setPreserveRatio(true);
+        editingArea.setMaxHeight(pdfPreview.getFitHeight());
+    }
+
+    public void setImageToPdfRatio(double imageToPdfRatio) {
+        this.imageToPdfRatio = imageToPdfRatio;
+    }
+
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
+    }
+
+    public void setExcelReader(ExcelReader excelReader) {
+        this.excelReader = excelReader;
+    }
+
+    public void handleSaveFields(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass()
+                .getResource("/fxml/FxFieldsSaver.fxml"));
+        Parent root = loader.load();
+        FxFieldsSaverController controller = loader.getController();
+        Stage saveFieldsWindow = new Stage();
+        controller.init(fxFields, saveFieldsWindow);
+        saveFieldsWindow.setScene(new Scene(root));
+        saveFieldsWindow.setTitle("Сохранить поля");
+        saveFieldsWindow.initModality(Modality.APPLICATION_MODAL);
+        saveFieldsWindow.toFront();
+        saveFieldsWindow.show();
     }
 }

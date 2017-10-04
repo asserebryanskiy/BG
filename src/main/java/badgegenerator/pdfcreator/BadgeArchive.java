@@ -1,4 +1,4 @@
-package badgegenerator.pdfeditor;
+package badgegenerator.pdfcreator;
 
 import java.io.*;
 import java.util.zip.ZipEntry;
@@ -7,14 +7,13 @@ import java.util.zip.ZipOutputStream;
 /**
  * Class is used to create archive of badges
  */
-public class BadgeArchive {
+class BadgeArchive {
     private final int BUFFER = 2048;
     private final ZipOutputStream out;
     private final byte[] data;
     private final BadgeCreator badgeCreator;
 
-    // ToDo: create test, that checks font in created document
-    public BadgeArchive(String archivePath, BadgeCreator badgeCreator) throws FileNotFoundException {
+    BadgeArchive(String archivePath, BadgeCreator badgeCreator) throws FileNotFoundException {
         FileOutputStream dest = new FileOutputStream(archivePath);
         out = new ZipOutputStream(new
                 BufferedOutputStream(dest));
@@ -23,7 +22,7 @@ public class BadgeArchive {
         this.badgeCreator = badgeCreator;
     }
 
-    public void createBadgeEntry(int i) throws IOException {
+    void createBadgeEntry(int i) throws IOException {
         BufferedInputStream origin;
         String fileName = "badge_" + i + ".pdf";
         ByteArrayInputStream bais = new
@@ -40,7 +39,7 @@ public class BadgeArchive {
         origin.close();
     }
 
-    public void createCommonBadge() throws IOException {
+    void createCommonBadge() throws IOException {
         BufferedInputStream origin;
         String fileName = "allInOne" + ".pdf";
         ByteArrayInputStream bais = new
@@ -57,7 +56,7 @@ public class BadgeArchive {
         origin.close();
     }
 
-    public ZipOutputStream getOutputStream() {
+    ZipOutputStream getOutputStream() {
         return out;
     }
 }
