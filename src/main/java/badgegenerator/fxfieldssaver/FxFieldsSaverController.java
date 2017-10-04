@@ -2,6 +2,7 @@ package badgegenerator.fxfieldssaver;
 
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.SavesLoader;
+import com.sun.javafx.tk.Toolkit;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -69,8 +70,9 @@ public class FxFieldsSaverController {
             savesBox.getChildren().forEach(n -> n.setEffect(null));
             node.setEffect(shadow);
         }));
-        final double longestBtnWidth = btnBox.getChildren().get(0)
-                .getBoundsInLocal().getWidth();
+        final double longestBtnWidth = Toolkit.getToolkit().getFontLoader()
+                .computeStringWidth(((Button) btnBox.getChildren().get(0)).getText(),
+                        ((Button) btnBox.getChildren().get(0)).getFont());
         btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
     }
 

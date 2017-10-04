@@ -13,7 +13,7 @@
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="130.0" prefWidth="294.0">
          <children>
             <ListView fx:id="savedFields" fixedCellSize="25.0" prefHeight="240.0" prefWidth="200.0" />
-            <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+            <VBox alignment="TOP_CENTER" spacing="5.0">
                <children>
                   <Button fx:id="loadFieldBtn" mnemonicParsing="false" onAction="#handleLoadField" prefWidth="90.0" text="Загрузить" />
                   <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые" textAlignment="CENTER" />
