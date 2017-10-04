@@ -1,13 +1,10 @@
-package badgegenerator.pdfeditor;
+package badgegenerator.custompanes;
 
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
-
-import java.util.ArrayList;
-import java.util.function.Predicate;
 
 /**
  * Borders, that could be added to the field with possible hyphenation. \
@@ -19,14 +16,15 @@ public class ResizeableBorder extends StackPane{
     private double deltaX;
 
     // Pane structure
-    public ResizeableBorder(Field field,
+    public ResizeableBorder(FieldWithHyphenation fxField,
                             Position value) {
         super();
+        setManaged(false);
         setAlignment(Pos.TOP_LEFT);
-        Rectangle base = new Rectangle(24, field.getPrefHeight());
-        layoutYProperty().bind(field.layoutYProperty());
-        maxHeightProperty().bind(field.prefHeightProperty());
-        base.heightProperty().bind(field.prefHeightProperty());
+        Rectangle base = new Rectangle(24, fxField.getMaxHeight());
+        layoutYProperty().bind(fxField.layoutYProperty());
+        maxHeightProperty().bind(fxField.maxHeightProperty());
+        base.heightProperty().bind(fxField.maxHeightProperty());
         setMaxWidth(base.getWidth());
 
         resizeSvg = new SVGPath();
@@ -36,17 +34,17 @@ public class ResizeableBorder extends StackPane{
         resizeSvg.setLayoutY(getHeight() / 2 - resizeSvg.getBoundsInLocal().getHeight() / 2);
 
         // mouse hover effects
-        field.setOnMouseEntered(event -> field.getResizeableBorders().stream()
+        fxField.setOnMouseEntered(event -> fxField.getResizeableBorders().stream()
                 .map(ResizeableBorder::getResizeSvg)
                 .forEach(svg -> {
                     svg.setVisible(true);
                 }));
-        field.setOnMouseExited(event -> field.getResizeableBorders().stream()
+        fxField.setOnMouseExited(event -> fxField.getResizeableBorders().stream()
                 .map(ResizeableBorder::getResizeSvg)
                 .forEach(svg -> svg.setVisible(false)));
         setOnMouseEntered(event -> resizeSvg.setVisible(true));
         setOnMouseExited(event -> resizeSvg.setVisible(false));
-        resizeSvg.setId(String.format("%sResizeSvg%s", field.getId(), value.name()));
+        resizeSvg.setId(String.format("%sResizeSvg%s", fxField.getId(), value.name()));
 
         setOnMousePressed(event -> {
             borderX = getLayoutX() + getPrefWidth() / 2;
@@ -55,36 +53,35 @@ public class ResizeableBorder extends StackPane{
 
         // dragging property
         if(value.name().equals("RIGHT")) {
-            layoutXProperty().bind(field.layoutXProperty().add(field.prefWidthProperty()));
+            layoutXProperty().bind(fxField.layoutXProperty().add(fxField.prefWidthProperty()));
             setOnMouseDragged(event -> {
                 resizeSvg.setVisible(true);
                 final double newX = event.getSceneX() + deltaX - getMaxWidth() / 2;
-                if(newX < field.getLayoutX() + field.getMinWidth()
+                if(newX < fxField.getLayoutX() + fxField.getMinWidth()
                         || newX >= getParent().getBoundsInLocal().getWidth()
-                        || (field.getNumberOfLines() == 1
-                        && newX > field.getLayoutX() + field.getPrefWidth())) return;
+                        || (fxField.getNumberOfLines() == 1
+                        && newX > fxField.getLayoutX() + fxField.getPrefWidth())) return;
 
-                field.setPrefWidth(newX - field.getLayoutX());
-                field.computeHyphenation();
-                field.setTextFlowAligned();
+                fxField.setPrefWidth(newX - fxField.getLayoutX());
+                fxField.computeHyphenation();
+                fxField.setTextFlowAligned(fxField.getAlignment());
                 borderX = getLayoutX() + getPrefWidth() / 2;
-//                deltaX = borderX - event.getSceneX();
             });
         } else { // LEFT
-            layoutXProperty().bind(field.layoutXProperty().subtract(base.getWidth()));
+            layoutXProperty().bind(fxField.layoutXProperty().subtract(base.getWidth()));
             setOnMouseDragged(event -> {
                 resizeSvg.setVisible(true);
                 final double newX = event.getSceneX() + deltaX - getPrefWidth() / 2;
                 if(newX <= 0
-                        || newX > field.getLayoutX() + field.getPrefWidth() - field.getMinWidth()
-                        || (field.getNumberOfLines() == 1 && newX < field.getLayoutX())) {
+                        || newX > fxField.getLayoutX() + fxField.getPrefWidth() - fxField.getMinWidth()
+                        || (fxField.getNumberOfLines() == 1 && newX < fxField.getLayoutX())) {
                     return;
                 }
-                double oldWidth = field.getPrefWidth();
-                field.setPrefWidth(field.getLayoutX() + field.getPrefWidth() - newX);
-                field.computeHyphenation();
-                field.setLayoutX(field.getLayoutX() + oldWidth - field.getPrefWidth());
-                field.setTextFlowAligned();
+                double oldWidth = fxField.getPrefWidth();
+                fxField.setPrefWidth(fxField.getLayoutX() + oldWidth - newX);
+                fxField.computeHyphenation();
+                fxField.setLayoutX(fxField.getLayoutX() + oldWidth - fxField.getPrefWidth());
+                fxField.setTextFlowAligned(fxField.getAlignment());
                 borderX = getLayoutX() + getPrefWidth() / 2;
             });
         }
@@ -92,8 +89,6 @@ public class ResizeableBorder extends StackPane{
         base.setOpacity(0);
 
         getChildren().addAll(base, resizeSvg);
-
-        field.addResizeableBorder(this);
     }
 
 

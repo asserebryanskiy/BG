@@ -1,4 +1,4 @@
-package badgegenerator.pdfeditor;
+package badgegenerator.custompanes;
 
 /**
  * Is thrown, if a node doesn't have an ID.

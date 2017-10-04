@@ -1,4 +1,4 @@
-package badgegenerator.pdfeditor;
+package badgegenerator.custompanes;
 
 /**
  * Is thrown, if node doesn't have parent.
