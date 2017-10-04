@@ -17,14 +17,14 @@
                   <TextField />
                </children>
             </VBox>
-            <VBox fx:id="btnBox" alignment="TOP_CENTER" prefWidth="100.0" spacing="5.0">
+            <VBox alignment="TOP_CENTER" spacing="5.0">
                <children>
                   <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#handleSaveBtn" prefWidth="90.0" text="Сохранить" />
                   <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#handleDeleteSave" prefWidth="90.0" text="Удалить" textAlignment="CENTER" />
                   <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#handleCancel" prefWidth="90.0" text="Отмена" textAlignment="CENTER" />
                </children>
                <padding>
-                  <Insets top="20.0" />
+                  <Insets left="5.0" right="5.0" top="20.0" />
                </padding>
             </VBox>
          </children>

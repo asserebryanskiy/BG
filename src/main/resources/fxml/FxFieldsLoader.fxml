@@ -19,7 +19,7 @@
                   <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые" textAlignment="CENTER" />
                </children>
                <padding>
-                  <Insets top="20.0" />
+                  <Insets left="5.0" right="5.0" top="20.0" />
                </padding>
             </VBox>
          </children>
