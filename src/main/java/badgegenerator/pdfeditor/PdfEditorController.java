@@ -4,6 +4,7 @@ import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fxfieldssaver.FxFieldsSaverController;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
+import com.sun.javafx.tk.Toolkit;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,6 +34,9 @@ import java.util.List;
 
 
 public class PdfEditorController {
+
+    @FXML
+    private Button btnBrowseFont;
 
     @FXML
     private GridPane pdfRedactorRoot;
@@ -145,10 +149,8 @@ public class PdfEditorController {
         leftAlignmentButton.setGraphic(leftAlignmentSvg);
         centerAlignmentButton.setGraphic(centerAlignmentSvg);
         rightAlignmentButton.setGraphic(rightAlignmentSvg);
-        progressIndicatorBackground.setWidth(pdfRedactorRoot.getBoundsInParent().getWidth()
-                + pdfRedactorRoot.getPadding().getLeft() * 2);
-        progressIndicatorBackground.setHeight(pdfRedactorRoot.getBoundsInParent().getHeight()
-                + pdfRedactorRoot.getPadding().getTop() * 2);
+        btnBrowseFont.setPrefWidth(Toolkit.getToolkit().getFontLoader()
+                .computeStringWidth(btnBrowseFont.getText(), btnBrowseFont.getFont()) + 40);
         font = fxFields.get(0).getFont();
         fontSizeField.setText(String.format("%d",
                 (int) (fxFields.get(0).getFont().getSize() / imageToPdfRatio)));
