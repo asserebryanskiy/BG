@@ -220,11 +220,13 @@ public class PdfEditorController {
         }
     }
 
-    private void showProgressScreen(boolean show) {
-        progressIndicatorBox.setVisible(show);
-        progressIndicatorBackground.setVisible(show);
-        progressIndicator.setVisible(show);
-        cancelButton.setVisible(show);
+    private void showProgressScreen(boolean value) {
+        progressIndicatorBackground.setWidth(pdfRedactorRoot.getScene().getWidth());
+        progressIndicatorBackground.setHeight(pdfRedactorRoot.getScene().getHeight());
+        progressIndicatorBox.setVisible(value);
+        progressIndicatorBackground.setVisible(value);
+        progressIndicator.setVisible(value);
+        cancelButton.setVisible(value);
     }
 
     public void handleCancelBadgeCreation() {

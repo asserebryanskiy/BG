@@ -50,8 +50,6 @@ public class FxFieldsLoaderController implements Initializable{
                 .computeStringWidth(((Button) btnBox.getChildren().get(0)).getText(),
                         ((Button) btnBox.getChildren().get(0)).getFont()) + 40;
         btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
-        loaderBackground.setWidth(root.getBoundsInLocal().getWidth());
-        loaderBackground.setHeight(root.getBoundsInLocal().getHeight());
     }
 
     public void setSavedFieldsNames(List<String> savedFieldsNames) {
@@ -108,6 +106,8 @@ public class FxFieldsLoaderController implements Initializable{
     }
 
     private void showProgressScreen(boolean value) {
+        loaderBackground.setWidth(root.getScene().getWidth());
+        loaderBackground.setHeight(root.getScene().getHeight());
         loaderBackground.setVisible(value);
         progressBar.setVisible(value);
     }

@@ -67,8 +67,6 @@ public class FileLoaderController implements Initializable{
         buttons.add(btnLoadFields);
         buttons.forEach(btn -> btn.setMinWidth(
                 Main.computeStringWidth(btn.getText(), btn.getFont())));
-        progressIndicatorBackground.setWidth(root.getBoundsInLocal().getWidth());
-        progressIndicatorBackground.setHeight(root.getBoundsInLocal().getHeight());
     }
 
     public void handleBrowseXlsx(MouseEvent event) {
@@ -224,6 +222,8 @@ public class FileLoaderController implements Initializable{
     }
 
     private void showProgressScreen(boolean value) {
+        progressIndicatorBackground.setWidth(root.getScene().getWidth());
+        progressIndicatorBackground.setHeight(root.getScene().getHeight());
         progressIndicator.setVisible(value);
         progressIndicatorBackground.setVisible(value);
     }
