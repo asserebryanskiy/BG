@@ -4,6 +4,7 @@ import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.SavesLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.VBox;
@@ -23,6 +24,8 @@ public class FxFieldsSaverController {
 
     @FXML
     private VBox savesBox;
+    @FXML
+    private VBox btnBox;
 
     private File srcDirectory;
     private List<FxField> fields;
@@ -66,6 +69,9 @@ public class FxFieldsSaverController {
             savesBox.getChildren().forEach(n -> n.setEffect(null));
             node.setEffect(shadow);
         }));
+        final double longestBtnWidth = btnBox.getChildren().get(0)
+                .getBoundsInLocal().getWidth();
+        btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
     }
 
     public void handleSaveBtn() {
