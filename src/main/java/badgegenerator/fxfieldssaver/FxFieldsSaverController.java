@@ -72,7 +72,7 @@ public class FxFieldsSaverController {
         }));
         final double longestBtnWidth = Toolkit.getToolkit().getFontLoader()
                 .computeStringWidth(((Button) btnBox.getChildren().get(0)).getText(),
-                        ((Button) btnBox.getChildren().get(0)).getFont());
+                        ((Button) btnBox.getChildren().get(0)).getFont()) + 40;
         btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
     }
 
