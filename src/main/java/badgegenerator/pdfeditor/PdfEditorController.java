@@ -398,7 +398,12 @@ public class PdfEditorController {
     public void handleChangeFont() {
         fxFields.stream()
                 .filter(f -> f.isSelected)
-                .forEach(field -> field.setFont(new Font(fontNameField.getText(), field.getFontSize())));
+                .forEach(field -> {
+                    String fontName = fontNameField.getText();
+                    field.setFont(
+                            new Font(fontName, field.getFontSize()),
+                            AssessableFonts.getFontPath(fontName));
+                });
     }
 
     public void handleShowHelpBox(MouseEvent event) throws IOException {

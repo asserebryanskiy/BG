@@ -40,10 +40,10 @@ public class FxFieldsSaver {
                     File.separator,
                     fieldFile.getNumberOfColumn());
             ObjectOutputStream oos;
-            try {
-                FileOutputStream fos = new FileOutputStream(filePath);
+            try(FileOutputStream fos = new FileOutputStream(filePath)) {
                 oos = new ObjectOutputStream(fos);
                 oos.writeObject(fieldFile);
+                oos.close();
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
                         "Не удалось сохранить поле");

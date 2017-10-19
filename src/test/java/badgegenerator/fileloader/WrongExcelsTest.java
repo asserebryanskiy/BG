@@ -32,7 +32,8 @@ public class WrongExcelsTest {
         thrown.expect(IOException.class);
         thrown.expectMessage("Список участников должен начинаться с первого ряда");
 
-        ExcelReader reader = new ExcelReader(getClass().getResource("/wrongExcel1.xls").getFile(),
+        ExcelReader reader = new ExcelReader(getClass()
+                .getResource("/wrongExcel1.xls").getFile(),
                 false);
         reader.processFile();
     }

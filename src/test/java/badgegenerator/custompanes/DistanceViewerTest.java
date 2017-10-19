@@ -1,11 +1,18 @@
 package badgegenerator.custompanes;
 
+import javafx.application.Application;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import org.junit.Before;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
+import static java.lang.Thread.sleep;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DistanceViewerTest {
+public class DistanceViewerTest extends ApplicationTest{
+
     @Test
     public void yChangeChangesText() throws Exception {
         FxField field = new SingleLineField("Example",
@@ -18,5 +25,10 @@ public class DistanceViewerTest {
 
         // Assert
         assertThat(viewer.getText(), is("100"));
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
     }
 }

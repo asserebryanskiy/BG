@@ -7,9 +7,12 @@ import badgegenerator.custompanes.SingleLineField;
 import badgegenerator.fxfieldssaver.FxFieldSave;
 import badgegenerator.fxfieldssaver.FxFieldsSaver;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +27,10 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by andreyserebryanskiy on 02/10/2017.
  */
-public class FxFieldsLoaderTest {
+public class FxFieldsLoaderTest extends ApplicationTest{
     private static final double initialX = 20;
     private static final Color initialColor = Color.RED;
-    private static final String fontPath = FxFieldsLoaderTest.class
-            .getResource(File.separator + "freeset.ttf").getFile();
+    private static String fontPath;
     private static final double initialFontSize = 20;
     private static final double initialY = 20;
     private static final String initialAlignment = "CENTER";
@@ -36,8 +38,10 @@ public class FxFieldsLoaderTest {
     private static FxFieldSave loadedSave;
     private static FxFieldSave loadedSaveWithHyp;
 
-    @BeforeClass
-    public static void beforeAllTests() throws Exception {
+    @Before
+    public void beforeAllTests() throws Exception {
+        fontPath = FxFieldsLoaderTest.class.getClassLoader()
+                .getResource(  File.separator + "freeset.ttf").getFile();
         FxField field = new SingleLineField("Example", 0, 200);
         FxField fieldWithHyp = new FieldWithHyphenation("Example words", 1, 200);
         List<FxField> fields = new ArrayList<>(2);
@@ -139,5 +143,10 @@ public class FxFieldsLoaderTest {
     public void alignmentPreservesAfterSaveLoad() throws Exception {
         assertThat(loadedSave.getAlignment(), is(initialAlignment));
         assertThat(loadedSaveWithHyp.getAlignment(), is(initialAlignment));
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
     }
 }

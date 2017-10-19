@@ -4,9 +4,12 @@ import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
+import javafx.stage.Stage;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,12 +28,13 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by andreyserebryanskiy on 02/10/2017.
  */
-public class FxFieldsSaverTest {
+public class FxFieldsSaverTest extends ApplicationTest{
     private static File directory;
-    @BeforeClass
-    public static void beforeAllTests() throws IOException {
+    @Before
+    public void beforeAllTests() throws IOException {
         FxField field1 = new SingleLineField("Example", 0, 100);
-        String fontPath = FxFieldsSaverTest.class.getResource("/freeset.ttf").getFile();
+        String fontPath = FxFieldsSaverTest.class.getClassLoader()
+                .getResource(File.separator + "freeset.ttf").getFile();
         FxField field2 = new FieldWithHyphenation("Example words", 1, 120);
         field2.setFont(fontPath);
         List<FxField> fields = new ArrayList<>();
@@ -88,5 +92,10 @@ public class FxFieldsSaverTest {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
     }
 }

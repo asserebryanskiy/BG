@@ -76,7 +76,8 @@ public class AssessableFonts {
         }
 
         assessableFxFonts = Font.getFontNames().stream()
-                .filter(name -> allAssessableFonts.keySet().contains(name.toLowerCase()))
+                .filter(name -> allAssessableFonts.keySet()
+                        .contains(name.toLowerCase()))
                 .collect(Collectors.toList());
         assessableFxFonts.add("Helvetica");
     }

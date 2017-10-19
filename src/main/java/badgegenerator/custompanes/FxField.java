@@ -181,10 +181,14 @@ public abstract class FxField extends DraggablePane {
         return font;
     }
 
+    public void setFont(Font font, String fontPath) {
+        setFont(font);
+        this.fontPath = fontPath;
+    }
+
     public void setFont(Font font) {
         double oldWidth = getPrefWidth();
         this.font = font;
-        fontPath = AssessableFonts.getFontPath(font.getName());
         setFontImpl();
         setMaxHeight(computeMaxHeight());
         switch (alignment) {
