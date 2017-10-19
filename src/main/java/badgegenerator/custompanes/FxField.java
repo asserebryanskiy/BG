@@ -1,5 +1,6 @@
 package badgegenerator.custompanes;
 
+import badgegenerator.appfilesmanager.AssessableFonts;
 import badgegenerator.appfilesmanager.LoggerManager;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
@@ -183,6 +184,7 @@ public abstract class FxField extends DraggablePane {
     public void setFont(Font font) {
         double oldWidth = getPrefWidth();
         this.font = font;
+        fontPath = AssessableFonts.getFontPath(font.getName());
         setFontImpl();
         setMaxHeight(computeMaxHeight());
         switch (alignment) {

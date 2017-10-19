@@ -21,8 +21,9 @@ public class HelpMessages {
     public static void load() {
         helpMessages = new HashMap<>();
         try(Scanner scanner = new Scanner(
-                HelpMessages.class.getResourceAsStream(
-                        File.separator + "helpMessages.txt"))) {
+                HelpMessages.class.getClassLoader()
+                        .getResourceAsStream(File.separator
+                                + "helpMessages.txt"))) {
             while(scanner.hasNext()) {
                 String line = scanner.nextLine();
                 String key = line.substring(0, line.indexOf("|"));

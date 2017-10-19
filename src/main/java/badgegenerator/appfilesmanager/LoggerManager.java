@@ -32,7 +32,10 @@ public class LoggerManager {
         }
         String builder = dir.getAbsolutePath() +
                 File.separator +
-                String.format("%tF_%tR", LocalDate.now(), LocalTime.now()) +
+                String.format("%tF_%tH-%tM",
+                        LocalDate.now(),
+                        LocalTime.now(),
+                        LocalTime.now()) +
                 ".log";
         FileHandler fh;
         try {

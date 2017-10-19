@@ -38,11 +38,8 @@ public class HelpPopUp extends Popup{
 
         setOnShown(event -> {
             HelpPopUp source = (HelpPopUp) event.getSource();
-//            double screenX = source.localToScreen(source.getLayoutX(), source.getLayoutY()).getX();
             double screenX = source.getX() + source.getWidth();
-            System.out.println(screenX);
             double screenRightBorder = Screen.getPrimary().getBounds().getMaxX();
-            System.out.println(screenRightBorder);
             if(screenX + 100 > screenRightBorder) setX(screenX - 2 * getWidth());
         });
     }
