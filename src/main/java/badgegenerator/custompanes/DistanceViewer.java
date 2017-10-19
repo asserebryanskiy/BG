@@ -31,7 +31,7 @@ public class DistanceViewer extends Pane {
                 setVisible(false));
         if(orientation.name().equals("VERTICAL")) {
             text.setText(String.valueOf((int) ((500 - fxField.getLayoutY())
-                    * fxField.getImageToPdfRatio())));
+                    / fxField.getImageToPdfRatio())));
             setLayoutX(20);
             line.setStartX(0);
             line.setEndX(25);
@@ -39,8 +39,8 @@ public class DistanceViewer extends Pane {
             line.setEndY(0);
             layoutYProperty().bind(fxField.layoutYProperty());
             layoutYProperty().addListener((observable, oldValue, newValue) ->
-                    text.setText(String.format("%.0f", (500 - newValue.doubleValue())
-                                                    * fxField.getImageToPdfRatio())));
+                    text.setText(String.format("%.0f", newValue.doubleValue()
+                                                    / fxField.getImageToPdfRatio())));
             GridPane grid = new GridPane();
             grid.addColumn(0, line, text);
             ColumnConstraints constraints = new ColumnConstraints();
@@ -49,8 +49,8 @@ public class DistanceViewer extends Pane {
             getChildren().add(grid);
         } else {
             text.setText(String.valueOf((int) (fxField.getLayoutX()
-                    * fxField.getImageToPdfRatio())));
-            setLayoutY(10);
+                    / fxField.getImageToPdfRatio())));
+            setLayoutY(20);
             line.setStartX(0);
             line.setEndX(0);
             line.setStartY(0);
@@ -58,7 +58,7 @@ public class DistanceViewer extends Pane {
             layoutXProperty().bind(fxField.layoutXProperty());
             fxField.layoutXProperty().addListener(((observable, oldValue, newValue) ->
                     text.setText(String.valueOf((int) (newValue.doubleValue()
-                            * fxField.getImageToPdfRatio())))));
+                            / fxField.getImageToPdfRatio())))));
             GridPane grid = new GridPane();
             grid.addRow(0, line, text);
             RowConstraints constraints = new RowConstraints();

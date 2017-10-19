@@ -1,8 +1,10 @@
 package badgegenerator.fileloader;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
@@ -26,11 +28,22 @@ public class ExcelReader {
     }
 
     public void processFile() throws IOException {
-        XSSFWorkbook excelFile = new XSSFWorkbook(new FileInputStream(srcPath));
-        XSSFSheet sheet = excelFile.getSheetAt(0);
+        Workbook excelFile;
+        if(srcPath.endsWith(".xlsx")) {
+            excelFile = new XSSFWorkbook(new FileInputStream(srcPath));
+        } else excelFile = new HSSFWorkbook(new FileInputStream(srcPath));
+        Sheet sheet = excelFile.getSheetAt(0);
+        if(sheet.getFirstRowNum() > 0) {
+            throw new IOException("Список участников должен начинаться с первого ряда");
+        }
         // Missing cells will be replaced with ""
         int numberOfRows = sheet.getPhysicalNumberOfRows();
-        //retrieve headings
+        if(numberOfRows > 2000) {
+            throw new IOException("Больше 2 000 рядов в таблице");
+        } else if(numberOfRows == 0) {
+            throw new IOException("Загруженный файл пустой");
+        }
+        // retrieve headings
         if(hasHeadings) getHeadingsFromTable(sheet);
         numberOfColumns = getNumberOfColumns(sheet, numberOfRows);
         values = new String[numberOfRows][numberOfColumns];
@@ -40,9 +53,8 @@ public class ExcelReader {
         Arrays.fill(longestWords, "");
         for(int row = hasHeadings ? 1 : 0; row < numberOfRows; row++) {
             for(int column = 0; column < numberOfColumns; column++) {
-                values[row][column] = sheet.getRow(row)
-                        .getCell(column, Row.CREATE_NULL_AS_BLANK)
-                        .getStringCellValue();
+                Cell cell = sheet.getRow(row).getCell(column, Row.CREATE_NULL_AS_BLANK);
+                values[row][column] = cell.getStringCellValue();
                 if(values[row][column].length() > largestFields[column].length()) {
                     largestFields[column] = values[row][column];
                 }
@@ -59,22 +71,27 @@ public class ExcelReader {
         }
     }
 
-    private void getHeadingsFromTable(XSSFSheet sheet) {
+    private void getHeadingsFromTable(Sheet sheet) throws IOException {
         headings = new ArrayList<>();
         sheet.getRow(0)
                 .cellIterator()
                 .forEachRemaining(cell -> headings.add(cell.getStringCellValue()));
+        if(headings.size() > 10) throw new IOException("Больше 10 столбцов в таблице");
         numberOfColumns = headings.size();
     }
 
-    private int getNumberOfColumns(XSSFSheet sheet, int numberOfRows) {
+    private int getNumberOfColumns(Sheet sheet, int numberOfRows) throws IOException {
         if(hasHeadings) {
             return headings.size();
         } else {
             int maxNumberOfColumns = 0;
             for(int i = 0; i<numberOfRows; i++) {
-                XSSFRow row = sheet.getRow(i);
-                int counter = row.getPhysicalNumberOfCells();
+                Row row = sheet.getRow(i);
+                if(row == null) continue;
+                int counter = row.getLastCellNum();
+                if(counter > 10) {
+                    throw new IOException("Больше 10 столбцов в таблице");
+                }
                 if(counter>maxNumberOfColumns) maxNumberOfColumns = counter;
             }
             return maxNumberOfColumns;

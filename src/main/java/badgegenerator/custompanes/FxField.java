@@ -1,58 +1,85 @@
 package badgegenerator.custompanes;
 
+import badgegenerator.appfilesmanager.LoggerManager;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A special class, created to realize text dragging and further convertation to pdf.
  * Could be realized through SingleLineField and FieldWithHyphenation.
  */
 public abstract class FxField extends DraggablePane {
+    private static Logger logger = Logger.getLogger(FxField.class.getSimpleName());
+
     private static List<Guide> guides = new ArrayList<>();
     private static Line verticalGuide;
 
-    protected int numberOfColumn;
+    private int numberOfColumn;
     protected double imageToPdfRatio;
-    protected double maxAllowableWidth;
+    double maxAllowableWidth;
     protected Font font;
-    protected DoubleProperty fontSize;
+    private DoubleProperty fontSize;
     private String fontPath;
     private String alignment = "CENTER";
     private Color color = Color.color(0,0,0);
-    protected TextField fontSizeField;
-    protected TextField fontNameField;
-    protected ColorPicker fontColorPicker;
+    TextField fontSizeField;
+    TextField fontNameField;
+    ColorPicker fontColorPicker;
+    List<Button> alignmentButtons;
+    private boolean capitalized;
+    private static Line horizontalGuide;
 
     public FxField(int numberOfColumn,
                    double imageToPdfRatio,
                    double maxAllowableWidth,
                    String fontPath,
-                   double fontSize) throws FileNotFoundException {
+                   double fontSize) {
         super();
         this.numberOfColumn = numberOfColumn;
         this.imageToPdfRatio = imageToPdfRatio;
         this.maxAllowableWidth = maxAllowableWidth;
         if(fontPath != null) {
-            this.font = Font.loadFont(new FileInputStream(fontPath), fontSize);
-            this.fontPath = fontPath;
+            try {
+                this.font = Font.loadFont(new FileInputStream(fontPath), fontSize);
+                this.fontPath = fontPath;
+            } catch (FileNotFoundException e) {
+                LoggerManager.initializeLogger(logger);
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Не удалось загрузить файл шрифта для бейджа.");
+                alert.show();
+                logger.log(Level.SEVERE, String.format("Ошибка при загрузке шрифта из%s",
+                        fontPath), e);
+                this.font = Font.loadFont(getClass()
+                        .getResourceAsStream("/fonts/Helvetica.otf"), fontSize);
+            }
         } else {
             this.font = Font.loadFont(getClass()
                     .getResourceAsStream("/fonts/Helvetica.otf"), fontSize);
         }
         this.fontSize = new SimpleDoubleProperty(fontSize);
         if(fontPath != null) this.fontPath = fontPath;
-        setId(String.format("field%s", numberOfColumn));
+        setId(String.format("field%d", numberOfColumn));
+    }
+
+    public FxField(int id, double maxAllowableWidth) throws FileNotFoundException {
+        this(id, 1, maxAllowableWidth, null, 13);
     }
 
     public static List<Guide> getGuides() {
@@ -63,8 +90,12 @@ public abstract class FxField extends DraggablePane {
         FxField.verticalGuide = verticalGuide;
     }
 
+    public static void setHorizontalGuide(Line horizontalGuide) {
+        FxField.horizontalGuide = horizontalGuide;
+    }
+
     @Override
-    double checkIfIntersectGuides(double newX) {
+    double checkIfIntersectVerticalGuides(double newX) {
         if (verticalGuide != null) {
             if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - 5
                     && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + 5) {
@@ -98,6 +129,41 @@ public abstract class FxField extends DraggablePane {
         }
         return newX;
     }
+    
+    @Override
+    double checkIfIntersectHorizontalGuides(double newY) {
+        if (horizontalGuide != null) {
+            if(newY + getMaxHeight() / 2 > horizontalGuide.getStartY() - 5
+                    && newY + getMaxHeight() / 2 < horizontalGuide.getStartY() + 5) {
+                horizontalGuide.setVisible(true);
+                newY = horizontalGuide.getStartY() - getMaxHeight() / 2;
+            } else horizontalGuide.setVisible(false);
+        }
+        /*if(guides != null) {
+            for(Line guide : guides) {
+                // to avoid permanent chasing of guide after a field
+                if(!guide.getId().contains(getId())) {
+                    if(guide.getId().contains("Start")
+                            && newX > guide.getStartX() - 5
+                            && newX < guide.getStartX() + 5) {
+                        guide.setVisible(true);
+                        newX = guide.getStartX();
+                        setAlignment("LEFT");
+                        break;
+                    } else guide.setVisible(false);
+                    if(guide.getId().contains("End")
+                            && newX + getPrefWidth() > guide.getStartX() - 5
+                            && newX + getPrefWidth() < guide.getStartX() + 5) {
+                        guide.setVisible(true);
+                        newX = guide.getStartX() - getPrefWidth();
+                        setAlignment("RIGHT");
+                        break;
+                    } else guide.setVisible(false);
+                }
+            }
+        }*/
+        return newY;
+    }
 
     abstract void setTextFlowAligned(String alignment);
 
@@ -107,18 +173,18 @@ public abstract class FxField extends DraggablePane {
             guides.forEach(guide -> guide.setVisible(false));
         }
         if (verticalGuide != null) verticalGuide.setVisible(false);
+        if (horizontalGuide != null) horizontalGuide.setVisible(false);
     }
 
     public Font getFont() {
         return font;
     }
 
-    public void setFont(Font newFont) {
+    public void setFont(Font font) {
         double oldWidth = getPrefWidth();
-        font = newFont;
-        setFontImpl(newFont);
+        this.font = font;
+        setFontImpl();
         setMaxHeight(computeMaxHeight());
-        setPrefWidth(getBoundsInLocal().getWidth());
         switch (alignment) {
             case("RIGHT"): {
                 setLayoutX(getLayoutX() + oldWidth - getPrefWidth());
@@ -129,15 +195,37 @@ public abstract class FxField extends DraggablePane {
                 break;
             }
         }
+
+        if(fontNameField != null) {
+            fontNameField.setText(font.getName());
+        }
     }
 
-    abstract void setFontImpl(Font font);
+    public void setFont(String fontPath)  {
+        FileInputStream fontInputStream = null;
+        try {
+            fontInputStream = new FileInputStream(fontPath);
+        } catch (FileNotFoundException e) {
+            logger.log(Level.SEVERE, "Не удалось загрузить файл шрифта", e);
+            e.printStackTrace();
+        }
+        this.fontPath = fontPath;
+        setFont(Font.loadFont(fontInputStream, getFontSize()));
+    }
+
+    abstract void setFontImpl();
 
     public double getFontSize() {
         return fontSize.get();
     }
 
     public void setFontSize(double newFontSize) {
+        font = new Font(font.getName(), newFontSize);
+        if (newFontSize > 200
+                || computeStringWidth(getLongestWord()) > maxAllowableWidth) {
+            setFontSize(--newFontSize);
+            return;
+        }
         double oldWidth = getPrefWidth();
         fontSize.set(newFontSize);
         setFontSizeImpl(newFontSize);
@@ -153,6 +241,10 @@ public abstract class FxField extends DraggablePane {
             }
         }
     }
+
+    abstract String getLongestWord();
+
+    abstract String getText();
 
     abstract void setFontSizeImpl(double newFontSize);
 
@@ -185,13 +277,18 @@ public abstract class FxField extends DraggablePane {
         guides.add(guide);
     }
 
-    public void setFontPath(String fontPath) {
-        this.fontPath = fontPath;
-    }
-
     public void setAlignment(String alignment) {
-        this.alignment = alignment;
-        setAlignmentImpl(alignment);
+        this.alignment = alignment.toUpperCase();
+        if(alignmentButtons != null) {
+            alignmentButtons.forEach(btn -> {
+                if(btn.getId().contains(alignment.toLowerCase())) {
+                    ((SVGPath)btn.getGraphic()).setFill(Color.BLACK);
+                } else {
+                    ((SVGPath)btn.getGraphic()).setFill(Color.GRAY);
+                }
+            });
+        }
+        setAlignmentImpl(alignment.toUpperCase());
     }
 
     abstract void setAlignmentImpl(String alignment);
@@ -214,5 +311,32 @@ public abstract class FxField extends DraggablePane {
 
     public double getImageToPdfRatio() {
         return imageToPdfRatio;
+    }
+
+    public void setCapitalized(boolean value) {
+        double oldWidth = getPrefWidth();
+        this.capitalized = value;
+        setCapitalizedImpl(value);
+        setMaxHeight(computeMaxHeight());
+        switch (alignment) {
+            case("RIGHT"): {
+                setLayoutX(getLayoutX() + oldWidth - getPrefWidth());
+                break;
+            }
+            case("CENTER"): {
+                setLayoutX(getLayoutX() + (oldWidth - getPrefWidth()) / 2);
+                break;
+            }
+        }
+    }
+
+    public void setAlignmentButtons(List<Button> alignmentButtons) {
+        this.alignmentButtons = alignmentButtons;
+    }
+
+    abstract void setCapitalizedImpl(boolean value);
+
+    public boolean isCapitalized() {
+        return capitalized;
     }
 }

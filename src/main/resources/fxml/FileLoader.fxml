@@ -2,13 +2,15 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <StackPane fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fileloader.FileLoaderController">
    <children>
-      <GridPane fx:id="commonGrid" vgap="5.0">
+      <GridPane fx:id="commonGrid" prefHeight="296.0" vgap="5.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
             <ColumnConstraints />
@@ -18,7 +20,7 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints />
             <RowConstraints minHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
             <RowConstraints vgrow="SOMETIMES" />
             <RowConstraints vgrow="SOMETIMES" />
@@ -27,7 +29,10 @@
             <Label alignment="CENTER" layoutX="72.0" layoutY="37.0" nodeOrientation="LEFT_TO_RIGHT" text="Привет! Загрузи сюда свои файлы" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="TOP">
                <children>
-                  <Button fx:id="btnBrowsePdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5" />
+                  <Button fx:id="btnBrowsePdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
                   <VBox>
                      <children>
                         <TextField fx:id="pdfField" editable="false" prefHeight="27.0" prefWidth="218.0">
@@ -46,15 +51,18 @@
             </HBox>
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP">
                <children>
-                  <Button fx:id="btnBrowseXlsx" alignment="CENTER" mnemonicParsing="false" onMouseClicked="#handleBrowseXlsx" text="Обзор" GridPane.rowIndex="2">
+                  <Button fx:id="btnBrowseXlsx" alignment="CENTER" mnemonicParsing="false" onMouseClicked="#handleBrowseExcel" text="Обзор" GridPane.rowIndex="2">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </Button>
                   <VBox>
                      <children>
-                        <TextField editable="false" prefHeight="27.0" prefWidth="218.0" fx:id="xlsxField" />
-                        <Text fill="#f20000" strokeType="OUTSIDE" strokeWidth="0.0" text="Необходимо загрузить xlsx документ с данными об участниках" visible="false" wrappingWidth="210.0" fx:id="xlsxNotLoadedLabel">
+                        <TextField fx:id="excelFileField" editable="false" prefHeight="27.0" prefWidth="218.0" />
+                        <Text fx:id="excelNotLoadedLabel" fill="#f20000" strokeType="OUTSIDE" strokeWidth="0.0" text="Необходимо загрузить xlsx документ с данными об участниках" visible="false" wrappingWidth="210.0">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -67,8 +75,11 @@
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </CheckBox>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="140.0" text="Макет в формате .pdf" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="28.0" layoutY="140.0" text="Макет в формате .pdf" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="4">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>
@@ -76,24 +87,43 @@
                   <Insets top="10.0" />
                </GridPane.margin>
             </Label>
-            <Label layoutX="20.0" layoutY="79.0" text="Список участинков мероприятия в формате .xlsx" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <GridPane fx:id="proceedGrid" GridPane.rowIndex="6">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-               </rowConstraints>
+            <VBox GridPane.rowIndex="1">
                <children>
-                  <Button fx:id="btnCreateNewFields" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Создать новые поля" AnchorPane.bottomAnchor="20.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                  <Label alignment="TOP_LEFT" layoutX="20.0" layoutY="79.0" text="Список участников мероприятия в формате .xlsx" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+                  <Pane fx:id="excelHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
+                     <children>
+                        <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Pane>
+               </children>
+            </VBox>
+            <HBox alignment="TOP_RIGHT" spacing="10.0" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+               <children>
+                  <Button fx:id="btnLoadFields" mnemonicParsing="false" onAction="#handleOpenSavedFieldsScreen" text="Загрузить из шаблона">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
+                  <Pane fx:id="loadHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor" translateX="-6.0">
+                     <children>
+                        <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Pane>
+                  <Button fx:id="btnCreateNewFields" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Создать" AnchorPane.bottomAnchor="20.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </Button>
-                  <Button fx:id="btnLoadFields" mnemonicParsing="false" onAction="#handleOpenSavedFieldsScreen" text="Загрузить поля" />
                </children>
-            </GridPane>
+            </HBox>
          </children>
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

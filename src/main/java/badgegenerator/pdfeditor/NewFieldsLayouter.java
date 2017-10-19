@@ -24,11 +24,11 @@ class NewFieldsLayouter extends AbstractFieldsLayouter {
     }
 
     @Override
-    protected void setFieldsParameters(FxField fxField, int i) {
+    protected void setFieldsParameters(FxField fxField) {
         x = fieldsParent.getBoundsInLocal().getWidth() / 2
                 - fxField.getBoundsInLocal().getWidth() / 2;
         y = fieldsParent.getBoundsInLocal().getHeight() / 2
-                - (largestFields.length * 20 / 2) + i * 20;
+                - (largestFields.length * 20 / 2) + fxField.getNumberOfColumn() * 20;
         alignment = "CENTER";
     }
 

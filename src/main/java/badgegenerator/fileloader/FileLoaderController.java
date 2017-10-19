@@ -1,7 +1,10 @@
 package badgegenerator.fileloader;
 
 import badgegenerator.Main;
+import badgegenerator.appfilesmanager.LoggerManager;
+import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.fxfieldsloader.FxFieldsLoaderController;
+import badgegenerator.helppopup.HelpPopUp;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,22 +15,27 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileLoaderController implements Initializable{
+    private static Logger logger = Logger.getLogger(FileLoaderController.class.getSimpleName());
+
     @FXML
     private StackPane root;
     @FXML
@@ -43,20 +51,21 @@ public class FileLoaderController implements Initializable{
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
-    private TextField xlsxField;
+    private TextField excelFileField;
     @FXML
     private TextField pdfField;
     @FXML
     private CheckBox hasHeadingsCheckBox;
     @FXML
-    private Text xlsxNotLoadedLabel;
+    private Text excelNotLoadedLabel;
     @FXML
     private Text pdfNotLoadedLabel;
 
     private String pdfPath;
-    private String xlsxPath;
+    private String excelFilePath;
     private boolean hasHeadings;
     private ExcelReader excelReader;
+    private HelpPopUp helpPopUp;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,18 +75,19 @@ public class FileLoaderController implements Initializable{
         buttons.add(btnCreateNewFields);
         buttons.add(btnLoadFields);
         buttons.forEach(btn -> btn.setMinWidth(
-                Main.computeStringWidth(btn.getText(), btn.getFont())));
+                Main.computeStringWidth(btn.getText(), btn.getFont()) + 20));
+
     }
 
-    public void handleBrowseXlsx(MouseEvent event) {
+    public void handleBrowseExcel(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("XLSX files", "*.xlsx"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Excel files", "*.xlsx", "*.xls"));
         File selectedFile = fileChooser.showOpenDialog(null);
 
         if(selectedFile != null) {
-            xlsxField.setText(selectedFile.getName());
-            xlsxPath = selectedFile.getAbsolutePath();
+            excelFileField.setText(selectedFile.getName());
+            excelFilePath = selectedFile.getAbsolutePath();
         } else {
             System.out.println("File is incorrect");
         }
@@ -102,20 +112,19 @@ public class FileLoaderController implements Initializable{
             showProgressScreen(true);
             final Stage pdfRedactorWindow = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-            excelReader = new ExcelReader(xlsxPath, hasHeadings);
+            excelReader = new ExcelReader(excelFilePath, hasHeadings);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
             checkExcelFileTask.setOnSucceeded(e -> {
                 if((boolean) checkExcelFileTask.getValue()) {
-                    Task launchPdfEditorTask =
-                            new LaunchPdfEditorTask(excelReader, pdfPath);
+                    Task launchPdfEditorTask;
+                    launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
                     launchPdfEditorTask.setOnSucceeded(event1 -> {
                         showProgressScreen(false);
                         pdfRedactorWindow.setScene(
                                 new Scene((Parent) launchPdfEditorTask.getValue()));
                         pdfRedactorWindow.setResizable(false);
-                        pdfRedactorWindow.setX(pdfRedactorWindow.getX() - 200);
-                        pdfRedactorWindow.setY(pdfRedactorWindow.getY() - 100);
                         pdfRedactorWindow.show();
+                        pdfRedactorWindow.centerOnScreen();
                     });
                     launchPdfEditorTask.setOnFailed(c -> {
                         showProgressScreen(false);
@@ -141,17 +150,17 @@ public class FileLoaderController implements Initializable{
         if(checkIfFieldsAreFilled()) {
             showProgressScreen(true);
 
-            excelReader = new ExcelReader(xlsxPath, hasHeadings);
+            excelReader = new ExcelReader(excelFilePath, hasHeadings);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
             checkExcelFileTask.setOnSucceeded(e -> {
                 if((boolean) checkExcelFileTask.getValue()) {
-                    /*File savedFilesDirectory = new File(getClass()
-                            .getResource("/savedFields").getFile());*/
-                    List<String> savesNames = SavesLoader.getSavesNames();
+                    List<String> savesNames = SavesManager.getSavesNames();
                     if(savesNames == null) {
                         Alert alert = new Alert(Alert.AlertType.ERROR,
                                 "Ошибка при чтении файлов сохранения");
-                                alert.show();
+                        alert.show();
+                        LoggerManager.initializeLogger(logger);
+                        logger.log(Level.WARNING, "Ошибка при чтении файлов сохранения");
                         return;
                     }
                     if(savesNames.size() != 0) {
@@ -164,14 +173,10 @@ public class FileLoaderController implements Initializable{
                             root = loader.load();
                         } catch (IOException e1) {
                             e1.printStackTrace();
-                            try {
-                                e1.printStackTrace(new PrintStream(
-                                        new File(SavesLoader
-                                                .getSavesFolder().getParentFile()
-                                                .getAbsolutePath() + "log.txt")));
-                            } catch (FileNotFoundException e2) {
-                                e2.printStackTrace();
-                            }
+                            LoggerManager.initializeLogger(logger);
+                            logger.log(Level.SEVERE,
+                                    "Ошибка при загрузке при загрузке FxFieldsLoader.fxml",
+                                    e1);
                             Alert alert = new Alert(Alert.AlertType.ERROR,
                                     String.format("Не удалось загрузить сохраненные поля%n%s",
                                     e.toString()));
@@ -210,10 +215,10 @@ public class FileLoaderController implements Initializable{
             fieldsAreFilled = false;
             pdfNotLoadedLabel.setVisible(true);
         } else pdfNotLoadedLabel.setVisible(false);
-        if(xlsxField.getText().isEmpty()){
+        if(excelFileField.getText().isEmpty()){
             fieldsAreFilled = false;
-            xlsxNotLoadedLabel.setVisible(true);
-        } else xlsxNotLoadedLabel.setVisible(false);
+            excelNotLoadedLabel.setVisible(true);
+        } else excelNotLoadedLabel.setVisible(false);
         return fieldsAreFilled;
     }
 
@@ -226,5 +231,19 @@ public class FileLoaderController implements Initializable{
         progressIndicatorBackground.setHeight(root.getScene().getHeight());
         progressIndicator.setVisible(value);
         progressIndicatorBackground.setVisible(value);
+    }
+
+    public void handleChangeColor(MouseEvent event) {
+        ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.GRAY);
+    }
+
+    public void handleResetColor(MouseEvent event) {
+        ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.BLACK);
+    }
+
+    public void handleShowHelpBox(MouseEvent event) throws IOException {
+        if(helpPopUp != null && helpPopUp.isShowing()) return;
+        helpPopUp = new HelpPopUp(((Node) event.getSource()).getId());
+        helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
     }
 }

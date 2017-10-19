@@ -1,5 +1,6 @@
 package badgegenerator.custompanes;
 
+import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 
 
@@ -18,14 +19,16 @@ public abstract class DraggablePane extends SelectablePane {
     private double topLayoutBorder;
     private double bottomLayoutBorder;
 
-    public DraggablePane() {
+    DraggablePane() {
         super();
         makeDraggable();
         setManaged(false);
+        setCursor(Cursor.OPEN_HAND);
     }
 
     private void makeDraggable() {
         addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            setCursor(Cursor.CLOSED_HAND);
             calculateLayoutBorders();
             changeFieldsValues();
             // point, where mouse clicked
@@ -44,7 +47,8 @@ public abstract class DraggablePane extends SelectablePane {
 //            double newX = getLayoutX() + event.getSceneX() + deltaX - fieldX;
 //            double newY = getLayoutY() + event.getSceneY() + deltaY - fieldY;
             if (notInsideParent(newX, newY)) return;
-            newX = checkIfIntersectGuides(newX);
+            newX = checkIfIntersectVerticalGuides(newX);
+            newY = checkIfIntersectHorizontalGuides(newY);
 
             setLayoutX(newX);
             setLayoutY(newY);
@@ -54,6 +58,7 @@ public abstract class DraggablePane extends SelectablePane {
             fieldY = getLayoutY() + getMaxHeight() / 2;
         });
         addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            setCursor(Cursor.OPEN_HAND);
             makeGuidesInvisible();
         });
     }
@@ -64,7 +69,8 @@ public abstract class DraggablePane extends SelectablePane {
      * is refreshed according to DraggablePane parameters.
      * */
     abstract void changeFieldsValues();
-    abstract double checkIfIntersectGuides(double newX);
+    abstract double checkIfIntersectVerticalGuides(double newX);
+    abstract double checkIfIntersectHorizontalGuides(double newY);
     abstract void makeGuidesInvisible();
 
     private void calculateLayoutBorders() {

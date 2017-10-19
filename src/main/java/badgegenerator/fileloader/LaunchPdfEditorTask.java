@@ -1,5 +1,6 @@
 package badgegenerator.fileloader;
 
+import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.pdfeditor.PdfEditorController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -16,24 +17,27 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Launches next stage from fxml file;
  */
 public class LaunchPdfEditorTask extends Task {
-    private final String fxmlFilePath = "/fxml/PdfEditor.fxml";
+    private static Logger logger = Logger.getLogger(LaunchPdfEditorTask.class.getSimpleName());
+
     private final ExcelReader excelReader;
     private final String pdfPath;
     private final String fxFieldsPath;
     private PDDocument pdf;
 
-    public LaunchPdfEditorTask(ExcelReader excelReader, String pdfPath) {
-        this.excelReader = excelReader;
-        this.pdfPath = pdfPath;
-        fxFieldsPath = null;
+    public LaunchPdfEditorTask(ExcelReader excelReader, String pdfPath)  {
+        this(excelReader, pdfPath, null);
     }
 
-    public LaunchPdfEditorTask(ExcelReader excelReader, String pdfPath, String fxFieldsPath) {
+    public LaunchPdfEditorTask(ExcelReader excelReader,
+                               String pdfPath,
+                               String fxFieldsPath)  {
         this.excelReader = excelReader;
         this.pdfPath = pdfPath;
         this.fxFieldsPath = fxFieldsPath;
@@ -41,7 +45,7 @@ public class LaunchPdfEditorTask extends Task {
 
     @Override
     protected Parent call()  {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFilePath));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root;
         try {
             root = loader.load();
@@ -60,14 +64,14 @@ public class LaunchPdfEditorTask extends Task {
                 controller.init();
             }
         } catch (Exception e) {
-//        } catch (IOException | NullPointerException e) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
                         "Не удалось загрузить окно редактирования pdf",
                         ButtonType.OK);
                 alert.show();
-                e.printStackTrace();
             });
+            LoggerManager.initializeLogger(logger);
+            logger.log(Level.SEVERE, "Ошибка при загрузке PdfEditor.fxml", e);
             return null;
         }
 

@@ -36,15 +36,13 @@ public class ResizeableBorder extends StackPane{
         // mouse hover effects
         fxField.setOnMouseEntered(event -> fxField.getResizeableBorders().stream()
                 .map(ResizeableBorder::getResizeSvg)
-                .forEach(svg -> {
-                    svg.setVisible(true);
-                }));
+                .forEach(svg -> svg.setVisible(true)));
         fxField.setOnMouseExited(event -> fxField.getResizeableBorders().stream()
                 .map(ResizeableBorder::getResizeSvg)
                 .forEach(svg -> svg.setVisible(false)));
         setOnMouseEntered(event -> resizeSvg.setVisible(true));
         setOnMouseExited(event -> resizeSvg.setVisible(false));
-        resizeSvg.setId(String.format("%sResizeSvg%s", fxField.getId(), value.name()));
+        setId(String.format("%sResizeableBorder%s", fxField.getId(), value.name()));
 
         setOnMousePressed(event -> {
             borderX = getLayoutX() + getPrefWidth() / 2;
@@ -92,7 +90,7 @@ public class ResizeableBorder extends StackPane{
     }
 
 
-    public SVGPath getResizeSvg() {
+    private SVGPath getResizeSvg() {
         return resizeSvg;
     }
 }

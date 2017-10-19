@@ -1,14 +1,19 @@
 package badgegenerator.pdfeditor;
 
+import badgegenerator.appfilesmanager.AssessableFonts;
+import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fxfieldssaver.FxFieldsSaverController;
+import badgegenerator.helppopup.HelpPopUp;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
+import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.tk.Toolkit;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -19,21 +24,27 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class PdfEditorController {
+    private static Logger logger = Logger.getLogger(PdfEditorController.class.getSimpleName());
 
     @FXML
     private Button btnBrowseFont;
@@ -78,17 +89,19 @@ public class PdfEditorController {
     private Label progressStatusLabel;
 
     @FXML
-    private Rectangle horizontalScaleBack;
+    private StackPane helpBox;
 
     @FXML
-    private Rectangle verticalScaleBack;
+    private Pane closeHelpBoxPane;
+
+    @FXML
+    private CheckBox capsLockCheckBox;
 
     @FXML private Button leftAlignmentButton;
     @FXML private Button centerAlignmentButton;
     @FXML private Button rightAlignmentButton;
 
     private List<FxField> fxFields;
-    private Font font;
 
     private double imageToPdfRatio;
     private Task createBadgesArchiveTask;
@@ -96,6 +109,8 @@ public class PdfEditorController {
     private boolean compressFieldIfLineMissing = true;
     private String pdfPath;
     private ExcelReader excelReader;
+    private HelpPopUp helpPopUp;
+    private List<Button> alignmentButtons;
 
     public void init() {
         init(null);
@@ -120,13 +135,8 @@ public class PdfEditorController {
                     imageToPdfRatio);
         }
         layouter.positionFields();
-        layouter.addScaleMarks(verticalScaleBack, horizontalScaleBack);
+        layouter.addScaleMarks();
         fxFields = layouter.getFxFields();
-        fxFields.forEach(fxField -> {
-            fxField.setFontNameField(fontNameField);
-            fxField.setFontSizeField(fontSizeField);
-            fxField.setFontColorPicker(fontColorPicker);
-        });
         // adds possibility to remove selection
         pdfRedactorRoot.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (fxFields.stream()
@@ -149,12 +159,25 @@ public class PdfEditorController {
         leftAlignmentButton.setGraphic(leftAlignmentSvg);
         centerAlignmentButton.setGraphic(centerAlignmentSvg);
         rightAlignmentButton.setGraphic(rightAlignmentSvg);
+        alignmentButtons = new ArrayList<>(3);
+        alignmentButtons.add(leftAlignmentButton);
+        alignmentButtons.add(centerAlignmentButton);
+        alignmentButtons.add(rightAlignmentButton);
+        alignmentButtons.forEach(btn -> ((SVGPath)btn.getGraphic()).setFill(Color.GRAY));
         btnBrowseFont.setPrefWidth(Toolkit.getToolkit().getFontLoader()
                 .computeStringWidth(btnBrowseFont.getText(), btnBrowseFont.getFont()) + 40);
-        font = fxFields.get(0).getFont();
         fontSizeField.setText(String.format("%d",
                 (int) (fxFields.get(0).getFont().getSize() / imageToPdfRatio)));
         fontNameField.setText(fxFields.get(0).getFont().getName());
+        fontNameField.setEditable(true);
+        TextFields.bindAutoCompletion(fontNameField, AssessableFonts.getAssessableFxFonts());
+        fontNameField.setFocusTraversable(true);
+        fxFields.forEach(fxField -> {
+            fxField.setFontNameField(fontNameField);
+            fxField.setFontSizeField(fontSizeField);
+            fxField.setFontColorPicker(fontColorPicker);
+            fxField.setAlignmentButtons(alignmentButtons);
+        });
     }
 
     public void handleBrowseFont() throws InterruptedException, IOException {
@@ -167,16 +190,9 @@ public class PdfEditorController {
         File selectedFile = fileChooser.showOpenDialog(null);
 
         if(selectedFile != null) {
-            FileInputStream fontInputStream = new FileInputStream(selectedFile.getAbsolutePath());
-            Font newFont = Font.loadFont(fontInputStream,
-                    Double.valueOf(fontSizeField.getText()) * imageToPdfRatio);
-            fontNameField.setText(font.getName());
             fxFields.stream()
                     .filter(field -> field.isSelected)
-                    .forEach(field -> {
-                        field.setFont(newFont);
-                        field.setFontPath(selectedFile.getAbsolutePath());
-                    });
+                    .forEach(field -> field.setFont(selectedFile.getAbsolutePath()));
         } else {
             System.out.println("File is incorrect");
         }
@@ -195,7 +211,7 @@ public class PdfEditorController {
                 .forEach(field -> field.setFill(fontColorPicker.getValue()));
     }
 
-    public void handleSaveBadges(MouseEvent event) throws IOException, InterruptedException {
+    public void handleSaveBadges() throws IOException, InterruptedException {
         FileChooser directoryChooser = new FileChooser();
         File selectedDirectory = directoryChooser.showSaveDialog(null);
 
@@ -208,10 +224,49 @@ public class PdfEditorController {
                     selectedDirectory.getAbsolutePath() + ".zip",
                     compressFieldIfLineMissing);
             createBadgesArchiveTask.setOnSucceeded(event1 -> {
-                showProgressScreen(false);
-                Alert doneAlert = new Alert(Alert.AlertType.INFORMATION);
-                doneAlert.setContentText("Скачивание завершено");
-                doneAlert.show();
+                if (createBadgesArchiveTask.getValue().equals(true)) {
+                    showProgressScreen(false);
+//                    Stage doneAlert = new Stage();
+
+                    ButtonType yesBtn = new ButtonType("Да", ButtonBar.ButtonData.YES);
+                    ButtonType noBtn = new ButtonType("Нет", ButtonBar.ButtonData.NO);
+                    Alert doneAlert = new Alert(Alert.AlertType.INFORMATION,
+                            "Скачивание завершено!"
+                                    + System.lineSeparator()
+                                    + System.lineSeparator()
+                                    + "Открыть папку с архивом?",
+                            noBtn, yesBtn);
+                    Optional<ButtonType> result = doneAlert.showAndWait();
+                    if (result.isPresent() && result.get() == yesBtn) {
+                        String path = selectedDirectory.getAbsolutePath();
+                        path = path.substring(0, path.lastIndexOf(File.separator));
+                        try {
+                            if(PlatformUtil.isMac()) {
+                                Runtime.getRuntime().exec("open " + path);
+                            } else {
+                                Runtime.getRuntime().exec("explorer.exe /select, " + path);
+                            }
+                        } catch (IOException e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR,
+                                    "Не удалось открыть папку с архивом");
+                            alert.show();
+                            LoggerManager.initializeLogger(logger);
+                            logger.log(Level.SEVERE, "Ошибка при открытии папки с архивом", e);
+                            e.printStackTrace();
+                        }
+                        /*if (Desktop.isDesktopSupported()) {
+                            try {
+                                String path = selectedDirectory.getAbsolutePath();
+                                Desktop.getDesktop().open(
+                                        new File(path.substring(0, path.lastIndexOf(File.separator))));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }*/
+                    }
+                } else {
+                    showProgressScreen(false);
+                }
             });
             createBadgesArchiveTask.setOnCancelled(e -> showProgressScreen(false));
             progressIndicator.progressProperty().bind(createBadgesArchiveTask.progressProperty());
@@ -241,18 +296,27 @@ public class PdfEditorController {
             alignment = "LEFT";
         } else if(event.getSource().toString().contains("center")) {
             alignment = "CENTER";
-        } else alignment = "RIGHT";
+        } else {
+            alignment = "RIGHT";
+        }
+        alignmentButtons.forEach(btn -> {
+            if(btn.getId().contains(alignment.toLowerCase())) {
+                ((SVGPath)btn.getGraphic()).setFill(Color.BLACK);
+            } else {
+                ((SVGPath)btn.getGraphic()).setFill(Color.GRAY);
+            }
+        });
 
         fxFields.stream()
                 .filter(field -> field.isSelected)
                 .forEach(field -> field.setAlignment(alignment));
     }
 
-    public void handleSetCompressFieldsTrue(ActionEvent event) {
+    public void handleSetCompressFieldsTrue() {
         compressFieldIfLineMissing = true;
     }
 
-    public void handleSetCompressFieldsFalse(ActionEvent event) {
+    public void handleSetCompressFieldsFalse() {
         compressFieldIfLineMissing = false;
     }
 
@@ -275,7 +339,7 @@ public class PdfEditorController {
         this.excelReader = excelReader;
     }
 
-    public void handleSaveFields(ActionEvent event) throws IOException {
+    public void handleSaveFields() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass()
                 .getResource("/fxml/FxFieldsSaver.fxml"));
         Parent root = loader.load();
@@ -287,5 +351,59 @@ public class PdfEditorController {
         saveFieldsWindow.initModality(Modality.APPLICATION_MODAL);
         saveFieldsWindow.toFront();
         saveFieldsWindow.show();
+    }
+
+    public void handleShowAnimation(MouseEvent event) {
+        HelpAnimation animation = new HelpAnimation();
+        helpBox.getChildren().removeIf(node -> node instanceof HelpAnimation);
+        helpBox.getChildren().add(animation);
+        closeHelpBoxPane.setManaged(false);
+        closeHelpBoxPane.setLayoutX(200);
+        closeHelpBoxPane.setPrefSize(12,12);
+        closeHelpBoxPane.setMaxHeight(12);
+        closeHelpBoxPane.setMaxWidth(12);
+        helpBox.setVisible(true);
+        if(((Node)event.getSource()).getId().contains("yes")) {
+            animation.playWithMotion();
+        } else {
+            animation.play();
+        }
+    }
+
+    public void handleChangeColor(MouseEvent event) {
+        ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.GRAY);
+    }
+
+    public void handleResetColor(MouseEvent event) {
+        ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.BLACK);
+    }
+
+    public void handleCloseHelpBox() {
+        helpBox.setVisible(false);
+    }
+
+    public void setCapitalized() {
+        fxFields.stream().filter(field -> field.isSelected)
+                .forEach(field -> field.setCapitalized(capsLockCheckBox.isSelected()));
+    }
+
+    public void handleBack(ActionEvent event) throws IOException {
+        FxField.getGuides().clear();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/FileLoader.fxml"));
+        stage.setScene(new Scene(root));
+        stage.centerOnScreen();
+    }
+
+    public void handleChangeFont() {
+        fxFields.stream()
+                .filter(f -> f.isSelected)
+                .forEach(field -> field.setFont(new Font(fontNameField.getText(), field.getFontSize())));
+    }
+
+    public void handleShowHelpBox(MouseEvent event) throws IOException {
+        if(helpPopUp != null && helpPopUp.isShowing()) return;
+        helpPopUp = new HelpPopUp(((Node) event.getSource()).getId());
+        helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
     }
 }

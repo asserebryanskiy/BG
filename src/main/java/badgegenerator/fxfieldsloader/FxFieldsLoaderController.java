@@ -1,8 +1,8 @@
 package badgegenerator.fxfieldsloader;
 
+import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fileloader.LaunchPdfEditorTask;
-import badgegenerator.fileloader.SavesLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -67,12 +68,12 @@ public class FxFieldsLoaderController implements Initializable{
         savedFields.setItems(values);
     }
 
-    public void handleLoadField(ActionEvent event) {
+    public void handleLoadField(ActionEvent event) throws IOException {
         String saveName = savedFields.getSelectionModel().getSelectedItem().getText();
         if(saveName != null && !saveName.equals(PLACEHOLDER)) {
-            File save = new File(SavesLoader.getSavesFolder().getAbsolutePath()
+            File save = new File(SavesManager.getSavesFolder().getAbsolutePath()
                     + "/" + saveName);
-            SavesLoader.setCurrentSaveName(saveName);
+            SavesManager.setCurrentSaveName(saveName);
             if(save.list().length - 1 ==
                     excelReader.getLargestFields().length) {
                 // getSavesNames fields
@@ -97,7 +98,7 @@ public class FxFieldsLoaderController implements Initializable{
                 thread.setDaemon(true);
                 thread.start();
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
+                Alert alert = new Alert(Alert.AlertType.WARNING,
                         "Количество колонок в excel и количество сохраненных полей различается",
                         ButtonType.OK);
                 alert.show();
@@ -120,7 +121,7 @@ public class FxFieldsLoaderController implements Initializable{
         this.pdfPath = pdfPath;
     }
 
-    public void handleLoadNewFields(ActionEvent event) {
+    public void handleLoadNewFields(ActionEvent event) throws IOException {
         showProgressScreen(true);
         final Stage pdfRedactorWindow =
                 (Stage) ((Node) event.getSource()).getScene().getWindow();

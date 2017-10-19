@@ -2,6 +2,9 @@ package badgegenerator.pdfcreator;
 
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
+import com.itextpdf.io.font.PdfEncodings;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -12,11 +15,14 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class BadgeCreator {
+class BadgeCreator {
+//    private static Logger logger = Logger.getLogger(BadgeCreator.class.getSimpleName());
 
     private final List<FxField> fxFields;
+    private final ArrayList<FxToPdfFieldAdapter> adapters;
     private float ratio;
     private String[][] participants;
 
@@ -29,16 +35,27 @@ public class BadgeCreator {
     private int numberOfLines;
     private boolean compressFieldIfLineMissing;
 
-    public BadgeCreator(List<FxField> fxFields,
-                        String srcPdfPath,
-                        String[][] participants,
-                        double imageToPdfRatio,
-                        boolean compressFieldIfLineMissing) throws IOException {
+    BadgeCreator(List<FxField> fxFields,
+                 String srcPdfPath,
+                 String[][] participants,
+                 double imageToPdfRatio,
+                 boolean compressFieldIfLineMissing) throws IOException {
         // in memory test
+//        LoggerManager.initializeLogger(logger);
         this.fxFields = fxFields;
-        srcPdf = new PdfDocument(new PdfReader(srcPdfPath));
+        try {
+            srcPdf = new PdfDocument(new PdfReader(srcPdfPath));
+        } catch (IOException e) {
+            throw new IOException("Не удалось найти исходный pdf с макетом");
+        }
         PdfPage srcPage = srcPdf.getFirstPage();
         pageSize = srcPage.getPageSize();
+        this.adapters = new ArrayList<>(fxFields.size());
+        fxFields.forEach(field -> adapters.add(
+                new FxToPdfFieldAdapter(field, imageToPdfRatio, pageSize.getHeight())));
+        if(adapters.stream().anyMatch(a -> a.getFontProgram() == null)) {
+            throw new IOException("Не удалось загрузить файл шрифта");
+        }
         this.participants = participants;
         ratio = (float) imageToPdfRatio;
         this.compressFieldIfLineMissing = compressFieldIfLineMissing;
@@ -47,7 +64,7 @@ public class BadgeCreator {
         commonPdf = new PdfDocument(new PdfWriter(commonPdfOutStream));
     }
 
-    public byte[] createBadgeInMemory(int i) throws IOException {
+    byte[] createBadgeInMemory(int i) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfDocument newPdf = new PdfDocument(new PdfWriter(out));
         srcPdf.copyPagesTo(1,1,newPdf);
@@ -58,17 +75,20 @@ public class BadgeCreator {
         int sumOfMissingLines = 0;
         for (int j = 0; j < participantRow.length; j++) {
             FxField fxField = fxFields.get(j);
-            FxToPdfFieldAdapter adapter = new FxToPdfFieldAdapter(fxFields.get(j),
-                    ratio, pageSize.getHeight());
-            String value = participantRow[fxFields.get(j).getNumberOfColumn()];
+            FxToPdfFieldAdapter adapter = adapters.get(j);
+            String value = adapter.isCapitalized() ?
+                    participantRow[adapter.getNumberOfColumn()].toUpperCase()
+                    : participantRow[adapter.getNumberOfColumn()];
             String alignment = adapter.getAlignment();
             float yCoordinate = adapter.getY();
             if(compressFieldIfLineMissing && sumOfMissingLines > 0) {
                 yCoordinate += sumOfMissingLines;
             }
+            PdfFont font = PdfFontFactory
+                    .createFont(adapter.getFontProgram(), PdfEncodings.IDENTITY_H, true);
 
             pdfCanvas.beginText()
-                    .setFontAndSize(adapter.getFont(), adapter.getFontSize())
+                    .setFontAndSize(font, adapter.getFontSize())
                     .setColor(adapter.getPdfColor(), true)
                     .setLeading(adapter.getLeading())
                     .moveText(adapter.getX(), yCoordinate);
@@ -158,7 +178,7 @@ public class BadgeCreator {
      *
      * Should be called only after all badges were created.
      * */
-    public byte[] createCommonBadge() {
+    byte[] createCommonBadge() {
         commonPdf.close();
         return commonPdfOutStream.toByteArray();
     }

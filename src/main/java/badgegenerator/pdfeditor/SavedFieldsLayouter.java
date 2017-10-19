@@ -31,12 +31,12 @@ public class SavedFieldsLayouter extends AbstractFieldsLayouter {
     }
 
     @Override
-    protected void setFieldsParameters(FxField fxField, int i) {
-        FxFieldSave save = saves.get(i);
+    protected void setFieldsParameters(FxField fxField) {
+        FxFieldSave save = saves.get(fxField.getNumberOfColumn());
         alignment = save.getAlignment();
         switch (alignment) {
             case("RIGHT"): {
-                x = save.getX() - fxField.getPrefWidth() - save.getWidth();
+                x = save.getX() + save.getWidth() - fxField.getPrefWidth();
                 break;
             }
             case("CENTER"): {

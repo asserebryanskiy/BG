@@ -1,16 +1,22 @@
 package badgegenerator.pdfcreator;
 
+import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
 import javafx.concurrent.Task;
+import javafx.scene.control.Alert;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Task is designed to make time consuming creation of archive be done behind the UI
  */
 public class CreateBadgeArchiveTask extends Task {
+    private static Logger logger = Logger.getLogger(CreateBadgeArchiveTask.class.getSimpleName());
+
     private final String targetDirectoryPath;
     private final List<FxField> fxFields;
     private final double imageToPdfRatio;
@@ -33,26 +39,36 @@ public class CreateBadgeArchiveTask extends Task {
     }
 
     @Override
-    protected Void call() throws Exception {
-        fxFields.sort(Comparator.comparing(FxField::getLayoutY));
-        BadgeCreator badgeCreator = new BadgeCreator(fxFields,
-                pdfPath,
-                excelReader.getValues(),
-                imageToPdfRatio,
-                compressFieldIfLineMissing);
-        BadgeArchive badgeArchive = new BadgeArchive(targetDirectoryPath, badgeCreator);
-        final int numberOfFiles = excelReader.getValues().length;
-        for(int i = excelReader.getHasHeadings() ? 1 : 0;
-            i < numberOfFiles; i++) {
-            if(isCancelled()) break;
-            badgeArchive.createBadgeEntry(i);
-            updateProgress(i, numberOfFiles + 1);
-            updateMessage(String.format("Готов %d файл из %d", i, numberOfFiles));
+    protected Boolean call() throws Exception {
+        try {
+            fxFields.sort(Comparator.comparing(FxField::getLayoutY));
+            BadgeCreator badgeCreator = new BadgeCreator(fxFields,
+                    pdfPath,
+                    excelReader.getValues(),
+                    imageToPdfRatio,
+                    compressFieldIfLineMissing);
+            BadgeArchive badgeArchive = new BadgeArchive(targetDirectoryPath, badgeCreator);
+            final int numberOfFiles = excelReader.getValues().length;
+            for(int i = excelReader.getHasHeadings() ? 1 : 0;
+                i < numberOfFiles; i++) {
+                if(isCancelled()) break;
+                badgeArchive.createBadgeEntry(i);
+                updateProgress(i, numberOfFiles + 1);
+                updateMessage(String.format("Готов %d файл из %d", i, numberOfFiles));
+            }
+            updateProgress(numberOfFiles, numberOfFiles + 1);
+            updateMessage("Создаю общий бейдж");
+            badgeArchive.createCommonBadge();
+            badgeArchive.getOutputStream().close();
+            return true;
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    String.format("Ошибка при создании бейджей%n%s", e.getMessage()));
+            alert.show();
+            LoggerManager.initializeLogger(logger);
+            logger.log(Level.SEVERE, "Error : " + e.getMessage(), e);
+            e.printStackTrace();
+            return false;
         }
-        updateProgress(numberOfFiles, numberOfFiles + 1);
-        updateMessage("Создаю общий бейдж");
-        badgeArchive.createCommonBadge();
-        badgeArchive.getOutputStream().close();
-        return null;
     }
 }

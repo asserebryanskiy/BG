@@ -3,17 +3,13 @@ package badgegenerator.pdfeditor;
 import badgegenerator.custompanes.*;
 import badgegenerator.fxfieldssaver.FxFieldSave;
 import com.sun.javafx.tk.Toolkit;
-import javafx.scene.control.Alert;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -62,31 +58,23 @@ abstract class AbstractFieldsLayouter {
                 .forEach(i -> {
                     FxField fxField;
                     setFieldFontAndSize(i);
-                    try {
-                        if(largestFields[i].length() > longestWords[i].length()) {
-                            fxField = new FieldWithHyphenation(largestFields[i],
-                                    longestWords[i],
-                                    i,
-                                    imageToPdfRatio,
-                                    fieldsParent.getBoundsInLocal().getWidth() - 48,
-                                    fontPath,
-                                    fontSize);
-                        } else {
-                            fxField = new SingleLineField(largestFields[i],
-                                    i,
-                                    imageToPdfRatio,
-                                    fieldsParent.getBoundsInLocal().getWidth() - 48,
-                                    fontSize,
-                                    fontPath);
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Alert alert = new Alert(Alert.AlertType.ERROR,
-                                "Не удалось найти файл сохранения");
-                        alert.show();
-                        return;
+                    if(largestFields[i].length() > longestWords[i].length()) {
+                        fxField = new FieldWithHyphenation(largestFields[i],
+                                longestWords[i],
+                                i,
+                                imageToPdfRatio,
+                                fieldsParent.getBoundsInLocal().getWidth() - 48,
+                                fontPath,
+                                fontSize);
+                    } else {
+                        fxField = new SingleLineField(largestFields[i],
+                                i,
+                                imageToPdfRatio,
+                                fieldsParent.getBoundsInLocal().getWidth() - 48,
+                                fontSize,
+                                fontPath);
                     }
-                    setFieldsParameters(fxField, i);
+                    setFieldsParameters(fxField);
                     if(fxField instanceof FieldWithHyphenation) {
                         ((FieldWithHyphenation) fxField).addResizeableBorder(
                                 new ResizeableBorder(((FieldWithHyphenation) fxField),
@@ -112,63 +100,75 @@ abstract class AbstractFieldsLayouter {
                             new DistanceViewer(fxField, Orientation.HORIZONTAL));
                     verticalScaleBar.getChildren().add(
                             new DistanceViewer(fxField, Orientation.VERTICAL));
-                    /*fieldsParent.getChildren().addAll(
-                            new DistanceViewer(fxField, Orientation.VERTICAL),
-                            new DistanceViewer(fxField, Orientation.HORIZONTAL));*/
                     fxFields.add(fxField);
                 });
         fieldsParent.getChildren().addAll(FxField.getGuides());
         Line verticalGuide = new Line(fieldsParent.getBoundsInLocal().getWidth() / 2,
-                0,
+                1,
                 fieldsParent.getBoundsInLocal().getWidth() / 2,
                 fieldsParent.getBoundsInLocal().getHeight() - 1);
         verticalGuide.setVisible(false);
-        fieldsParent.getChildren().add(verticalGuide);
+        Line horizontalGuide = new Line(1,
+                fieldsParent.getBoundsInLocal().getHeight() / 2,
+                fieldsParent.getBoundsInLocal().getWidth() - 1,
+                fieldsParent.getBoundsInLocal().getHeight() / 2);
+        horizontalGuide.setManaged(false);
+        horizontalGuide.setVisible(false);
+        fieldsParent.getChildren().addAll(verticalGuide, horizontalGuide);
         FxField.setVerticalGuide(verticalGuide);
+        FxField.setHorizontalGuide(horizontalGuide);
     }
 
-    void addScaleMarks(Rectangle verticalScaleBack, Rectangle horizontalScaleBack) {
+    void addScaleMarks() {
+        float textHeight = Toolkit.getToolkit().getFontLoader().getFontMetrics(new Font(8))
+                .getLineHeight();
+        float textWidth = Toolkit.getToolkit().getFontLoader()
+                .computeStringWidth("999", new Font(8));
         double parentHeight = fieldsParent.getBoundsInLocal().getHeight();
-        double oneMarkHeight = Toolkit.getToolkit().getFontLoader()
-                .getFontMetrics(new Font(8)).getLineHeight();
-        int maxNumberOfMarksV = (int) (parentHeight / oneMarkHeight);
-        double vStep = Math.ceil(parentHeight * imageToPdfRatio / maxNumberOfMarksV / 10) * 10;
-        vStep /= imageToPdfRatio;
-        // VERTICAL
-        for(double i = 0; i <= parentHeight; i += vStep) {
-            VBox pane = new VBox();
-            Text text = new Text(String.format("%.0f", i * imageToPdfRatio));
-            pane.setLayoutX(0);
-            pane.setLayoutY(parentHeight - i);
-            text.setFont(new Font(8));
-            Line line = new Line(0, i, 25, i);
-            pane.setManaged(false);
-            pane.setManaged(false);
-            pane.getChildren().addAll(line, text);
-            verticalScaleBar.getChildren().add(pane);
-        }
-        verticalScaleBack.setHeight(verticalScaleBar.getBoundsInLocal().getHeight() + 10);
 
-        double parentWidth = fieldsParent.getBoundsInLocal().getWidth();
-        double oneMarkWidth = Toolkit.getToolkit().getFontLoader()
-                .computeStringWidth("100 ", new Font(8));
-        int maxNumberOfMarksH = (int) (parentWidth / oneMarkWidth);
-        double hStep = Math.ceil(parentWidth * imageToPdfRatio / maxNumberOfMarksH / 10) * 10;
-        hStep /= imageToPdfRatio;
-        // HORIZONTAL
-        for(double i = 0; i <= parentWidth - oneMarkWidth; i += hStep) {
-            HBox pane = new HBox();
-            Text text = new Text(String.format("%.0f ", i * imageToPdfRatio));
-            pane.setLayoutY(0);
-            pane.setLayoutX(i);
+        // pdf - 419, ratio - 1.19
+        double bigStep = Math.ceil(parentHeight / imageToPdfRatio / 200) * 10 * imageToPdfRatio;
+        double smallStep = bigStep / 5;
+
+        for(double i = 0; i <= parentHeight; i += bigStep) {
+            Text text = new Text(String.valueOf((int) Math.round(i / imageToPdfRatio)));
             text.setFont(new Font(8));
-            Line line = new Line(i, 1, i, 16);
-            pane.setManaged(false);
-            pane.setManaged(false);
-            pane.getChildren().addAll(line, text);
-            horizontalScaleBar.getChildren().add(pane);
+            text.setLayoutY(i + textHeight);
+            text.setManaged(false);
+            Line line = new Line(0, i, textWidth + 10, i);
+            line.setManaged(false);
+            for(double j = smallStep; j < bigStep; j += smallStep) {
+                double y = i + j;
+                if(y > parentHeight) break;
+                Line smallMark = new Line(textWidth + 5, y, textWidth + 10, y);
+                smallMark.setManaged(false);
+                verticalScaleBar.getChildren().add(smallMark);
+            }
+            verticalScaleBar.getChildren().addAll(text, line);
         }
-        horizontalScaleBack.setWidth(parentWidth);
+        Rectangle vBack = new Rectangle(textWidth + 10, parentHeight,
+                Color.color(0,0,0,0));
+        verticalScaleBar.getChildren().add(vBack);
+
+        // HORIZONTAL
+        double parentWidth = fieldsParent.getBoundsInLocal().getWidth();
+        for(double i = 0; i <= parentWidth; i += bigStep) {
+            Text text = new Text(String.valueOf((int) Math.round(i / imageToPdfRatio)));
+            text.setFont(new Font(8));
+            text.setLayoutY(textHeight);
+            text.setLayoutX(i + 5);
+            text.setManaged(false);
+            Line line = new Line(i, 1, i, textWidth + 10);
+            line.setManaged(false);
+            for(double j = smallStep; j < bigStep; j += smallStep) {
+                double x = i + j;
+                if(x > parentWidth) break;
+                Line smallMark = new Line(x, textWidth + 10, x, textWidth + 5);
+                smallMark.setManaged(false);
+                horizontalScaleBar.getChildren().add(smallMark);
+            }
+            horizontalScaleBar.getChildren().addAll(text, line);
+        }
     }
 
     List<FxField> getFxFields() {
@@ -177,5 +177,5 @@ abstract class AbstractFieldsLayouter {
 
     protected abstract void setFieldFontAndSize(int i);
 
-    protected abstract void setFieldsParameters(FxField fxField, int i);
+    protected abstract void setFieldsParameters(FxField fxField);
 }

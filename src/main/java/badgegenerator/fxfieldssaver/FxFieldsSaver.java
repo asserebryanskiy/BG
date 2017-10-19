@@ -1,7 +1,8 @@
 package badgegenerator.fxfieldssaver;
 
+import badgegenerator.appfilesmanager.LoggerManager;
+import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FxField;
-import badgegenerator.fileloader.SavesLoader;
 import javafx.scene.control.Alert;
 
 import java.io.File;
@@ -15,30 +16,28 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class is used to create folders with serialized fields and their fonts.
  */
 public class FxFieldsSaver {
-    private final String bundleName;
-    private List<FxField> fields;
-    private String bundlePath;
+    private static Logger logger = Logger.getLogger(FxFieldsSaver.class.getSimpleName());
 
-    public FxFieldsSaver(List<FxField> fields,
-                         String bundleName) {
-        this.fields = fields;
-        this.bundleName = bundleName;
-        bundlePath = SavesLoader.getSavesFolder().getAbsolutePath()
-                + "/" + bundleName;
+    private FxFieldsSaver() {
     }
 
-    public void createSave() {
-        File directory = new File(bundlePath);
-        directory.mkdir();
+    public static void createSave(List<FxField> fields, String bundleName) {
+        File saveDir = new File(SavesManager.getSavesFolder().getAbsolutePath()
+                + File.separator
+                + bundleName);
+        saveDir.mkdir();
         fields.forEach(field -> {
             FxFieldSave fieldFile = new FxFieldSave(field);
-            String filePath = String.format("%s/%s.fxf",
-                    directory.getAbsolutePath(),
+            String filePath = String.format("%s%s%s.fxf",
+                    saveDir.getAbsolutePath(),
+                    File.separator,
                     fieldFile.getNumberOfColumn());
             ObjectOutputStream oos;
             try {
@@ -47,13 +46,18 @@ public class FxFieldsSaver {
                 oos.writeObject(fieldFile);
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
-                        String.format("Не удалось сохранить поле%n%s", e.toString()));
+                        "Не удалось сохранить поле");
                 alert.show();
-                e.printStackTrace();
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE,
+                        String.format("Ошибка при сохранении поля%d", field.getNumberOfColumn()),
+                        e);
             }
         });
 
-        File fontsDirectory = new File(directory.getAbsolutePath() + "/fonts");
+        File fontsDirectory = new File(saveDir.getAbsolutePath()
+                + File.separator
+                + "fonts");
         fontsDirectory.mkdir();
         Map<String, FxField> uniqueFontNames = new HashMap<>();
         for(FxField field : fields) {
@@ -66,8 +70,9 @@ public class FxFieldsSaver {
         uniqueFontNames.keySet().forEach(key -> {
             String fontPath = uniqueFontNames.get(key).getFontPath();
             Path from = Paths.get(fontPath);
-            Path to = Paths.get(String.format("%s/%s.%s",
+            Path to = Paths.get(String.format("%s%s%s.%s",
                     fontsDirectory.getAbsolutePath(),
+                    File.separator,
                     key,
                     fontPath.substring(fontPath.length() - 3, fontPath.length())));
             try {
@@ -78,7 +83,10 @@ public class FxFieldsSaver {
                         String.format("Не удалось сохранить файл шрифта%n%s",
                                 e.toString()));
                 alert.show();
-                e.printStackTrace();
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE,
+                        String.format("Ошибка при сохранении шрифта в %s", fontPath),
+                        e);
             }
         });
     }

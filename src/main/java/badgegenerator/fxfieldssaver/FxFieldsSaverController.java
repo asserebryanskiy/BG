@@ -1,7 +1,8 @@
 package badgegenerator.fxfieldssaver;
 
+import badgegenerator.appfilesmanager.LoggerManager;
+import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FxField;
-import badgegenerator.fileloader.SavesLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -18,9 +19,13 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class FxFieldsSaverController {
+    private static Logger logger = Logger.getLogger(FxFieldsSaverController.class.getSimpleName());
+
     private final String PLACEHOLDER = "--Нет сохранения--";
 
     @FXML
@@ -38,8 +43,8 @@ public class FxFieldsSaverController {
     public void init(List<FxField> fields, Stage stage) {
         this.fields = fields;
         this.stage = stage;
-        srcDirectory = SavesLoader.getSavesFolder();
-        saveNames = SavesLoader.getSavesNames();
+        srcDirectory = SavesManager.getSavesFolder();
+        saveNames = SavesManager.getSavesNames();
         if(saveNames.size() > 0) {
             IntStream.range(0, saveNames.size())
                     .forEach(i -> {
@@ -76,7 +81,7 @@ public class FxFieldsSaverController {
         btnBox.getChildren().forEach(btn -> ((Button) btn).setPrefWidth(longestBtnWidth));
     }
 
-    public void handleSaveBtn() {
+    public void handleSaveBtn() throws IOException {
         TextField clickedField = (TextField) savesBox.getChildren()
                 .get(lastClickedItemIndex);
         if(saveIndices.contains(lastClickedItemIndex)) {
@@ -84,40 +89,52 @@ public class FxFieldsSaverController {
         } else if (saveNames.contains(clickedField.getText())) {
             clickedField.setText("");
             Alert alert = new Alert(Alert.AlertType.WARNING,
-                    "Сохранение с таким именем уже существует");
+                    "Сохранение с таким именем уже существует.");
             alert.show();
             return;
         } else if(clickedField.getText().startsWith(".")) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
-                    "Имя сохранения не может начинаться с точки");
+                    "Имя сохранения не может начинаться с точки.");
             alert.show();
             return;
         } else if(clickedField.getText().contains("/")
                 || clickedField.getText().contains("\\")) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
-                    "Имя сохранения не может содержать\"/\" и \"\\\"");
+                    "Имя сохранения не может содержать\"/\" и \"\\\".");
             alert.show();
             return;
         }
         else if(clickedField.getText().isEmpty()) return;
 
-        FxFieldsSaver saver = new FxFieldsSaver(fields, clickedField.getText());
-        saver.createSave();
+        FxFieldsSaver.createSave(fields, clickedField.getText());
         stage.close();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                "Настройки сохранены");
+        alert.show();
     }
 
-    public void handleDeleteSave() throws IOException {
+    public void handleDeleteSave()  {
         TextField clickedField = (TextField) savesBox.getChildren()
                 .get(lastClickedItemIndex);
         if (!saveIndices.contains(lastClickedItemIndex)) return;
-        else if(SavesLoader.getCurrentSaveName().equals(clickedField.getText())) {
+        else if(SavesManager.getCurrentSaveName().equals(clickedField.getText())) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
-                    "Нельзя удалить текущее сохранение");
+                    "Нельзя удалить текущее сохранение.");
             alert.show();
             return;
         }
         saveNames.remove(clickedField.getText());
-        delete(srcDirectory.getAbsolutePath() + "/" + clickedField.getText());
+        try {
+            delete(srcDirectory.getAbsolutePath()
+                    + File.separator
+                    + clickedField.getText());
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Не удалось удалить сохранение");
+            alert.show();
+            LoggerManager.initializeLogger(logger);
+            logger.log(Level.SEVERE, "Ошибка при удалении сохранения", e);
+        }
         clickedField.setText("");
         clickedField.setPromptText(PLACEHOLDER);
         clickedField.setEditable(true);

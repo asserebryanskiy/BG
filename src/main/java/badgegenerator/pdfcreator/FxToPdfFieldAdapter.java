@@ -1,18 +1,21 @@
 package badgegenerator.pdfcreator;
 
+import badgegenerator.appfilesmanager.AssessableFonts;
+import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
-import com.itextpdf.io.font.PdfEncodings;
+import com.itextpdf.io.font.FontProgram;
+import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
 import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Is used to transform javaFx field parameters to pdf ones.
@@ -23,39 +26,66 @@ import java.io.InputStream;
  *  - calculating proper leading between lines.
  * */
 public class FxToPdfFieldAdapter {
+    private static Logger logger = Logger.getLogger(FxToPdfFieldAdapter.class.getSimpleName());
+
     private float x;
     private float y;
     private String alignment;
     private float fontSize;
-    private PdfFont font;
+    private FontProgram fontProgram;
     private Color pdfColor;
     private float leading;
     private int numberOfLines;
+    private int numberOfColumn;
+    private boolean capitalized;
 
     public FxToPdfFieldAdapter(FxField fxField,
                                double imageToPdfRatio,
-                               float pdfHeight) throws IOException {
+                               float pdfHeight) {
         x = (float) (fxField.getLayoutX() / imageToPdfRatio);
         y = (float) (pdfHeight - (fxField.getLayoutY() + getFontMetrics(fxField).getMaxAscent())
                 / imageToPdfRatio);
         alignment = fxField.getAlignment();
         fontSize = (float) (fxField.getFontSize() / imageToPdfRatio);
 
-        if(fxField.getFontPath() == null) {
+        if(fxField.getFont().getName().equals("Helvetica")) {
             InputStream fontInputStream = getClass()
                     .getResourceAsStream("/fonts/Helvetica.otf");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[2048];
             int a;
-            while((a = fontInputStream.read(buffer, 0, buffer.length)) != -1) {
-                baos.write(buffer, 0, a);
+            try {
+                while((a = fontInputStream.read(buffer, 0, buffer.length)) != -1) {
+                    baos.write(buffer, 0, a);
+                }
+                baos.flush();
+                fontProgram = FontProgramFactory.createFont(baos.toByteArray());
+            } catch (IOException e) {
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE, "Не удалось загрузить Helvetica", e);
+                e.printStackTrace();
             }
-            baos.flush();
-            font = PdfFontFactory.createFont(baos.toByteArray(),
-                    PdfEncodings.IDENTITY_H, true);
+        } else if(fxField.getFontPath() == null) {
+            String fontPath = AssessableFonts.getFontPath(fxField.getFont().getName());
+            try {
+                fontProgram = FontProgramFactory.createFont(fontPath);
+            } catch (IOException e) {
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE,
+                        String.format("Не удалось загрузить шрифт из %s", fontPath),
+                        e);
+                e.printStackTrace();
+            }
         } else {
-            font = PdfFontFactory.createFont(fxField.getFontPath(),
-                    PdfEncodings.IDENTITY_H, true);
+            try {
+                fontProgram = FontProgramFactory.createFont(fxField.getFontPath());
+            } catch (IOException e) {
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE,
+                        String.format("Не удалось загрузить шрифт из %s", fxField.getFontPath()),
+                        e);
+                e.printStackTrace();
+            }
         }
 
         javafx.scene.paint.Color fxColor = fxField.getFill();
@@ -68,17 +98,19 @@ public class FxToPdfFieldAdapter {
         if (fxField instanceof FieldWithHyphenation) {
             numberOfLines = ((FieldWithHyphenation) fxField).getNumberOfLines();
         } else numberOfLines = 1;
+        numberOfColumn = fxField.getNumberOfColumn();
+        capitalized = fxField.isCapitalized();
     }
 
     private FontMetrics getFontMetrics(FxField fxField) {
         return Toolkit.getToolkit().getFontLoader().getFontMetrics(fxField.getFont());
     }
 
-    public float getX() {
+    float getX() {
         return x;
     }
 
-    public float getY() {
+    float getY() {
         return y;
     }
 
@@ -86,23 +118,31 @@ public class FxToPdfFieldAdapter {
         return alignment;
     }
 
-    public float getFontSize() {
+    float getFontSize() {
         return fontSize;
     }
 
-    public PdfFont getFont() {
-        return font;
+    FontProgram getFontProgram() {
+        return fontProgram;
     }
 
-    public Color getPdfColor() {
+    Color getPdfColor() {
         return pdfColor;
     }
 
-    public float getLeading() {
+    float getLeading() {
         return leading;
     }
 
-    public int getNumberOfLines() {
+    int getNumberOfLines() {
         return numberOfLines;
+    }
+
+    int getNumberOfColumn() {
+        return numberOfColumn;
+    }
+
+    boolean isCapitalized() {
+        return capitalized;
     }
 }
