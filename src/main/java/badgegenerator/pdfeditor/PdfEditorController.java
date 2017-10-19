@@ -17,6 +17,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -33,6 +36,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -239,12 +243,13 @@ public class PdfEditorController {
                     Optional<ButtonType> result = doneAlert.showAndWait();
                     if (result.isPresent() && result.get() == yesBtn) {
                         String path = selectedDirectory.getAbsolutePath();
-                        path = path.substring(0, path.lastIndexOf(File.separator));
+                        String parentPath = path.substring(0, path.lastIndexOf(File.separator));
                         try {
                             if(PlatformUtil.isMac()) {
-                                Runtime.getRuntime().exec("open " + path);
+                                Runtime.getRuntime().exec("open " + parentPath);
                             } else {
-                                Runtime.getRuntime().exec("explorer.exe /select, " + path);
+                                Runtime.getRuntime().exec("explorer.exe /select, "
+                                        + parentPath + path.substring(path.lastIndexOf(File.separator)));
                             }
                         } catch (IOException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR,

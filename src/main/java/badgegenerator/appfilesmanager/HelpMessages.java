@@ -21,9 +21,8 @@ public class HelpMessages {
     public static void load() {
         helpMessages = new HashMap<>();
         try(Scanner scanner = new Scanner(
-                HelpMessages.class.getClassLoader()
-                        .getResourceAsStream(File.separator
-                                + "helpMessages.txt"))) {
+                HelpMessages.class
+                        .getResourceAsStream("/helpMessages.txt"))) {
             while(scanner.hasNext()) {
                 String line = scanner.nextLine();
                 String key = line.substring(0, line.indexOf("|"));
@@ -44,7 +43,7 @@ public class HelpMessages {
                     "Не удалось загрузить текст подсказок");
             alert.show();
             LoggerManager.initializeLogger(logger);
-            logger.log(Level.SEVERE, "Error", e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
