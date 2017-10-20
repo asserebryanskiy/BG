@@ -34,12 +34,15 @@ public class FxFieldsLoader {
                                         savePath, File.separator, fileName));
                         ObjectInputStream ois = new ObjectInputStream(fis);
                         FxFieldSave fieldFile = (FxFieldSave) ois.readObject();
+                        ois.close();
+                        fis.close();
                         if(!fieldFile.getFontName().equals("Helvetica")) {
                             String fontPath = searchForFont(savePath,
                                     fieldFile.getFontName());
                             fieldFile.setFontPath(fontPath);
                             FileInputStream fontInStream = new FileInputStream(fontPath);
                             fieldFile.setFont(Font.loadFont(fontInStream, 13));
+                            fontInStream.close();
                         }
                         return fieldFile;
                     } catch (Exception e) {

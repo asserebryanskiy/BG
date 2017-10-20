@@ -3,6 +3,7 @@ package badgegenerator.appfilesmanager;
 import com.sun.javafx.PlatformUtil;
 import javafx.scene.control.Alert;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -34,7 +35,8 @@ public class HelpMessages {
                     + " - /System/Library/Fonts%n"
                     + " - /Library/Fonts%n"
                     + " - User/Library/Fonts%n"
-                    : "Программа ищет шрифты в папке C:\\\\Windows\\Fonts%n";
+                    : String.format("Программа ищет шрифты в папке %s%n",
+                    new File(System.getenv("WINDIR"), "Fonts").getAbsolutePath());
             helpMessages.put("fontsHelpIcon", fontHelpMessage);
         } catch (Exception e) {
             e.printStackTrace();

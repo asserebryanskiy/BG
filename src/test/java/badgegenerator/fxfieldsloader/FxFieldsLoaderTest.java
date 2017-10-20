@@ -15,6 +15,7 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -166,7 +167,8 @@ public class FxFieldsLoaderTest extends ApplicationTest{
     @Test
     public void fontPathPreservesAfterSaveLoad() throws Exception {
         // Arrange
-        String path = getClass().getResource(  "/freeset.ttf").getFile();
+        URL url = getClass().getResource("/freeset.ttf");
+        String path = Paths.get(url.toURI()).toFile().getAbsolutePath();
         fields.forEach(f -> f.setFont(path));
 
         // Act
@@ -177,7 +179,12 @@ public class FxFieldsLoaderTest extends ApplicationTest{
         FxFieldSave loadedSave = saves.get(0);
         FxFieldSave loadedSaveWithHyp = saves.get(1);
         String expectedPath = SavesManager.getSavesFolder().getAbsolutePath()
-                + "/test/fonts/FreeSet.ttf";
+                + File.separator
+                + "test"
+                + File.separator
+                + "fonts"
+                + File.separator
+                + "FreeSet.ttf";
 
         // Assert
         assertThat(loadedSave.getFontPath(), is(expectedPath));

@@ -4,6 +4,7 @@ import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
+import com.sun.javafx.PlatformUtil;
 import javafx.stage.Stage;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,8 +33,8 @@ public class FxFieldsSaverTest extends ApplicationTest{
     @Before
     public void setUp() throws IOException {
         FxField field1 = new SingleLineField("Example", 0, 100);
-        String fontPath = FxFieldsSaverTest.class.getClassLoader()
-                .getResource(File.separator + "freeset.ttf").getFile();
+        String fontPath = getClass().getResource("/freeset.ttf").getPath();
+        if(PlatformUtil.isWindows()) fontPath = fontPath.substring(1);
         FxField field2 = new FieldWithHyphenation("Example words", 1, 120);
         field2.setFont(fontPath);
         List<FxField> fields = new ArrayList<>();
