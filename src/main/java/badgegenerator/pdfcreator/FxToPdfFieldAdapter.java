@@ -65,7 +65,17 @@ public class FxToPdfFieldAdapter {
                 logger.log(Level.SEVERE, "Не удалось загрузить Helvetica", e);
                 e.printStackTrace();
             }
-        } else if(fxField.getFontPath() == null) {
+        } else if(fxField.customFontBrowsed()) {
+            try {
+                fontProgram = FontProgramFactory.createFont(fxField.getFontPath());
+            } catch (IOException e) {
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.SEVERE,
+                        String.format("Не удалось загрузить шрифт из %s", fxField.getFontPath()),
+                        e);
+                e.printStackTrace();
+            }
+        } else {
             String fontPath = AssessableFonts.getFontPath(fxField.getFont().getName());
             try {
                 fontProgram = FontProgramFactory.createFont(fontPath);
@@ -73,16 +83,6 @@ public class FxToPdfFieldAdapter {
                 LoggerManager.initializeLogger(logger);
                 logger.log(Level.SEVERE,
                         String.format("Не удалось загрузить шрифт из %s", fontPath),
-                        e);
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                fontProgram = FontProgramFactory.createFont(fxField.getFontPath());
-            } catch (IOException e) {
-                LoggerManager.initializeLogger(logger);
-                logger.log(Level.SEVERE,
-                        String.format("Не удалось загрузить шрифт из %s", fxField.getFontPath()),
                         e);
                 e.printStackTrace();
             }

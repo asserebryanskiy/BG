@@ -41,6 +41,7 @@ public class CreateBadgeArchiveTask extends Task {
     @Override
     protected Boolean call() throws Exception {
         try {
+            // is done to provide fields bindings functionality
             fxFields.sort(Comparator.comparing(FxField::getLayoutY));
             BadgeCreator badgeCreator = new BadgeCreator(fxFields,
                     pdfPath,

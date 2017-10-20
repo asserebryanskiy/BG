@@ -23,6 +23,7 @@ public class FxFieldSave implements Serializable{
     private String alignment;
     private int numberOfColumn;
     private Font font;
+    private boolean capitalized;
 
     public FxFieldSave(FxField field) {
         x = field.getLayoutX();
@@ -36,6 +37,7 @@ public class FxFieldSave implements Serializable{
         fontName = field.getFont().getName();
         alignment = field.getAlignment();
         numberOfColumn = field.getNumberOfColumn();
+        capitalized = field.isCapitalized();
     }
 
     public double getX() {
@@ -92,5 +94,9 @@ public class FxFieldSave implements Serializable{
 
     public double getWidth() {
         return width;
+    }
+
+    public boolean isCapitalized() {
+        return capitalized;
     }
 }

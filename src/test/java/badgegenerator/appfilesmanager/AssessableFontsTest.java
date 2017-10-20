@@ -3,16 +3,16 @@ package badgegenerator.appfilesmanager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class AssessableFontsTest {
-    private static List<String> fontNames;
+    private static Set<String> fontNames;
     @BeforeClass
     public static void setUp() throws Exception {
-        fontNames = AssessableFonts.getAssessableFxFonts();
+        fontNames = AssessableFonts.getFontsNames();
     }
 
     @Test

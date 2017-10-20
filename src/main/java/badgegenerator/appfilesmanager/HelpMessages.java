@@ -3,7 +3,6 @@ package badgegenerator.appfilesmanager;
 import com.sun.javafx.PlatformUtil;
 import javafx.scene.control.Alert;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -22,7 +21,7 @@ public class HelpMessages {
         helpMessages = new HashMap<>();
         try(Scanner scanner = new Scanner(
                 HelpMessages.class
-                        .getResourceAsStream("/helpMessages.txt"))) {
+                        .getResourceAsStream("/helpMessages.txt"), "UTF8")) {
             while(scanner.hasNext()) {
                 String line = scanner.nextLine();
                 String key = line.substring(0, line.indexOf("|"));

@@ -34,6 +34,7 @@ public class SavedFieldsLayouter extends AbstractFieldsLayouter {
     protected void setFieldsParameters(FxField fxField) {
         FxFieldSave save = saves.get(fxField.getNumberOfColumn());
         alignment = save.getAlignment();
+        fxField.setCapitalized(save.isCapitalized());
         switch (alignment) {
             case("RIGHT"): {
                 x = save.getX() + save.getWidth() - fxField.getPrefWidth();

@@ -7,7 +7,6 @@ import badgegenerator.custompanes.SingleLineField;
 import javafx.stage.Stage;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -31,7 +30,7 @@ import static org.junit.Assert.assertThat;
 public class FxFieldsSaverTest extends ApplicationTest{
     private static File directory;
     @Before
-    public void beforeAllTests() throws IOException {
+    public void setUp() throws IOException {
         FxField field1 = new SingleLineField("Example", 0, 100);
         String fontPath = FxFieldsSaverTest.class.getClassLoader()
                 .getResource(File.separator + "freeset.ttf").getFile();

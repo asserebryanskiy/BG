@@ -191,6 +191,7 @@ public class FileLoaderController implements Initializable{
                         savedFieldsWindow.setScene(new Scene(root));
                         savedFieldsWindow.setResizable(false);
                         savedFieldsWindow.show();
+                        savedFieldsWindow.centerOnScreen();
                     } else {
                         showProgressScreen(false);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION,

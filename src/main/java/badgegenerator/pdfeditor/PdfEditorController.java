@@ -17,9 +17,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -36,7 +33,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -174,7 +170,7 @@ public class PdfEditorController {
                 (int) (fxFields.get(0).getFont().getSize() / imageToPdfRatio)));
         fontNameField.setText(fxFields.get(0).getFont().getName());
         fontNameField.setEditable(true);
-        TextFields.bindAutoCompletion(fontNameField, AssessableFonts.getAssessableFxFonts());
+        TextFields.bindAutoCompletion(fontNameField, AssessableFonts.getFontsNames());
         fontNameField.setFocusTraversable(true);
         fxFields.forEach(fxField -> {
             fxField.setFontNameField(fontNameField);
@@ -182,6 +178,15 @@ public class PdfEditorController {
             fxField.setFontColorPicker(fontColorPicker);
             fxField.setAlignmentButtons(alignmentButtons);
         });
+    }
+
+    public void handleChangeFont() {
+        fxFields.stream()
+                .filter(f -> f.isSelected)
+                .forEach(field -> {
+                    String fontName = fontNameField.getText();
+                    field.setFont(new Font(fontName, field.getFontSize()));
+                });
     }
 
     public void handleBrowseFont() throws InterruptedException, IOException {
@@ -356,6 +361,7 @@ public class PdfEditorController {
         saveFieldsWindow.initModality(Modality.APPLICATION_MODAL);
         saveFieldsWindow.toFront();
         saveFieldsWindow.show();
+        saveFieldsWindow.centerOnScreen();
     }
 
     public void handleShowAnimation(MouseEvent event) {
@@ -398,17 +404,6 @@ public class PdfEditorController {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/FileLoader.fxml"));
         stage.setScene(new Scene(root));
         stage.centerOnScreen();
-    }
-
-    public void handleChangeFont() {
-        fxFields.stream()
-                .filter(f -> f.isSelected)
-                .forEach(field -> {
-                    String fontName = fontNameField.getText();
-                    field.setFont(
-                            new Font(fontName, field.getFontSize()),
-                            AssessableFonts.getFontPath(fontName));
-                });
     }
 
     public void handleShowHelpBox(MouseEvent event) throws IOException {

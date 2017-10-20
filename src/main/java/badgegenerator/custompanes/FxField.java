@@ -44,6 +44,7 @@ public abstract class FxField extends DraggablePane {
     ColorPicker fontColorPicker;
     List<Button> alignmentButtons;
     private boolean capitalized;
+    private boolean customFontBrowsed;
     private static Line horizontalGuide;
 
     public FxField(int numberOfColumn,
@@ -181,14 +182,15 @@ public abstract class FxField extends DraggablePane {
         return font;
     }
 
-    public void setFont(Font font, String fontPath) {
-        setFont(font);
-        this.fontPath = fontPath;
+    public void setFont(Font font) {
+        this.font = font;
+        fontPath = AssessableFonts.getFontPath(font.getName());
+        customFontBrowsed = false;
+        setFont();
     }
 
-    public void setFont(Font font) {
+    private void setFont() {
         double oldWidth = getPrefWidth();
-        this.font = font;
         setFontImpl();
         setMaxHeight(computeMaxHeight());
         switch (alignment) {
@@ -203,7 +205,7 @@ public abstract class FxField extends DraggablePane {
         }
 
         if(fontNameField != null) {
-            fontNameField.setText(font.getName());
+            fontNameField.setText(this.font.getName());
         }
     }
 
@@ -216,7 +218,9 @@ public abstract class FxField extends DraggablePane {
             e.printStackTrace();
         }
         this.fontPath = fontPath;
-        setFont(Font.loadFont(fontInputStream, getFontSize()));
+        customFontBrowsed = true;
+        font = Font.loadFont(fontInputStream, getFontSize());
+        setFont();
     }
 
     abstract void setFontImpl();
@@ -344,5 +348,9 @@ public abstract class FxField extends DraggablePane {
 
     public boolean isCapitalized() {
         return capitalized;
+    }
+
+    public boolean customFontBrowsed() {
+        return customFontBrowsed;
     }
 }
