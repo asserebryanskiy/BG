@@ -15,7 +15,7 @@
             <ColumnConstraints halignment="LEFT" />
          </columnConstraints>
          <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            <RowConstraints />
             <RowConstraints />
             <RowConstraints maxHeight="106.0" minHeight="0.0" />
             <RowConstraints maxHeight="160.0" minHeight="2.9440317153930664" />
