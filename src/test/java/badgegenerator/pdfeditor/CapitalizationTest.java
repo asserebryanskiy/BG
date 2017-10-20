@@ -3,9 +3,11 @@ package badgegenerator.pdfeditor;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
+import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class CapitalizationTest {
+public class CapitalizationTest extends ApplicationTest{
     private FieldWithHyphenation fieldWithHyp;
     private SingleLineField field;
     private List<FxField> fields;
@@ -100,5 +102,10 @@ public class CapitalizationTest {
                 is(fieldRightX));
         assertThat("Multi line", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),
                 is(fieldWithHypRightX));
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
     }
 }

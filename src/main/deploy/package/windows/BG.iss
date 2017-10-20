@@ -5,11 +5,11 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{8C5E5A2B-E6C2-4B9F-B960-81414A08961B}
+AppId={{5666E38F-2AFC-4662-964E-92203E4EEC86}
 AppName=BG
-AppVersion=1.0
-;AppVerName=BG 1.0
-AppPublisher=Company
+AppVersion=1.2
+;AppVerName=BG 1.2
+AppPublisher=My Company, Inc.
 AppPublisherURL=http://www.example.com/
 AppSupportURL=http://www.example.com/
 AppUpdatesURL=http://www.example.com/
@@ -17,7 +17,7 @@ DefaultDirName={pf}\BG
 DisableProgramGroupPage=yes
 OutputDir=C:\Users\User\Desktop
 OutputBaseFilename=BGsetup
-SetupIconFile=C:\Users\User\IdeaProjects\BG1\target\jfx\native\BG\BG.ico
+SetupIconFile=C:\Users\User\IdeaProjects\BG\src\main\deploy\package\windows\BG.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -27,6 +27,10 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+[Files]
+Source: "BG\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{commonprograms}\BG"; Filename: "{app}\BG.exe"

@@ -26,6 +26,8 @@
                     <mainClass>badgegenerator.Main</mainClass>
                     <vendor>company</vendor>
                     <appName>BG</appName>
+                    <bundler>EXE</bundler>
+                    <verbose>true</verbose>
                 </configuration>
                 <executions>
                     <execution>

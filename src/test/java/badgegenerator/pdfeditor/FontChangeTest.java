@@ -4,10 +4,14 @@ import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
 
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +21,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by andreyserebryanskiy on 10/10/2017.
  */
-public class FontChangeTest {
-    private String fontPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/freeset.ttf";
+public class FontChangeTest extends ApplicationTest{
     private FieldWithHyphenation fieldWithHyp;
     private SingleLineField field;
     private List<FxField> fields;
@@ -39,6 +42,10 @@ public class FontChangeTest {
 
     @Test
     public void prefSizeChangesOnFontChange() throws Exception {
+        // Arrange
+        URL fontUrl = getClass().getResource("/freeset.ttf");
+        String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
+
         // Act
         fields.forEach(f -> f.setFont(fontPath));
 
@@ -97,6 +104,9 @@ public class FontChangeTest {
     public void colorPreservesOnFontChange() throws Exception {
         // Arrange
         fields.forEach(f -> f.setFill(Color.RED));
+        URL fontUrl = getClass().getResource("/freeset.ttf");
+        String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
+
 
         // Act
         fields.forEach(f -> f.setFont(fontPath));
@@ -125,6 +135,9 @@ public class FontChangeTest {
         fields.forEach(f -> f.setAlignment("RIGHT"));
         double fieldRightX = field.getPrefWidth();
         double fieldWithHypRightX = fieldWithHyp.getPrefWidth();
+        URL fontUrl = getClass().getResource("/freeset.ttf");
+        String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
+
 
         // Act
         fields.forEach(f -> f.setFont(fontPath));
@@ -151,5 +164,9 @@ public class FontChangeTest {
                 is(fieldRightX));
         assertThat("Multi line", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),
                 is(fieldWithHypRightX));
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
     }
 }
