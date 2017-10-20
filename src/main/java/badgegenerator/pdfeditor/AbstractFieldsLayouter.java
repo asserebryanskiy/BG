@@ -169,6 +169,9 @@ abstract class AbstractFieldsLayouter {
             }
             horizontalScaleBar.getChildren().addAll(text, line);
         }
+        Rectangle hBack = new Rectangle(parentWidth, textWidth + 10,
+                Color.color(0,0,0,0));
+        horizontalScaleBar.getChildren().add(hBack);
     }
 
     List<FxField> getFxFields() {

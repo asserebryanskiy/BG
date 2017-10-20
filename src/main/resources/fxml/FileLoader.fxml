@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.*?>
 <StackPane fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fileloader.FileLoaderController">
    <children>
       <GridPane fx:id="commonGrid" prefHeight="296.0" vgap="5.0">
@@ -132,11 +131,20 @@
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>
       </GridPane>
-      <Rectangle fx:id="progressIndicatorBackground" arcHeight="5.0" arcWidth="5.0" fill="#ffffffa3" height="278.0" stroke="WHITE" strokeType="INSIDE" visible="false" width="357.0" />
-      <ProgressIndicator fx:id="progressIndicator" visible="false">
-         <StackPane.margin>
-            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-         </StackPane.margin>
-      </ProgressIndicator>
+      <StackPane fx:id="loadingScreen" visible="false">
+         <children>
+            <Rectangle fx:id="progressIndicatorBackground" arcHeight="5.0" arcWidth="5.0" fill="#ffffffd7" height="278.0" stroke="WHITE" strokeType="INSIDE" width="357.0" />
+            <VBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <ProgressIndicator fx:id="progressIndicator" prefHeight="161.0" prefWidth="357.0">
+                     <StackPane.margin>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </StackPane.margin>
+                  </ProgressIndicator>
+                  <Text fx:id="loaderMessage" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
    </children>
 </StackPane>

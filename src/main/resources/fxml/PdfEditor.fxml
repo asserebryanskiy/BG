@@ -27,7 +27,7 @@
             <RowConstraints minHeight="10.0" />
          </rowConstraints>
          <children>
-            <GridPane hgap="5.0" prefHeight="510.0" vgap="5.0" GridPane.rowSpan="10">
+            <GridPane hgap="5.0" vgap="5.0" GridPane.rowSpan="10">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" />
                   <ColumnConstraints hgrow="SOMETIMES" />
@@ -47,11 +47,7 @@
                      </children>
                   </StackPane>
                   <Pane fx:id="verticalScaleBar" GridPane.rowIndex="1" />
-                  <Pane fx:id="horizontalScaleBar" maxWidth="30.0" minHeight="30.0" prefWidth="30.0" GridPane.columnIndex="1">
-                     <children>
-                        <Rectangle fx:id="horizontalScaleBack" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
-                     </children>
-                  </Pane>
+                  <Pane fx:id="horizontalScaleBar" GridPane.columnIndex="1" />
                </children>
             </GridPane>
             <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
@@ -68,7 +64,7 @@
                   </HBox>
                </children>
             </VBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="358.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <Label layoutX="359.0" layoutY="176.0" minWidth="100.0" text="Размер шрифта" />
                   <TextField fx:id="fontSizeField" layoutX="475.0" layoutY="169.0" onAction="#handleChangeFieldFontSize" prefHeight="27.0" prefWidth="41.0">

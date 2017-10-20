@@ -50,14 +50,15 @@ public class LaunchPdfEditorTask extends Task {
         try {
             root = loader.load();
             PdfEditorController controller = loader.getController();
+            updateMessage("Загружаю pdf");
             pdf = PDDocument.load(new File(pdfPath));
-
             double imageHeight = 500;
             double pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
             controller.setImageToPdfRatio(imageHeight / pdfHeight);
             controller.setPdfPreview(createImageFromPdf(), imageHeight);
             controller.setPdfPath(pdfPath);
             controller.setExcelReader(excelReader);
+            updateMessage("Загружаю шрифты");
             if(fxFieldsPath != null) {
                 controller.init(fxFieldsPath);
             } else {

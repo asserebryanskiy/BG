@@ -49,7 +49,9 @@ public class FileLoaderController implements Initializable{
     @FXML
     private Rectangle progressIndicatorBackground;
     @FXML
-    private ProgressIndicator progressIndicator;
+    private StackPane loadingScreen;
+    @FXML
+    private Text loaderMessage;
     @FXML
     private TextField excelFileField;
     @FXML
@@ -114,10 +116,12 @@ public class FileLoaderController implements Initializable{
 
             excelReader = new ExcelReader(excelFilePath, hasHeadings);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
+            loaderMessage.textProperty().bind(checkExcelFileTask.messageProperty());
             checkExcelFileTask.setOnSucceeded(e -> {
                 if((boolean) checkExcelFileTask.getValue()) {
-                    Task launchPdfEditorTask;
-                    launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
+                    Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
+                    loaderMessage.textProperty().unbind();
+                    loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
                     launchPdfEditorTask.setOnSucceeded(event1 -> {
                         showProgressScreen(false);
                         pdfRedactorWindow.setScene(
@@ -152,8 +156,11 @@ public class FileLoaderController implements Initializable{
 
             excelReader = new ExcelReader(excelFilePath, hasHeadings);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
+            loaderMessage.textProperty().bind(checkExcelFileTask.messageProperty());
             checkExcelFileTask.setOnSucceeded(e -> {
                 if((boolean) checkExcelFileTask.getValue()) {
+                    loaderMessage.textProperty().unbind();
+                    loaderMessage.setText("Загружаю сохранения");
                     List<String> savesNames = SavesManager.getSavesNames();
                     if(savesNames == null) {
                         Alert alert = new Alert(Alert.AlertType.ERROR,
@@ -230,8 +237,7 @@ public class FileLoaderController implements Initializable{
     private void showProgressScreen(boolean value) {
         progressIndicatorBackground.setWidth(root.getScene().getWidth());
         progressIndicatorBackground.setHeight(root.getScene().getHeight());
-        progressIndicator.setVisible(value);
-        progressIndicatorBackground.setVisible(value);
+        loadingScreen.setVisible(value);
     }
 
     public void handleChangeColor(MouseEvent event) {

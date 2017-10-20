@@ -28,6 +28,7 @@ public class CheckExcelFileTask extends Task {
 
     @Override
     protected Boolean call() throws Exception {
+        updateMessage("Проверяю Excel файл");
         try {
             excelReader.processFile();
         } catch (Exception e) {

@@ -97,6 +97,9 @@ public class PdfEditorController {
     @FXML
     private CheckBox capsLockCheckBox;
 
+    @FXML
+    private Button saveFieldsBtn;
+
     @FXML private Button leftAlignmentButton;
     @FXML private Button centerAlignmentButton;
     @FXML private Button rightAlignmentButton;
@@ -178,6 +181,7 @@ public class PdfEditorController {
             fxField.setFontColorPicker(fontColorPicker);
             fxField.setAlignmentButtons(alignmentButtons);
         });
+        saveFieldsBtn.autosize();
     }
 
     public void handleChangeFont() {
@@ -411,4 +415,5 @@ public class PdfEditorController {
         helpPopUp = new HelpPopUp(((Node) event.getSource()).getId());
         helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
     }
+
 }
