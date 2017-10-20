@@ -58,7 +58,6 @@ public class LaunchPdfEditorTask extends Task {
             controller.setPdfPreview(createImageFromPdf(), imageHeight);
             controller.setPdfPath(pdfPath);
             controller.setExcelReader(excelReader);
-            updateMessage("Загружаю шрифты");
             if(fxFieldsPath != null) {
                 controller.init(fxFieldsPath);
             } else {

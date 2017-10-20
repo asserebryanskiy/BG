@@ -5,10 +5,7 @@ import badgegenerator.appfilesmanager.LoggerManager;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.SVGPath;
@@ -43,8 +40,8 @@ public abstract class FxField extends DraggablePane {
     TextField fontNameField;
     ColorPicker fontColorPicker;
     List<Button> alignmentButtons;
+    CheckBox capsLockCheckBox;
     private boolean capitalized;
-    private boolean customFontBrowsed;
     private static Line horizontalGuide;
 
     public FxField(int numberOfColumn,
@@ -141,29 +138,6 @@ public abstract class FxField extends DraggablePane {
                 newY = horizontalGuide.getStartY() - getMaxHeight() / 2;
             } else horizontalGuide.setVisible(false);
         }
-        /*if(guides != null) {
-            for(Line guide : guides) {
-                // to avoid permanent chasing of guide after a field
-                if(!guide.getId().contains(getId())) {
-                    if(guide.getId().contains("Start")
-                            && newX > guide.getStartX() - 5
-                            && newX < guide.getStartX() + 5) {
-                        guide.setVisible(true);
-                        newX = guide.getStartX();
-                        setAlignment("LEFT");
-                        break;
-                    } else guide.setVisible(false);
-                    if(guide.getId().contains("End")
-                            && newX + getPrefWidth() > guide.getStartX() - 5
-                            && newX + getPrefWidth() < guide.getStartX() + 5) {
-                        guide.setVisible(true);
-                        newX = guide.getStartX() - getPrefWidth();
-                        setAlignment("RIGHT");
-                        break;
-                    } else guide.setVisible(false);
-                }
-            }
-        }*/
         return newY;
     }
 
@@ -185,7 +159,6 @@ public abstract class FxField extends DraggablePane {
     public void setFont(Font font) {
         this.font = font;
         fontPath = AssessableFonts.getFontPath(font.getName());
-        customFontBrowsed = false;
         setFont();
     }
 
@@ -218,7 +191,6 @@ public abstract class FxField extends DraggablePane {
             e.printStackTrace();
         }
         this.fontPath = fontPath;
-        customFontBrowsed = true;
         font = Font.loadFont(fontInputStream, getFontSize());
         setFont();
     }
@@ -274,6 +246,10 @@ public abstract class FxField extends DraggablePane {
 
     public void setFontColorPicker(ColorPicker fontColorPicker) {
         this.fontColorPicker = fontColorPicker;
+    }
+
+    public void setCapsLockCheckBox(CheckBox capsLockCheckBox) {
+        this.capsLockCheckBox = capsLockCheckBox;
     }
 
     public void setFill(Color color) {
@@ -350,7 +326,4 @@ public abstract class FxField extends DraggablePane {
         return capitalized;
     }
 
-    public boolean customFontBrowsed() {
-        return customFontBrowsed;
-    }
 }

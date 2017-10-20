@@ -18,7 +18,6 @@ import java.util.stream.Stream;
  */
 public class AssessableFonts {
     private static final Logger logger = Logger.getLogger(AssessableFonts.class.getSimpleName());
-    private static List<String> assessableFxFonts;
     private static Map<String, String> allAssessableFonts;
 
     public static Set<String> getFontsNames() {
@@ -35,44 +34,7 @@ public class AssessableFonts {
         return allAssessableFonts.get(fontName);
     }
 
-    private static void process() {
-        /*if(PlatformUtil.isMac()) {
-            File fontsDirectory1 = new File("/Library/Fonts");
-            File fontsDirectory2 = new File("/System/Library/Fonts");
-            File fontsDirectory3 = new File(System.getProperty("user.home"),
-                    "/Library/Fonts");
-
-            allAssessableFonts = Stream.of(fontsDirectory1.listFiles(),
-                    fontsDirectory2.listFiles(),
-                    fontsDirectory3.listFiles())
-                    .flatMap(Stream::of)
-                    .filter(file -> !file.getName().endsWith(".dir")
-                            && !file.getName().endsWith(".list")
-                            && !file.getName().endsWith(".scale")
-                            && !file.getName().contains(".DS_Store"))
-                    .collect(Collectors.toMap(file -> {
-                        String fileName = file.getName().toLowerCase();
-                        return fileName.substring(0, fileName.length() - 4);
-                    }, file -> file));
-        } else {
-            File fontsDir = new File(System.getenv("WINDIR"), "Fonts");
-            try {
-                allAssessableFonts = Arrays.stream(fontsDir.listFiles())
-                        .collect(Collectors.toMap(file -> {
-                            String fileName = file.getName().toLowerCase();
-                            return fileName.substring(0, fileName.length() - 4);
-                        }, file -> file));
-            } catch (Exception e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        String.format("Не удалось найти шрифты в папке%s", fontsDir.getAbsolutePath()));
-                alert.show();
-                e.printStackTrace();
-                LoggerManager.initializeLogger(logger);
-                logger.log(Level.SEVERE,
-                        String.format("Не удалось найти шрифты в папке%s", fontsDir.getAbsolutePath()),
-                        e);
-            }
-        }*/
+    public static void process() {
         Stream<File> stream;
         if(PlatformUtil.isMac()) {
             File fontsDirectory1 = new File("/Library/Fonts");
@@ -103,7 +65,6 @@ public class AssessableFonts {
                 return;
             }
         }
-//        Map<String, String> fontPathMap = new HashMap<>();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         allAssessableFonts = new HashMap<>();
@@ -127,9 +88,5 @@ public class AssessableFonts {
         });
 
         allAssessableFonts.putIfAbsent("Helvetica", null);
-//        assessableFxFonts = Font.getFontNames().stream()
-//                .filter(name -> allAssessableFonts.keySet()
-//                        .contains(name.toLowerCase()))
-//                .collect(Collectors.toList());
     }
 }

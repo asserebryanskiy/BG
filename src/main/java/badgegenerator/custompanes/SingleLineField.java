@@ -82,6 +82,9 @@ public class SingleLineField extends FxField {
                 }
             });
         }
+        if(capsLockCheckBox != null) {
+            capsLockCheckBox.setSelected(isCapitalized());
+        }
     }
 
     @Override

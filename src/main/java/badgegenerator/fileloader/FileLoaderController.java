@@ -1,6 +1,7 @@
 package badgegenerator.fileloader;
 
 import badgegenerator.Main;
+import badgegenerator.appfilesmanager.AssessableFonts;
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.fxfieldsloader.FxFieldsLoaderController;
@@ -68,6 +69,7 @@ public class FileLoaderController implements Initializable{
     private boolean hasHeadings;
     private ExcelReader excelReader;
     private HelpPopUp helpPopUp;
+    private Thread loadFontsThread;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -78,7 +80,16 @@ public class FileLoaderController implements Initializable{
         buttons.add(btnLoadFields);
         buttons.forEach(btn -> btn.setMinWidth(
                 Main.computeStringWidth(btn.getText(), btn.getFont()) + 20));
-
+        Task<Void> loadFontsTasks = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                AssessableFonts.process();
+                return null;
+            }
+        };
+        loadFontsThread = new Thread(loadFontsTasks);
+        loadFontsThread.setDaemon(true);
+        loadFontsThread.start();
     }
 
     public void handleBrowseExcel(MouseEvent event) {
@@ -113,6 +124,19 @@ public class FileLoaderController implements Initializable{
         if(checkIfFieldsAreFilled()) {
             showProgressScreen(true);
             final Stage pdfRedactorWindow = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            if(loadFontsThread.isAlive()) {
+                loaderMessage.setText("Загружаю шрифты");
+                try {
+                    loadFontsThread.join();
+                } catch (InterruptedException e) {
+                    LoggerManager.initializeLogger(logger);
+                    logger.log(Level.SEVERE, e.toString(), e);
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Не удалось загрузить шрифты");
+                    alert.show();
+                    e.printStackTrace();
+                }
+            }
 
             excelReader = new ExcelReader(excelFilePath, hasHeadings);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);

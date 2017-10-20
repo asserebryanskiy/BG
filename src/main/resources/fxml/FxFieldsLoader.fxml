@@ -23,7 +23,7 @@
             </VBox>
          </children>
       </HBox>
-      <StackPane fx:id="loaderScreen">
+      <StackPane fx:id="loaderScreen" visible="false">
          <children>
             <Rectangle fx:id="loaderBackground" arcHeight="5.0" arcWidth="5.0" fill="#ffffff80" height="130.0" stroke="TRANSPARENT" strokeType="INSIDE" width="295.0" />
             <VBox alignment="CENTER" spacing="10.0">

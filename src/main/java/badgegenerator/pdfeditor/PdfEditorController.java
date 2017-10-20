@@ -180,6 +180,7 @@ public class PdfEditorController {
             fxField.setFontSizeField(fontSizeField);
             fxField.setFontColorPicker(fontColorPicker);
             fxField.setAlignmentButtons(alignmentButtons);
+            fxField.setCapsLockCheckBox(capsLockCheckBox);
         });
         saveFieldsBtn.autosize();
     }

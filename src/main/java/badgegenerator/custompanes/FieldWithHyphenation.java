@@ -226,6 +226,9 @@ public class FieldWithHyphenation extends FxField {
                 }
             });
         }
+        if(capsLockCheckBox != null) {
+            capsLockCheckBox.setSelected(isCapitalized());
+        }
     }
 
     public int getNumberOfLines() {

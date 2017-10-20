@@ -1,6 +1,5 @@
 package badgegenerator.pdfcreator;
 
-import badgegenerator.appfilesmanager.AssessableFonts;
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
@@ -12,7 +11,6 @@ import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,40 +47,29 @@ public class FxToPdfFieldAdapter {
         fontSize = (float) (fxField.getFontSize() / imageToPdfRatio);
 
         if(fxField.getFont().getName().equals("Helvetica")) {
-            InputStream fontInputStream = getClass()
-                    .getResourceAsStream("/fonts/Helvetica.otf");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[2048];
-            int a;
             try {
+                InputStream fontInputStream = getClass()
+                        .getResourceAsStream("/fonts/Helvetica.otf");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[2048];
+                int a;
                 while((a = fontInputStream.read(buffer, 0, buffer.length)) != -1) {
                     baos.write(buffer, 0, a);
                 }
                 baos.flush();
                 fontProgram = FontProgramFactory.createFont(baos.toByteArray());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LoggerManager.initializeLogger(logger);
                 logger.log(Level.SEVERE, "Не удалось загрузить Helvetica", e);
                 e.printStackTrace();
             }
-        } else if(fxField.customFontBrowsed()) {
+        } else {
             try {
                 fontProgram = FontProgramFactory.createFont(fxField.getFontPath());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LoggerManager.initializeLogger(logger);
                 logger.log(Level.SEVERE,
                         String.format("Не удалось загрузить шрифт из %s", fxField.getFontPath()),
-                        e);
-                e.printStackTrace();
-            }
-        } else {
-            String fontPath = AssessableFonts.getFontPath(fxField.getFont().getName());
-            try {
-                fontProgram = FontProgramFactory.createFont(fontPath);
-            } catch (IOException e) {
-                LoggerManager.initializeLogger(logger);
-                logger.log(Level.SEVERE,
-                        String.format("Не удалось загрузить шрифт из %s", fontPath),
                         e);
                 e.printStackTrace();
             }
