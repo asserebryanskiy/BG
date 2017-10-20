@@ -13,7 +13,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -38,7 +41,9 @@ public class FxFieldsLoaderController implements Initializable{
     @FXML
     private Rectangle loaderBackground;
     @FXML
-    private ProgressBar progressBar;
+    private StackPane loaderScreen;
+    @FXML
+    private Text loaderMessage;
     @FXML
     private VBox btnBox;
 
@@ -83,6 +88,7 @@ public class FxFieldsLoaderController implements Initializable{
                 Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader,
                         pdfPath,
                         save.getAbsolutePath());
+                loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
                 launchPdfEditorTask.setOnSucceeded(event1 -> {
                     showProgressScreen(false);
                     if(launchPdfEditorTask.getValue() != null) {
@@ -92,6 +98,7 @@ public class FxFieldsLoaderController implements Initializable{
                         pdfRedactorWindow.setX(pdfRedactorWindow.getX() - 200);
                         pdfRedactorWindow.setY(pdfRedactorWindow.getY() - 100);
                         pdfRedactorWindow.show();
+                        pdfRedactorWindow.centerOnScreen();
                     }
                 });
                 Thread thread = new Thread(launchPdfEditorTask);
@@ -109,8 +116,7 @@ public class FxFieldsLoaderController implements Initializable{
     private void showProgressScreen(boolean value) {
         loaderBackground.setWidth(root.getScene().getWidth());
         loaderBackground.setHeight(root.getScene().getHeight());
-        loaderBackground.setVisible(value);
-        progressBar.setVisible(value);
+        loaderScreen.setVisible(value);
     }
 
     public void setExcelReader(ExcelReader excelReader) {
