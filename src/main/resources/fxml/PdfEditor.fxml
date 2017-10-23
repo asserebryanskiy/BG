@@ -49,10 +49,9 @@
                   <RowConstraints fillHeight="false" />
                   <RowConstraints fillHeight="false" />
                   <RowConstraints fillHeight="false" valignment="TOP" />
-                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" valignment="TOP" />
                </rowConstraints>
                <children>
-                  <GridPane hgap="5.0" vgap="5.0" GridPane.rowSpan="11">
+                  <GridPane gridLinesVisible="true" hgap="5.0" vgap="5.0" GridPane.rowSpan="10" GridPane.valignment="TOP">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" />
                         <ColumnConstraints hgrow="SOMETIMES" />
