@@ -49,9 +49,10 @@
                   <RowConstraints fillHeight="false" />
                   <RowConstraints fillHeight="false" />
                   <RowConstraints fillHeight="false" valignment="TOP" />
+                  <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" valignment="TOP" />
                </rowConstraints>
                <children>
-                  <GridPane hgap="5.0" vgap="5.0" GridPane.rowSpan="10">
+                  <GridPane hgap="5.0" vgap="5.0" GridPane.rowSpan="11">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" />
                         <ColumnConstraints hgrow="SOMETIMES" />
@@ -70,7 +71,7 @@
                               </ImageView>
                            </children>
                         </StackPane>
-                        <Pane fx:id="verticalScaleBar" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                        <Pane fx:id="verticalScaleBar" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP" />
                         <Pane fx:id="horizontalScaleBar" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
                      </children>
                   </GridPane>
@@ -139,7 +140,10 @@
                               </Pane>
                            </children>
                         </HBox>
-                        <Button mnemonicParsing="false" onAction="#handleBack" text="Назад" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
+                        <Button mnemonicParsing="false" onAction="#handleBack" text="Назад" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+                           <GridPane.margin>
+                              <Insets top="20.0" />
+                           </GridPane.margin></Button>
                      </children>
                   </GridPane>
                   <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
