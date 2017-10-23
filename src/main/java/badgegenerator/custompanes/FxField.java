@@ -43,6 +43,11 @@ public abstract class FxField extends DraggablePane {
     CheckBox capsLockCheckBox;
     private boolean capitalized;
     private static Line horizontalGuide;
+    private List<Line> horizontalGridLines = new ArrayList<>();
+    private List<Line> verticalGridLines = new ArrayList<>();
+    private double hGridLineStep;
+    private double vGridLineStep;
+    private boolean alignFieldWithGrid;
 
     public FxField(int numberOfColumn,
                    double imageToPdfRatio,
@@ -95,6 +100,29 @@ public abstract class FxField extends DraggablePane {
 
     @Override
     double checkIfIntersectVerticalGuides(double newX) {
+        if(verticalGridLines.size() != 0
+                && verticalGridLines.get(0).isVisible()
+                && alignFieldWithGrid) {
+            int lineIndex = (int) Math.round(newX / vGridLineStep);
+            if(lineIndex < verticalGridLines.size()) {
+                Line line = verticalGridLines.get(lineIndex);
+                int endLineIndex = (int) Math.round((newX + getPrefWidth()) / vGridLineStep);
+                if(endLineIndex < verticalGridLines.size()) {
+                    Line endLine = verticalGridLines.get(endLineIndex);
+                    double endX = newX + getPrefWidth();
+                    if(endX > endLine.getStartX() - 3
+                            && endX < endLine.getStartX() + 3) {
+                        newX = endLine.getStartX() - getPrefWidth();
+                        endLine.setStrokeWidth(0.5);
+                    } else endLine.setStrokeWidth(0.1);
+                }
+                double lineX = line.getStartX();
+                if(newX > lineX - 3 && newX < lineX + 3) {
+                    newX = lineX;
+                    line.setStrokeWidth(0.5);
+                } else line.setStrokeWidth(0.1);
+            }
+        }
         if (verticalGuide != null) {
             if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - 5
                     && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + 5) {
@@ -131,6 +159,30 @@ public abstract class FxField extends DraggablePane {
     
     @Override
     double checkIfIntersectHorizontalGuides(double newY) {
+        if(horizontalGridLines.size() != 0
+                && horizontalGridLines.get(0).isVisible()
+                && alignFieldWithGrid) {
+            int lineIndex = (int) Math.round(newY / hGridLineStep);
+            if(lineIndex < horizontalGridLines.size()) {
+                Line line = horizontalGridLines.get(lineIndex);
+                int endLineIndex = (int) Math.round((newY + getMaxHeight()) / hGridLineStep);
+                if(endLineIndex < horizontalGridLines.size()) {
+                    Line endLine = horizontalGridLines.get(endLineIndex);
+                    double endY = newY + getMaxHeight();
+                    double endLineY = endLine.getStartY();
+                    if(endY > endLineY - 3
+                            && endY < endLineY + 3) {
+                        newY = endLineY - getMaxHeight();
+                        endLine.setStrokeWidth(0.5);
+                    } else endLine.setStrokeWidth(0.1);
+                }
+                double lineY = line.getStartY();
+                if(newY > lineY - 3 && newY < lineY + 3) {
+                    newY = lineY;
+                    line.setStrokeWidth(0.5);
+                } else line.setStrokeWidth(0.1);
+            }
+        }
         if (horizontalGuide != null) {
             if(newY + getMaxHeight() / 2 > horizontalGuide.getStartY() - 5
                     && newY + getMaxHeight() / 2 < horizontalGuide.getStartY() + 5) {
@@ -150,6 +202,10 @@ public abstract class FxField extends DraggablePane {
         }
         if (verticalGuide != null) verticalGuide.setVisible(false);
         if (horizontalGuide != null) horizontalGuide.setVisible(false);
+        if (horizontalGridLines != null) horizontalGridLines.forEach(line ->
+                line.setStrokeWidth(0.1));
+        if (verticalGridLines != null) verticalGridLines.forEach(line ->
+                line.setStrokeWidth(0.1));
     }
 
     public Font getFont() {
@@ -326,4 +382,23 @@ public abstract class FxField extends DraggablePane {
         return capitalized;
     }
 
+    public void addHorizontalGridLine(Line gridLine) {
+        horizontalGridLines.add(gridLine);
+    }
+
+    public void addVerticalGridLine(Line gridLine) {
+        verticalGridLines.add(gridLine);
+    }
+
+    public void setHGridLineStep(double hGridLineStep) {
+        this.hGridLineStep = hGridLineStep;
+    }
+
+    public void setVGridLineStep(double vGridLineStep) {
+        this.vGridLineStep = vGridLineStep;
+    }
+
+    public void setAlignFieldWithGrid(boolean alignFieldWithGrid) {
+        this.alignFieldWithGrid = alignFieldWithGrid;
+    }
 }

@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
  * layout.
  */
 abstract class AbstractFieldsLayouter {
+    private final List<Line> gridLines;
     private Pane horizontalScaleBar;
     private Pane verticalScaleBar;
     protected double imageToPdfRatio;
@@ -41,12 +42,14 @@ abstract class AbstractFieldsLayouter {
     AbstractFieldsLayouter(Pane fieldsParent,
                            Pane verticalScaleBar,
                            Pane horizontalScaleBar,
+                           List<Line> gridLines,
                            String[] largestFields,
                            String[] longestWords,
                            double imageToPdfRatio) {
         this.fieldsParent = fieldsParent;
         this.verticalScaleBar = verticalScaleBar;
         this.horizontalScaleBar = horizontalScaleBar;
+        this.gridLines = gridLines;
         this.largestFields = largestFields;
         this.longestWords = longestWords;
         this.imageToPdfRatio = imageToPdfRatio;
@@ -125,8 +128,8 @@ abstract class AbstractFieldsLayouter {
         float textWidth = Toolkit.getToolkit().getFontLoader()
                 .computeStringWidth("999", new Font(8));
         double parentHeight = fieldsParent.getBoundsInLocal().getHeight();
+        double parentWidth = fieldsParent.getBoundsInLocal().getWidth();
 
-        // pdf - 419, ratio - 1.19
         double bigStep = Math.ceil(parentHeight / imageToPdfRatio / 200) * 10 * imageToPdfRatio;
         double smallStep = bigStep / 5;
 
@@ -135,8 +138,14 @@ abstract class AbstractFieldsLayouter {
             text.setFont(new Font(8));
             text.setLayoutY(i + textHeight);
             text.setManaged(false);
-            Line line = new Line(0, i, textWidth + 10, i);
+            Line line = new Line(1, i, textWidth + 10, i);
             line.setManaged(false);
+            Line gridLine = new Line(1, i, parentWidth - 1, i);
+            addGridLine(gridLine);
+            if(fxFields != null) fxFields.forEach(field -> {
+                field.addHorizontalGridLine(gridLine);
+                field.setHGridLineStep(bigStep);
+            });
             for(double j = smallStep; j < bigStep; j += smallStep) {
                 double y = i + j;
                 if(y > parentHeight) break;
@@ -151,7 +160,6 @@ abstract class AbstractFieldsLayouter {
         verticalScaleBar.getChildren().add(vBack);
 
         // HORIZONTAL
-        double parentWidth = fieldsParent.getBoundsInLocal().getWidth();
         for(double i = 0; i <= parentWidth; i += bigStep) {
             Text text = new Text(String.valueOf((int) Math.round(i / imageToPdfRatio)));
             text.setFont(new Font(8));
@@ -160,6 +168,12 @@ abstract class AbstractFieldsLayouter {
             text.setManaged(false);
             Line line = new Line(i, 1, i, textWidth + 10);
             line.setManaged(false);
+            Line gridLine = new Line(i, 1, i, parentHeight - 1);
+            addGridLine(gridLine);
+            if(fxFields != null) fxFields.forEach(field -> {
+                field.addVerticalGridLine(gridLine);
+                field.setVGridLineStep(bigStep);
+            });
             for(double j = smallStep; j < bigStep; j += smallStep) {
                 double x = i + j;
                 if(x > parentWidth) break;
@@ -172,6 +186,15 @@ abstract class AbstractFieldsLayouter {
         Rectangle hBack = new Rectangle(parentWidth, textWidth + 10,
                 Color.color(0,0,0,0));
         horizontalScaleBar.getChildren().add(hBack);
+    }
+
+    private void addGridLine(Line gridLine) {
+        gridLine.setStrokeWidth(0.1);
+        gridLine.setFill(Color.DARKGRAY);
+        gridLine.setManaged(false);
+        gridLine.setVisible(false);
+        gridLines.add(gridLine);
+        fieldsParent.getChildren().add(gridLine);
     }
 
     List<FxField> getFxFields() {

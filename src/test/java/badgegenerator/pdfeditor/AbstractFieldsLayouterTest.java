@@ -5,6 +5,8 @@ import javafx.stage.Stage;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -14,6 +16,7 @@ public class AbstractFieldsLayouterTest extends ApplicationTest{
         NewFieldsLayouter layouter = new NewFieldsLayouter(new Pane(),
                 new Pane(),
                 new Pane(),
+                new ArrayList<>(),
                 new String[]{"Example"},
                 new String[]{"Example"},
                 1);

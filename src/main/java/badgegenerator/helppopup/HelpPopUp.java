@@ -17,8 +17,10 @@ import java.util.logging.Logger;
  */
 public class HelpPopUp extends Popup{
     private static Logger logger = Logger.getLogger(HelpPopUp.class.getSimpleName());
+    private String parentsNodeId;
 
     public HelpPopUp(String nodeId) throws IOException {
+        parentsNodeId = nodeId;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HelpPopUp.fxml"));
         Parent root;
         try {
@@ -42,5 +44,9 @@ public class HelpPopUp extends Popup{
             double screenRightBorder = Screen.getPrimary().getBounds().getMaxX();
             if(screenX + 100 > screenRightBorder) setX(screenX - 2 * getWidth());
         });
+    }
+
+    public String getParentsNodeId() {
+        return parentsNodeId;
     }
 }

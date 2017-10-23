@@ -2,6 +2,9 @@ package badgegenerator.pdfeditor;
 
 import badgegenerator.custompanes.FxField;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
+
+import java.util.List;
 
 /**
  * A realization of AbstractFieldsLayouter. Is used to position new FxFields
@@ -10,10 +13,11 @@ class NewFieldsLayouter extends AbstractFieldsLayouter {
     NewFieldsLayouter(Pane fieldsParent,
                                 Pane verticalScaleBar,
                                 Pane horizontalScaleBar,
+                                List<Line> gridLines,
                                 String[] largestFields,
                                 String[] longestWords,
                                 double imageToPdfRatio) {
-        super(fieldsParent, verticalScaleBar, horizontalScaleBar,
+        super(fieldsParent, verticalScaleBar, horizontalScaleBar, gridLines,
                 largestFields, longestWords, imageToPdfRatio);
     }
 

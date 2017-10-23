@@ -116,7 +116,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Pane>
-                  <Button fx:id="btnCreateNewFields" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Создать" AnchorPane.bottomAnchor="20.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                  <Button fx:id="btnCreateNewFields" layoutX="265.0" layoutY="260.0" mnemonicParsing="false" onMouseClicked="#handleProceed" text="Далее" AnchorPane.bottomAnchor="20.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>

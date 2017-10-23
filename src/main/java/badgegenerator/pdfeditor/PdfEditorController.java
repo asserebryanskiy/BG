@@ -9,6 +9,10 @@ import badgegenerator.helppopup.HelpPopUp;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.tk.Toolkit;
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import impl.org.controlsfx.autocompletion.SuggestionProvider;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,13 +29,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.controlsfx.control.textfield.TextFields;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -39,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,12 +94,6 @@ public class PdfEditorController {
     private Label progressStatusLabel;
 
     @FXML
-    private StackPane helpBox;
-
-    @FXML
-    private Pane closeHelpBoxPane;
-
-    @FXML
     private CheckBox capsLockCheckBox;
 
     @FXML
@@ -104,16 +103,28 @@ public class PdfEditorController {
     @FXML private Button centerAlignmentButton;
     @FXML private Button rightAlignmentButton;
 
+    @FXML
+    private MenuBar menuBar;
+
+    @FXML private CheckMenuItem visualizeGridCheckMenuItem;
+    @FXML private CheckMenuItem alignFieldsCheckMenuItem;
+
+    @FXML private RadioButton bindingYesButton;
+    @FXML private RadioButton bindingNoButton;
+    @FXML private CheckMenuItem bindingCheckMenuItem;
+
     private List<FxField> fxFields;
 
     private double imageToPdfRatio;
     private Task createBadgesArchiveTask;
     private static FileChooser fileChooser = new FileChooser();
-    private boolean compressFieldIfLineMissing = true;
+    private BooleanProperty compressFieldIfLineMissing
+            = new SimpleBooleanProperty(true);
     private String pdfPath;
     private ExcelReader excelReader;
-    private HelpPopUp helpPopUp;
+    private List<HelpPopUp> helpPopUps = new ArrayList<>();
     private List<Button> alignmentButtons;
+    private List<Line> gridLines = new ArrayList<>();
 
     public void init() {
         init(null);
@@ -125,6 +136,7 @@ public class PdfEditorController {
             layouter = new SavedFieldsLayouter(editingArea,
                     verticalScaleBar,
                     horizontalScaleBar,
+                    gridLines,
                     excelReader.getLargestFields(),
                     excelReader.getLongestWords(),
                     imageToPdfRatio,
@@ -133,6 +145,7 @@ public class PdfEditorController {
             layouter = new NewFieldsLayouter(editingArea,
                     verticalScaleBar,
                     horizontalScaleBar,
+                    gridLines,
                     excelReader.getLargestFields(),
                     excelReader.getLongestWords(),
                     imageToPdfRatio);
@@ -173,7 +186,12 @@ public class PdfEditorController {
                 (int) (fxFields.get(0).getFont().getSize() / imageToPdfRatio)));
         fontNameField.setText(fxFields.get(0).getFont().getName());
         fontNameField.setEditable(true);
-        TextFields.bindAutoCompletion(fontNameField, AssessableFonts.getFontsNames());
+        Set<String> fontsNames = AssessableFonts.getFontsNames();
+//        TextFields.bindAutoCompletion(fontNameField, fontsNames);
+        AutoCompletionTextFieldBinding<String> actb =
+                new AutoCompletionTextFieldBinding<>(fontNameField,
+                        SuggestionProvider.create(fontsNames));
+        actb.setOnAutoCompleted(event -> handleChangeFont());
         fontNameField.setFocusTraversable(true);
         fxFields.forEach(fxField -> {
             fxField.setFontNameField(fontNameField);
@@ -183,6 +201,19 @@ public class PdfEditorController {
             fxField.setCapsLockCheckBox(capsLockCheckBox);
         });
         saveFieldsBtn.autosize();
+        menuBar.setUseSystemMenuBar(true);
+        bindingCheckMenuItem.selectedProperty()
+                .bindBidirectional(bindingYesButton.selectedProperty());
+        bindingCheckMenuItem.selectedProperty()
+                .addListener((observable, oldValue, newValue) ->
+                        bindingNoButton.setSelected(!newValue));
+        bindingNoButton.selectedProperty()
+                .addListener((observable, oldValue, newValue) ->
+                bindingCheckMenuItem.setSelected(!newValue));
+        compressFieldIfLineMissing.bind(bindingYesButton.selectedProperty());
+        visualizeGridCheckMenuItem.selectedProperty()
+                .addListener((o, oldVal, newVal) ->
+                        alignFieldsCheckMenuItem.setDisable(!newVal));
     }
 
     public void handleChangeFont() {
@@ -236,7 +267,7 @@ public class PdfEditorController {
                     excelReader,
                     pdfPath,
                     selectedDirectory.getAbsolutePath() + ".zip",
-                    compressFieldIfLineMissing);
+                    compressFieldIfLineMissing.get());
             createBadgesArchiveTask.setOnSucceeded(event1 -> {
                 if (createBadgesArchiveTask.getValue().equals(true)) {
                     showProgressScreen(false);
@@ -259,7 +290,9 @@ public class PdfEditorController {
                                 Runtime.getRuntime().exec("open " + parentPath);
                             } else {
                                 Runtime.getRuntime().exec("explorer.exe /select, "
-                                        + parentPath + path.substring(path.lastIndexOf(File.separator)));
+                                        + parentPath
+                                        + path.substring(path.lastIndexOf(File.separator))
+                                        + ".zip");
                             }
                         } catch (IOException e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR,
@@ -327,33 +360,6 @@ public class PdfEditorController {
                 .forEach(field -> field.setAlignment(alignment));
     }
 
-    public void handleSetCompressFieldsTrue() {
-        compressFieldIfLineMissing = true;
-    }
-
-    public void handleSetCompressFieldsFalse() {
-        compressFieldIfLineMissing = false;
-    }
-
-    public void setPdfPreview(byte[] imageFromPdf, double height) {
-        pdfPreview.setImage(new Image(new ByteArrayInputStream(imageFromPdf)));
-        pdfPreview.setFitHeight(height);
-        pdfPreview.setPreserveRatio(true);
-        editingArea.setMaxHeight(pdfPreview.getFitHeight());
-    }
-
-    public void setImageToPdfRatio(double imageToPdfRatio) {
-        this.imageToPdfRatio = imageToPdfRatio;
-    }
-
-    public void setPdfPath(String pdfPath) {
-        this.pdfPath = pdfPath;
-    }
-
-    public void setExcelReader(ExcelReader excelReader) {
-        this.excelReader = excelReader;
-    }
-
     public void handleSaveFields() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass()
                 .getResource("/fxml/FxFieldsSaver.fxml"));
@@ -369,33 +375,12 @@ public class PdfEditorController {
         saveFieldsWindow.centerOnScreen();
     }
 
-    public void handleShowAnimation(MouseEvent event) {
-        HelpAnimation animation = new HelpAnimation();
-        helpBox.getChildren().removeIf(node -> node instanceof HelpAnimation);
-        helpBox.getChildren().add(animation);
-        closeHelpBoxPane.setManaged(false);
-        closeHelpBoxPane.setLayoutX(200);
-        closeHelpBoxPane.setPrefSize(12,12);
-        closeHelpBoxPane.setMaxHeight(12);
-        closeHelpBoxPane.setMaxWidth(12);
-        helpBox.setVisible(true);
-        if(((Node)event.getSource()).getId().contains("yes")) {
-            animation.playWithMotion();
-        } else {
-            animation.play();
-        }
-    }
-
     public void handleChangeColor(MouseEvent event) {
         ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.GRAY);
     }
 
     public void handleResetColor(MouseEvent event) {
         ((SVGPath)((Pane) event.getSource()).getChildren().get(0)).setFill(Color.BLACK);
-    }
-
-    public void handleCloseHelpBox() {
-        helpBox.setVisible(false);
     }
 
     public void setCapitalized() {
@@ -412,9 +397,59 @@ public class PdfEditorController {
     }
 
     public void handleShowHelpBox(MouseEvent event) throws IOException {
-        if(helpPopUp != null && helpPopUp.isShowing()) return;
-        helpPopUp = new HelpPopUp(((Node) event.getSource()).getId());
+        String sourceId = ((Node) event.getSource()).getId();
+        if(helpPopUps.stream()
+                .anyMatch(popUp -> popUp.getParentsNodeId().equals(sourceId))) return;
+        HelpPopUp helpPopUp = new HelpPopUp(sourceId);
         helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+        helpPopUps.add(helpPopUp);
+        helpPopUp.setOnHidden(e -> helpPopUps.remove(helpPopUp));
     }
+
+    public void handleShowGridLines(ActionEvent event) {
+        CheckMenuItem menuItem = (CheckMenuItem) event.getSource();
+        gridLines.forEach(line -> line.setVisible(menuItem.isSelected()));
+    }
+
+    public void setPdfPreview(byte[] imageFromPdf, double height) {
+        pdfPreview.setImage(new Image(new ByteArrayInputStream(imageFromPdf)));
+        pdfPreview.setFitHeight(height);
+        pdfPreview.setPreserveRatio(true);
+        editingArea.setMaxHeight(pdfPreview.getFitHeight());
+    }
+
+    public void setImageToPdfRatio(double imageToPdfRatio) {
+        this.imageToPdfRatio = imageToPdfRatio;
+    }
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
+    }
+
+    public void setExcelReader(ExcelReader excelReader) {
+        this.excelReader = excelReader;
+    }
+
+    public void handleSetAlignFields() {
+        fxFields.forEach(field ->
+                field.setAlignFieldWithGrid(alignFieldsCheckMenuItem.isSelected()));
+    }
+
+/*
+    public void handleShowAnimation(MouseEvent event) {
+        HelpAnimation animation = new HelpAnimation();
+        helpBox.getChildren().removeIf(node -> node instanceof HelpAnimation);
+        helpBox.getChildren().add(animation);
+        closeHelpBoxPane.setManaged(false);
+        closeHelpBoxPane.setLayoutX(200);
+        closeHelpBoxPane.setPrefSize(12,12);
+        closeHelpBoxPane.setMaxHeight(12);
+        closeHelpBoxPane.setMaxWidth(12);
+        helpBox.setVisible(true);
+        if(((Node)event.getSource()).getId().contains("yes")) {
+            animation.playWithMotion();
+        } else {
+            animation.play();
+        }
+    }*/
 
 }

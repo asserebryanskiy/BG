@@ -4,8 +4,10 @@ import badgegenerator.custompanes.FxField;
 import badgegenerator.fxfieldsloader.FxFieldsLoader;
 import badgegenerator.fxfieldssaver.FxFieldSave;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * A realization of AbstractFieldsLayouter. Is used to load and position saved FxFields
@@ -14,11 +16,12 @@ public class SavedFieldsLayouter extends AbstractFieldsLayouter {
     SavedFieldsLayouter(Pane fieldsParent,
                         Pane verticalScaleBar,
                         Pane horizontalScaleBar,
+                        List<Line> gridLines,
                         String[] largestFields,
                         String[] longestWords,
                         double imageToPdfRatio,
                         String savePath) {
-        super(fieldsParent, verticalScaleBar, horizontalScaleBar,
+        super(fieldsParent, verticalScaleBar, horizontalScaleBar, gridLines,
                 largestFields, longestWords, imageToPdfRatio);
         saves = FxFieldsLoader.load(savePath);
         saves.sort(Comparator.comparingInt(FxFieldSave::getNumberOfColumn));
