@@ -70,8 +70,8 @@
                               </ImageView>
                            </children>
                         </StackPane>
-                        <Pane fx:id="verticalScaleBar" GridPane.rowIndex="1" />
-                        <Pane fx:id="horizontalScaleBar" GridPane.columnIndex="1" />
+                        <Pane fx:id="verticalScaleBar" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                        <Pane fx:id="horizontalScaleBar" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
                      </children>
                   </GridPane>
                   <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
