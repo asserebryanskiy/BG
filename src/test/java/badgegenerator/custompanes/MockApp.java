@@ -49,6 +49,7 @@ public class MockApp extends Application {
         FxField.setVerticalGuide(verticalGuide);
         FxField.setHorizontalGuide(horizontalGuide);
         System.out.println(root.getBoundsInLocal().getWidth());
+        root.setMaxSize(300,300);
 
         fieldWithHyp.addResizeableBorder(new ResizeableBorder(fieldWithHyp, Position.LEFT));
         fieldWithHyp.addResizeableBorder(new ResizeableBorder(fieldWithHyp, Position.RIGHT));

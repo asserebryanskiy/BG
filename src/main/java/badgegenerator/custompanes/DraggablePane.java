@@ -2,6 +2,7 @@ package badgegenerator.custompanes;
 
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 
 
 /**
@@ -75,7 +76,7 @@ public abstract class DraggablePane extends SelectablePane {
 
     private void calculateLayoutBorders() {
         leftLayoutBorder = 0;
-        rightLayoutBorder = getParent().getBoundsInLocal().getWidth();
+        rightLayoutBorder = ((Pane) getParent()).getMaxWidth();
         topLayoutBorder = 0;
         bottomLayoutBorder = getParent().getBoundsInLocal().getHeight();
     }

@@ -33,7 +33,8 @@ public class BadgeCreatorTest {
         // Act
         byte[] pdf = bg.createBadgeInMemory(0);
         PdfReader reader = new PdfReader(new ByteArrayInputStream(pdf));
-        PdfWriter writer = new PdfWriter(new FileOutputStream("test.pdf"));
+        PdfWriter writer = new PdfWriter(
+                new FileOutputStream("src/test/testResources/test.pdf"));
         PdfDocument doc = new PdfDocument(reader, writer);
         doc.close();
 

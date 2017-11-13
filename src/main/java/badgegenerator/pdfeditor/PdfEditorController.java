@@ -418,6 +418,7 @@ public class PdfEditorController {
         pdfPreview.setFitHeight(height);
         pdfPreview.setPreserveRatio(true);
         editingArea.setMaxHeight(pdfPreview.getFitHeight());
+        editingArea.setMaxWidth(pdfPreview.getBoundsInLocal().getWidth());
     }
 
     public void setImageToPdfRatio(double imageToPdfRatio) {

@@ -66,14 +66,14 @@ abstract class AbstractFieldsLayouter {
                                 longestWords[i],
                                 i,
                                 imageToPdfRatio,
-                                fieldsParent.getBoundsInLocal().getWidth() - 48,
+                                fieldsParent.getMaxWidth(),
                                 fontPath,
                                 fontSize);
                     } else {
                         fxField = new SingleLineField(largestFields[i],
                                 i,
                                 imageToPdfRatio,
-                                fieldsParent.getBoundsInLocal().getWidth() - 48,
+                                fieldsParent.getMaxWidth(),
                                 fontSize,
                                 fontPath);
                     }
@@ -106,14 +106,14 @@ abstract class AbstractFieldsLayouter {
                     fxFields.add(fxField);
                 });
         fieldsParent.getChildren().addAll(FxField.getGuides());
-        Line verticalGuide = new Line(fieldsParent.getBoundsInLocal().getWidth() / 2,
+        Line verticalGuide = new Line(fieldsParent.getMaxWidth() / 2,
                 1,
-                fieldsParent.getBoundsInLocal().getWidth() / 2,
+                fieldsParent.getMaxWidth() / 2,
                 fieldsParent.getBoundsInLocal().getHeight() - 1);
         verticalGuide.setVisible(false);
         Line horizontalGuide = new Line(1,
                 fieldsParent.getBoundsInLocal().getHeight() / 2,
-                fieldsParent.getBoundsInLocal().getWidth() - 1,
+                fieldsParent.getMaxWidth() - 1,
                 fieldsParent.getBoundsInLocal().getHeight() / 2);
         horizontalGuide.setManaged(false);
         horizontalGuide.setVisible(false);
@@ -128,7 +128,7 @@ abstract class AbstractFieldsLayouter {
         float textWidth = Toolkit.getToolkit().getFontLoader()
                 .computeStringWidth("999", new Font(8));
         double parentHeight = fieldsParent.getBoundsInLocal().getHeight();
-        double parentWidth = fieldsParent.getBoundsInLocal().getWidth();
+        double parentWidth = fieldsParent.getMaxWidth();
 
         double bigStep = Math.ceil(parentHeight / imageToPdfRatio / 200) * 10 * imageToPdfRatio;
         double smallStep = bigStep / 5;
