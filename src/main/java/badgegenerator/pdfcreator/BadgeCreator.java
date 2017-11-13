@@ -21,6 +21,7 @@ import java.util.List;
 class BadgeCreator {
 //    private static Logger logger = Logger.getLogger(BadgeCreator.class.getSimpleName());
 
+    private final float OFFSET = 0.5f;                      // offset to nivialate float point effects
     private final List<FxField> fxFields;
     private final ArrayList<FxToPdfFieldAdapter> adapters;
     private float ratio;
@@ -107,7 +108,8 @@ class BadgeCreator {
                     String word = words[index];
                     float wordWidth = (float) fxField.computeStringWidth(word) / ratio;
                     lineWidth = (float) fxField.computeStringWidth(line.toString()) / ratio;
-                    if (lineWidth + spaceWidth + wordWidth <= maxWidth) {
+                    float newLineWidth = lineWidth + spaceWidth + wordWidth;
+                    if (newLineWidth < maxWidth + OFFSET) {
                         line.append(" ").append(word);
                     } else {
                         showTextAligned(alignment, pdfCanvas, line.toString(), lineWidth, maxWidth);

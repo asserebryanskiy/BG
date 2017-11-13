@@ -33,6 +33,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -432,6 +434,54 @@ public class PdfEditorController {
     public void handleSetAlignFields() {
         fxFields.forEach(field ->
                 field.setAlignFieldWithGrid(alignFieldsCheckMenuItem.isSelected()));
+    }
+
+    public void handleMakeBold(ActionEvent event) {
+        FxField firstSelected = fxFields.stream()
+                .filter(f -> f.isSelected).findFirst().orElse(null);
+        if (firstSelected != null) {
+            if (firstSelected.getFont().getName().contains("Bold")) {
+                fxFields.stream()
+                        .filter(f -> f.isSelected)
+                        .forEach(field -> {
+                            field.setFont(Font.font(field.getFont().getFamily(),
+                                    FontWeight.NORMAL, field.getFontSize()));
+                            System.out.println(field.getFont().getName());
+                        });
+            } else {
+                fxFields.stream()
+                        .filter(f -> f.isSelected)
+                        .forEach(field -> {
+                            field.setFont(Font.font(field.getFont().getFamily(),
+                                    FontWeight.BOLD, field.getFontSize()));
+                            System.out.println(field.getFont().getName());
+                        });
+            }
+        }
+    }
+
+    public void handleMakeItalic(ActionEvent event) {
+        FxField firstSelected = fxFields.stream()
+                .filter(f -> f.isSelected).findFirst().orElse(null);
+        if (firstSelected != null) {
+            if (firstSelected.getFont().getName().contains("Italic")) {
+                fxFields.stream()
+                        .filter(f -> f.isSelected)
+                        .forEach(field -> {
+                            field.setFont(Font.font(field.getFont().getFamily(),
+                                    FontPosture.REGULAR, field.getFontSize()));
+                            System.out.println(field.getFont().getName());
+                        });
+            } else {
+                fxFields.stream()
+                        .filter(f -> f.isSelected)
+                        .forEach(field -> {
+                            field.setFont(Font.font(field.getFont().getFamily(),
+                                    FontPosture.ITALIC, field.getFontSize()));
+                            System.out.println(field.getFont().getName());
+                        });
+            }
+        }
     }
 
 /*

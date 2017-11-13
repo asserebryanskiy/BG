@@ -22,11 +22,12 @@ import java.util.logging.Logger;
  * A special class, created to realize text dragging and further convertation to pdf.
  * Could be realized through SingleLineField and FieldWithHyphenation.
  */
-public abstract class FxField extends DraggablePane {
+public abstract class FxField extends DraggablePane implements StyleableText {
     private static Logger logger = Logger.getLogger(FxField.class.getSimpleName());
 
-    private static List<Guide> guides = new ArrayList<>();
-    private static Line verticalGuide;
+    private static List<Guide> guides = new ArrayList<>(); // list all guides connected with FxFields
+    private static Line verticalGuide;                     // vertical line in the center of the screen
+    private static Line horizontalGuide;                   // horizontal line in the center of the screen
 
     private int numberOfColumn;
     protected double imageToPdfRatio;
@@ -42,12 +43,13 @@ public abstract class FxField extends DraggablePane {
     List<Button> alignmentButtons;
     CheckBox capsLockCheckBox;
     private boolean capitalized;
-    private static Line horizontalGuide;
     private List<Line> horizontalGridLines = new ArrayList<>();
     private List<Line> verticalGridLines = new ArrayList<>();
     private double hGridLineStep;
     private double vGridLineStep;
     private boolean alignFieldWithGrid;
+    private boolean isBold;
+    private boolean isItalic;
 
     public FxField(int numberOfColumn,
                    double imageToPdfRatio,
@@ -401,4 +403,26 @@ public abstract class FxField extends DraggablePane {
     public void setAlignFieldWithGrid(boolean alignFieldWithGrid) {
         this.alignFieldWithGrid = alignFieldWithGrid;
     }
+
+    public void setBold(boolean value) {
+        this.isBold = value;
+        setBoldImpl(value);
+    }
+
+    public boolean isBold() {
+        return isBold;
+    }
+
+    abstract void setBoldImpl(boolean value);
+
+    public void setItalic(boolean value) {
+        this.isItalic = value;
+        setItalicImpl(value);
+    }
+
+    public boolean isItalic() {
+        return isItalic;
+    }
+
+    abstract void setItalicImpl(boolean value);
 }

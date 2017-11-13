@@ -11,8 +11,8 @@ import javafx.scene.text.TextAlignment;
  * An implementation of FxField used to layout single line text values.
  */
 public class SingleLineField extends FxField {
-    private final String originalValue;
-    private Text text;
+    private final String originalValue;  // value with which field was initialized
+    private Text text;                   // javaFx Text that holds String value
 
     public SingleLineField(String value,
                            int numberOfColumn,
@@ -110,5 +110,16 @@ public class SingleLineField extends FxField {
     void setCapitalizedImpl(boolean value) {
         text.setText(value ? originalValue.toUpperCase() : originalValue);
         setPrefWidth(computeStringWidth(text.getText()));
+    }
+
+    @Override
+    void setBoldImpl(boolean bold) {
+        if (bold) text.setStyle("-fx-font-weight: bold");
+        else text.setStyle("-fx-font-weight: regular");
+    }
+
+    @Override
+    void setItalicImpl(boolean value) {
+
     }
 }

@@ -20,17 +20,16 @@ import java.util.stream.Collectors;
  * Resizable borders make it possible to change hyphenation point.
  */
 public class FieldWithHyphenation extends FxField {
-    private final String originalValue;
-    private String[] words;
-    private final String LONGEST_WORD;
-    
-    private SimpleIntegerProperty numberOfLines;
-    private TextFlow textFlow;
-    private List<Text> lines;
-    private List<ResizeableBorder> resizeableBorders;
-    private double longestLineWidth;
-    private double[] wordsWidth;
-    private double spaceWidth;
+    private final String originalValue;                 // value with which field was initialized
+    private String[] words;                             // array of all words
+    private final String LONGEST_WORD;                  // word that determines max width of the field
+    private SimpleIntegerProperty numberOfLines;        // number of subsequent horizontal lines of text
+    private TextFlow textFlow;                          // base fx structure to hold lines of text
+    private List<Text> lines;                           // list of text lines
+    private List<ResizeableBorder> resizeableBorders;   // list of right and left resizeable borders
+    private double longestLineWidth;                    // width of longest word in current font
+    private double[] wordsWidth;                        // array of double values of words width
+    private double spaceWidth;                          // width of space character in current font
 
     public FieldWithHyphenation(String value,
                                 String longestWord,
@@ -249,6 +248,16 @@ public class FieldWithHyphenation extends FxField {
     void setCapitalizedImpl(boolean value) {
         words = value ? originalValue.toUpperCase().split("\\s") : originalValue.split("\\s");
         computeHyphenation();
+    }
+
+    @Override
+    void setBoldImpl(boolean value) {
+
+    }
+
+    @Override
+    void setItalicImpl(boolean value) {
+
     }
 
     public void addResizeableBorder(ResizeableBorder border) {
