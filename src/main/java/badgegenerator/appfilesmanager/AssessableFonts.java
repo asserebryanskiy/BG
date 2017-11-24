@@ -71,7 +71,7 @@ public class AssessableFonts {
         List<String> fxFonts = Font.getFontNames();
         stream.forEach(file -> {
             try {
-                String fileName = file.getName();
+                String fileName = file.getName().toLowerCase();
                 if(fileName.endsWith(".ttf")
                         || fileName.endsWith(".afm")
                         || fileName.endsWith(".otf")

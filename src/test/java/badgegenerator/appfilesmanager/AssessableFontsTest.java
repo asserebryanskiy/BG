@@ -29,4 +29,9 @@ public class AssessableFontsTest {
     public void helveticaIsAvailable() throws Exception {
         assertThat(fontNames.contains("Helvetica"), is(true));
     }
+
+    @Test
+    public void circeFontLoad() throws Exception {
+        assertThat(fontNames.contains("Circe Light"), is(true));
+    }
 }
