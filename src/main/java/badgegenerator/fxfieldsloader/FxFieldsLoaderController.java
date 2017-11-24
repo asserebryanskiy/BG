@@ -132,6 +132,7 @@ public class FxFieldsLoaderController implements Initializable{
         final Stage pdfRedactorWindow =
                 (Stage) ((Node) event.getSource()).getScene().getWindow();
         Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
+        loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
         launchPdfEditorTask.setOnSucceeded(event1 -> {
             showProgressScreen(false);
             if(launchPdfEditorTask.getValue() != null) {

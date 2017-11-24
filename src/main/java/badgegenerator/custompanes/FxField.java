@@ -25,6 +25,11 @@ import java.util.logging.Logger;
 public abstract class FxField extends DraggablePane implements StyleableText {
     private static Logger logger = Logger.getLogger(FxField.class.getSimpleName());
 
+    // min distance to grid line for field to be attracted to it
+    private static final int GUIDE_OFFSET = 5;
+    // min distance to guide for field to be attracted to it
+    private static final int GRID_OFFSET = 3;
+
     private static List<Guide> guides = new ArrayList<>(); // list all guides connected with FxFields
     private static Line verticalGuide;                     // vertical line in the center of the screen
     private static Line horizontalGuide;                   // horizontal line in the center of the screen
@@ -102,9 +107,7 @@ public abstract class FxField extends DraggablePane implements StyleableText {
 
     @Override
     double checkIfIntersectVerticalGuides(double newX) {
-        if(verticalGridLines.size() != 0
-                && verticalGridLines.get(0).isVisible()
-                && alignFieldWithGrid) {
+        if (!verticalGridLines.isEmpty() && alignFieldWithGrid) {
             int lineIndex = (int) Math.round(newX / vGridLineStep);
             if(lineIndex < verticalGridLines.size()) {
                 Line line = verticalGridLines.get(lineIndex);
@@ -126,8 +129,8 @@ public abstract class FxField extends DraggablePane implements StyleableText {
             }
         }
         if (verticalGuide != null) {
-            if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - 5
-                    && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + 5) {
+            if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - GUIDE_OFFSET
+                    && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + GUIDE_OFFSET) {
                 verticalGuide.setVisible(true);
                 newX = verticalGuide.getStartX() - getPrefWidth() / 2;
                 setAlignment("CENTER");
@@ -138,16 +141,16 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                 // to avoid permanent chasing of guide after a field
                 if(!guide.getId().contains(getId())) {
                     if(guide.getId().contains("Start")
-                            && newX > guide.getStartX() - 5
-                            && newX < guide.getStartX() + 5) {
+                            && newX > guide.getStartX() - GUIDE_OFFSET
+                            && newX < guide.getStartX() + GUIDE_OFFSET) {
                         guide.setVisible(true);
                         newX = guide.getStartX();
                         setAlignment("LEFT");
                         break;
                     } else guide.setVisible(false);
                     if(guide.getId().contains("End")
-                            && newX + getPrefWidth() > guide.getStartX() - 5
-                            && newX + getPrefWidth() < guide.getStartX() + 5) {
+                            && newX + getPrefWidth() > guide.getStartX() - GUIDE_OFFSET
+                            && newX + getPrefWidth() < guide.getStartX() + GUIDE_OFFSET) {
                         guide.setVisible(true);
                         newX = guide.getStartX() - getPrefWidth();
                         setAlignment("RIGHT");
@@ -172,14 +175,14 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                     Line endLine = horizontalGridLines.get(endLineIndex);
                     double endY = newY + getMaxHeight();
                     double endLineY = endLine.getStartY();
-                    if(endY > endLineY - 3
-                            && endY < endLineY + 3) {
+                    if(endY > endLineY - GRID_OFFSET
+                            && endY < endLineY + GRID_OFFSET) {
                         newY = endLineY - getMaxHeight();
                         endLine.setStrokeWidth(0.5);
                     } else endLine.setStrokeWidth(0.1);
                 }
                 double lineY = line.getStartY();
-                if(newY > lineY - 3 && newY < lineY + 3) {
+                if(newY > lineY - GRID_OFFSET && newY < lineY + GRID_OFFSET) {
                     newY = lineY;
                     line.setStrokeWidth(0.5);
                 } else line.setStrokeWidth(0.1);
