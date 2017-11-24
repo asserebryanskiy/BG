@@ -67,15 +67,6 @@ public class HelpMessages {
 //        }
 //    }
 
-    private static void logError(Exception e) {
-        e.printStackTrace();
-        Alert alert = new Alert(Alert.AlertType.ERROR,
-                "Не удалось загрузить текст подсказок");
-        alert.show();
-        LoggerManager.initializeLogger(logger);
-        logger.log(Level.SEVERE, e.getMessage(), e);
-    }
-
     public static void load() {
         helpMessages = new HashMap<>();
         try(Scanner scanner = new Scanner(

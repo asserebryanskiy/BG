@@ -216,6 +216,9 @@ public class PdfEditorController {
         visualizeGridCheckMenuItem.selectedProperty()
                 .addListener((o, oldVal, newVal) ->
                         alignFieldsCheckMenuItem.setDisable(!newVal));
+        GridPane grid = (GridPane) horizontalScaleBar.getParent();
+        grid.getRowConstraints().get(0).setMaxHeight(horizontalScaleBar
+                .getBoundsInLocal().getHeight());
     }
 
     public void handleChangeFont() {

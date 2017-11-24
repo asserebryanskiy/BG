@@ -15,8 +15,7 @@
             <VBox fx:id="btnBox" alignment="TOP_CENTER" spacing="5.0">
                <children>
                   <Button fx:id="loadFieldBtn" mnemonicParsing="false" onAction="#handleLoadField" prefWidth="90.0" text="Загрузить" />
-                  <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые" textAlignment="CENTER" />
-               </children>
+                  <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые&#10;бейджи" textAlignment="CENTER" /></children>
                <padding>
                   <Insets left="5.0" right="5.0" top="20.0" />
                </padding>

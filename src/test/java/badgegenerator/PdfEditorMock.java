@@ -17,6 +17,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by andreyserebryanskiy on 11/09/2017.
@@ -26,21 +28,24 @@ public class PdfEditorMock extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ExcelReader excelReader = new ExcelReader("/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/test.xlsx",
+        Path excelPath = Paths.get(getClass()
+                .getResource("/test.xlsx").toURI());
+        ExcelReader excelReader = new ExcelReader(excelPath.toFile().getAbsolutePath(),
                 true);
         excelReader.processFile();
-        String pdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/example.pdf";
+        Path pdfPath = Paths.get(getClass()
+                .getResource("/example.pdf").toURI());
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
         PdfEditorController controller = loader.getController();
-        pdf = PDDocument.load(new File(pdfPath));
+        pdf = PDDocument.load(new File(pdfPath.toFile().getAbsolutePath()));
         HelpMessages.load();
 
         double imageHeight = 500;
         double pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
         controller.setImageToPdfRatio(imageHeight / pdfHeight);
         controller.setPdfPreview(createImageFromPdf(), imageHeight);
-        controller.setPdfPath(pdfPath);
+        controller.setPdfPath(pdfPath.toFile().getAbsolutePath());
         controller.setExcelReader(excelReader);
         controller.init();
 
