@@ -1,6 +1,7 @@
 package badgegenerator.appfilesmanager;
 
 import com.sun.javafx.PlatformUtil;
+import com.sun.javafx.tk.Toolkit;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
 import org.apache.commons.lang3.time.StopWatch;
@@ -65,10 +66,8 @@ public class AssessableFonts {
                 return;
             }
         }
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         allAssessableFonts = new HashMap<>();
-        List<String> fxFonts = Font.getFontNames();
+        Set<String> fxFonts = new HashSet<>(Font.getFontNames());
         stream.forEach(file -> {
             try {
                 String fileName = file.getName().toLowerCase();
@@ -79,9 +78,7 @@ public class AssessableFonts {
                         || fileName.endsWith(".ttc")) {
                     Font font = Font.loadFont(new FileInputStream(file), 10);
                     String fontName = font.getName();
-                    if(fxFonts.contains(fontName)) {
-                        allAssessableFonts.putIfAbsent(fontName, file.getAbsolutePath());
-                    }
+                    allAssessableFonts.putIfAbsent(fontName, file.getAbsolutePath());
                 }
             } catch (Exception ignored) {
             }

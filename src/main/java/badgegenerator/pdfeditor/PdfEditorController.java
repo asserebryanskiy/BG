@@ -39,9 +39,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -222,12 +220,36 @@ public class PdfEditorController {
     }
 
     public void handleChangeFont() {
-        fxFields.stream()
-                .filter(f -> f.isSelected)
-                .forEach(field -> {
-                    String fontName = fontNameField.getText();
-                    field.setFont(new Font(fontName, field.getFontSize()));
-                });
+        String fontName = fontNameField.getText();
+        if (Font.getFontNames().contains(fontName)) {
+            fxFields.stream()
+                    .filter(f -> f.isSelected)
+                    .forEach(field -> {
+                        Font font = new Font(fontName, field.getFontSize());
+                        field.setFont(font);
+                    });
+        } else {
+            fxFields.stream()
+                    .filter(f -> f.isSelected)
+                    .forEach(field -> {
+                        FileInputStream fis;
+                        try {
+                            fis = new FileInputStream(AssessableFonts
+                                    .getFontPath(fontName));
+                        } catch (FileNotFoundException e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR,
+                                    "Не удалось установить шрифт " + fontName);
+                            alert.show();
+                            LoggerManager.initializeLogger(logger);
+                            logger.log(Level.SEVERE, "Ошибка при загрузке шрифта " + fontName, e);
+                            e.printStackTrace();
+                            return;
+                        }
+                        Font font = Font.loadFont(fis, field.getFontSize());
+                        field.setFont(font);
+                        System.out.println(field.getFont().getName());
+                    });
+        }
     }
 
     public void handleBrowseFont() throws InterruptedException, IOException {
