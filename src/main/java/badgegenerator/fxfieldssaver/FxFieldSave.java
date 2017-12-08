@@ -21,7 +21,7 @@ public class FxFieldSave implements Serializable{
     private String fontName;
     private String fontPath;
     private String alignment;
-    private int numberOfColumn;
+    private String columnId;
     private Font font;
     private boolean capitalized;
 
@@ -36,7 +36,7 @@ public class FxFieldSave implements Serializable{
         blue = color.getBlue();
         fontName = field.getFont().getName();
         alignment = field.getAlignment();
-        numberOfColumn = field.getNumberOfColumn();
+        columnId = field.getColumnId();
         capitalized = field.isCapitalized();
     }
 
@@ -72,8 +72,8 @@ public class FxFieldSave implements Serializable{
         this.fontPath = fontPath;
     }
 
-    public int getNumberOfColumn() {
-        return numberOfColumn;
+    public String getColumnId() {
+        return columnId;
     }
 
     public String getAlignment() {

@@ -34,7 +34,7 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     private static Line verticalGuide;                     // vertical line in the center of the screen
     private static Line horizontalGuide;                   // horizontal line in the center of the screen
 
-    private int numberOfColumn;
+    private String columnId;
     protected double imageToPdfRatio;
     double maxAllowableWidth;
     protected Font font;
@@ -56,13 +56,13 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     private boolean isBold;
     private boolean isItalic;
 
-    public FxField(int numberOfColumn,
+    public FxField(String columnId,
                    double imageToPdfRatio,
                    double maxAllowableWidth,
                    String fontPath,
                    double fontSize) {
         super();
-        this.numberOfColumn = numberOfColumn;
+        this.columnId = columnId;
         this.imageToPdfRatio = imageToPdfRatio;
         this.maxAllowableWidth = maxAllowableWidth;
         if(fontPath != null) {
@@ -86,10 +86,10 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         }
         this.fontSize = new SimpleDoubleProperty(fontSize);
         if(fontPath != null) this.fontPath = fontPath;
-        setId(String.format("field%d", numberOfColumn));
+        setId(String.format("field%d", columnId.hashCode()));
     }
 
-    public FxField(int id, double maxAllowableWidth) throws FileNotFoundException {
+    public FxField(String id, double maxAllowableWidth) throws FileNotFoundException {
         this(id, 1, maxAllowableWidth, null, 13);
     }
 
@@ -137,10 +137,10 @@ public abstract class FxField extends DraggablePane implements StyleableText {
             } else verticalGuide.setVisible(false);
         }
         if(guides != null) {
-            for(Line guide : guides) {
+            for(Guide guide : guides) {
                 // to avoid permanent chasing of guide after a field
-                if(!guide.getId().contains(getId())) {
-                    if(guide.getId().contains("Start")
+                if(guide.getGuideId() != columnId.hashCode()) {
+                    if(guide.getPosition().equals(Position.LEFT)
                             && newX > guide.getStartX() - GUIDE_OFFSET
                             && newX < guide.getStartX() + GUIDE_OFFSET) {
                         guide.setVisible(true);
@@ -148,7 +148,7 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                         setAlignment("LEFT");
                         break;
                     } else guide.setVisible(false);
-                    if(guide.getId().contains("End")
+                    if(guide.getPosition().equals(Position.RIGHT)
                             && newX + getPrefWidth() > guide.getStartX() - GUIDE_OFFSET
                             && newX + getPrefWidth() < guide.getStartX() + GUIDE_OFFSET) {
                         guide.setVisible(true);
@@ -348,8 +348,8 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         return alignment;
     }
 
-    public int getNumberOfColumn() {
-        return numberOfColumn;
+    public String getColumnId() {
+        return columnId;
     }
 
     public String getFontPath() {

@@ -28,8 +28,8 @@ public class FontChangeTest extends ApplicationTest{
 
     @Before
     public void setUp() throws Exception {
-        fieldWithHyp = new FieldWithHyphenation("Example words", 0, 200);
-        field = new SingleLineField("Example", 1, 200);
+        fieldWithHyp = new FieldWithHyphenation("Example words", "Example", 200);
+        field = new SingleLineField("Example", "Example1", 200);
         fields = new ArrayList<>();
         fields.add(fieldWithHyp);
         fields.add(field);
@@ -43,7 +43,7 @@ public class FontChangeTest extends ApplicationTest{
     @Test
     public void prefSizeChangesOnFontChange() throws Exception {
         // Arrange
-        URL fontUrl = getClass().getResource("/freeset.ttf");
+        URL fontUrl = getClass().getResource("/fonts/freeset.ttf");
         String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
 
         // Act
@@ -104,7 +104,7 @@ public class FontChangeTest extends ApplicationTest{
     public void colorPreservesOnFontChange() throws Exception {
         // Arrange
         fields.forEach(f -> f.setFill(Color.RED));
-        URL fontUrl = getClass().getResource("/freeset.ttf");
+        URL fontUrl = getClass().getResource("/fonts/freeset.ttf");
         String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
 
 
@@ -135,7 +135,7 @@ public class FontChangeTest extends ApplicationTest{
         fields.forEach(f -> f.setAlignment("RIGHT"));
         double fieldRightX = field.getPrefWidth();
         double fieldWithHypRightX = fieldWithHyp.getPrefWidth();
-        URL fontUrl = getClass().getResource("/freeset.ttf");
+        URL fontUrl = getClass().getResource("/fonts/freeset.ttf");
         String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
 
 

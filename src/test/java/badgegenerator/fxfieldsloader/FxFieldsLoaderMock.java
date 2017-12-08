@@ -14,9 +14,9 @@ public class FxFieldsLoaderMock extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ExcelReader excelReader = new ExcelReader("/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/test.xlsx",
-                true);
-        String pdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/example.pdf";
+        ExcelReader excelReader = new ExcelReader("/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/test.xlsx"
+        );
+        String pdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/empty.pdf";
         /*File savedFilesDirectory = new File(Main.class
                 .getResource("/savedFields").getFile());
         String[] names = savedFilesDirectory.list();*/

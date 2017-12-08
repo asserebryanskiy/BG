@@ -14,7 +14,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -58,18 +61,20 @@ public class FileLoaderController implements Initializable{
     @FXML
     private TextField pdfField;
     @FXML
-    private CheckBox hasHeadingsCheckBox;
+    private TextField emptyPdfField;
     @FXML
     private Text excelNotLoadedLabel;
     @FXML
-    private Text pdfNotLoadedLabel;
+    private Text emptyPdfNotLoadedLabel;
 
+    @FXML
+    private Text pdfNotLoadedLabel;
     private String pdfPath;
     private String excelFilePath;
-    private boolean hasHeadings;
     private ExcelReader excelReader;
     private HelpPopUp helpPopUp;
     private Thread loadFontsThread;
+    private String emptyPdfPath;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -92,7 +97,7 @@ public class FileLoaderController implements Initializable{
         loadFontsThread.start();
     }
 
-    public void handleBrowseExcel(MouseEvent event) {
+    public void handleBrowseExcel() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Excel files", "*.xlsx", "*.xls"));
@@ -106,7 +111,21 @@ public class FileLoaderController implements Initializable{
         }
     }
 
-    public void handleBrowsePdf(MouseEvent event) {
+    public void browseEmptyPdf() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        if(selectedFile != null) {
+            emptyPdfField.setText(selectedFile.getName());
+            emptyPdfPath = selectedFile.getAbsolutePath();
+        } else {
+            System.out.println("File is incorrect");
+        }
+    }
+
+    public void handleBrowsePdf() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
@@ -138,21 +157,23 @@ public class FileLoaderController implements Initializable{
                 }
             }
 
-            excelReader = new ExcelReader(excelFilePath, hasHeadings);
+            excelReader = new ExcelReader(excelFilePath);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
             loaderMessage.textProperty().bind(checkExcelFileTask.messageProperty());
             checkExcelFileTask.setOnSucceeded(e -> {
                 if((boolean) checkExcelFileTask.getValue()) {
-                    Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
+                    Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath, emptyPdfPath);
                     loaderMessage.textProperty().unbind();
                     loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
                     launchPdfEditorTask.setOnSucceeded(event1 -> {
                         showProgressScreen(false);
-                        pdfRedactorWindow.setScene(
-                                new Scene((Parent) launchPdfEditorTask.getValue()));
-                        pdfRedactorWindow.setResizable(false);
-                        pdfRedactorWindow.show();
-                        pdfRedactorWindow.centerOnScreen();
+                        Parent parent = (Parent) launchPdfEditorTask.getValue();
+                        if (parent != null) {
+                            pdfRedactorWindow.setScene(new Scene(parent));
+                            pdfRedactorWindow.setResizable(false);
+                            pdfRedactorWindow.show();
+                            pdfRedactorWindow.centerOnScreen();
+                        }
                     });
                     launchPdfEditorTask.setOnFailed(c -> {
                         showProgressScreen(false);
@@ -178,7 +199,7 @@ public class FileLoaderController implements Initializable{
         if(checkIfFieldsAreFilled()) {
             showProgressScreen(true);
 
-            excelReader = new ExcelReader(excelFilePath, hasHeadings);
+            excelReader = new ExcelReader(excelFilePath);
             Task checkExcelFileTask = new CheckExcelFileTask(excelReader);
             loaderMessage.textProperty().bind(checkExcelFileTask.messageProperty());
             checkExcelFileTask.setOnSucceeded(e -> {
@@ -219,6 +240,7 @@ public class FileLoaderController implements Initializable{
                         controller.setSavedFieldsNames(savesNames);
                         controller.setExcelReader(excelReader);
                         controller.setPdfPath(pdfPath);
+                        controller.setEmptyPdfPath(emptyPdfPath);
                         savedFieldsWindow.setScene(new Scene(root));
                         savedFieldsWindow.setResizable(false);
                         savedFieldsWindow.show();
@@ -247,15 +269,15 @@ public class FileLoaderController implements Initializable{
             fieldsAreFilled = false;
             pdfNotLoadedLabel.setVisible(true);
         } else pdfNotLoadedLabel.setVisible(false);
+        if(emptyPdfField.getText().isEmpty()) {
+            fieldsAreFilled = false;
+            emptyPdfNotLoadedLabel.setVisible(true);
+        } else emptyPdfNotLoadedLabel.setVisible(false);
         if(excelFileField.getText().isEmpty()){
             fieldsAreFilled = false;
             excelNotLoadedLabel.setVisible(true);
         } else excelNotLoadedLabel.setVisible(false);
         return fieldsAreFilled;
-    }
-
-    public void handleSetHasHeadings() {
-        hasHeadings = hasHeadingsCheckBox.isSelected();
     }
 
     private void showProgressScreen(boolean value) {

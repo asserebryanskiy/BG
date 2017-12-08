@@ -2,6 +2,7 @@ package badgegenerator;
 
 import badgegenerator.appfilesmanager.HelpMessages;
 import badgegenerator.fileloader.ExcelReader;
+import badgegenerator.fileloader.PdfFieldExtractor;
 import badgegenerator.pdfeditor.PdfEditorController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,43 +18,47 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 /**
  * Created by andreyserebryanskiy on 11/09/2017.
  */
 public class PdfEditorMock extends Application {
-    private PDDocument pdf;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Path excelPath = Paths.get(getClass()
-                .getResource("/test.xlsx").toURI());
-        ExcelReader excelReader = new ExcelReader(excelPath.toFile().getAbsolutePath(),
-                true);
+        String excelPath = getResourcePath("/excels/test.xlsx");
+        ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        Path pdfPath = Paths.get(getClass()
-                .getResource("/example.pdf").toURI());
+        String fullPdfPath = getResourcePath("/pdfs/hShiftCenter.pdf");
+        String emptyPdfPath = getResourcePath("/pdfs/empty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
         PdfEditorController controller = loader.getController();
-        pdf = PDDocument.load(new File(pdfPath.toFile().getAbsolutePath()));
+        PDDocument pdf = PDDocument.load(new File(emptyPdfPath));
         HelpMessages.load();
 
+        PdfFieldExtractor extractor = new PdfFieldExtractor(fullPdfPath, excelReader);
         double imageHeight = 500;
-        double pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
+        float pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
         controller.setImageToPdfRatio(imageHeight / pdfHeight);
-        controller.setPdfPreview(createImageFromPdf(), imageHeight);
-        controller.setPdfPath(pdfPath.toFile().getAbsolutePath());
+        controller.setPdfPreview(createImageFromPdf(pdf), imageHeight);
+        controller.setPdfPath(emptyPdfPath);
         controller.setExcelReader(excelReader);
-        controller.init();
+        controller.init(extractor.getFields());
 
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-    private byte[] createImageFromPdf() throws IOException {
+    private String getResourcePath(String name) throws URISyntaxException {
+        return Paths.get(getClass()
+                .getResource(name).toURI())
+                .toFile().getAbsolutePath();
+    }
+
+    private byte[] createImageFromPdf(PDDocument pdf) throws IOException {
         PDFRenderer renderer = new PDFRenderer(pdf);
         BufferedImage bim = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
         ByteArrayOutputStream out = new ByteArrayOutputStream();

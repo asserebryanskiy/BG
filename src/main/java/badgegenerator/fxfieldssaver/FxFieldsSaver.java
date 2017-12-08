@@ -38,7 +38,7 @@ public class FxFieldsSaver {
             String filePath = String.format("%s%s%s.fxf",
                     saveDir.getAbsolutePath(),
                     File.separator,
-                    fieldFile.getNumberOfColumn());
+                    fieldFile.getColumnId());
             ObjectOutputStream oos;
             try(FileOutputStream fos = new FileOutputStream(filePath)) {
                 oos = new ObjectOutputStream(fos);
@@ -50,7 +50,7 @@ public class FxFieldsSaver {
                 alert.show();
                 LoggerManager.initializeLogger(logger);
                 logger.log(Level.SEVERE,
-                        String.format("Ошибка при сохранении поля%d", field.getNumberOfColumn()),
+                        String.format("Ошибка при сохранении поля%d", field.getColumnId()),
                         e);
             }
         });

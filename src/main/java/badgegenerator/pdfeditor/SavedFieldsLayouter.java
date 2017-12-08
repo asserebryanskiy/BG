@@ -4,38 +4,41 @@ import badgegenerator.custompanes.FxField;
 import badgegenerator.fxfieldsloader.FxFieldsLoader;
 import badgegenerator.fxfieldssaver.FxFieldSave;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A realization of AbstractFieldsLayouter. Is used to load and position saved FxFields
  */
 public class SavedFieldsLayouter extends AbstractFieldsLayouter {
+    private Map<String, FxFieldSave> saves;
+
     SavedFieldsLayouter(Pane fieldsParent,
                         Pane verticalScaleBar,
                         Pane horizontalScaleBar,
                         List<Line> gridLines,
                         String[] largestFields,
                         String[] longestWords,
+                        String[] headings,
                         double imageToPdfRatio,
                         String savePath) {
         super(fieldsParent, verticalScaleBar, horizontalScaleBar, gridLines,
-                largestFields, longestWords, imageToPdfRatio);
+                largestFields, longestWords, headings, imageToPdfRatio);
         saves = FxFieldsLoader.load(savePath);
-        saves.sort(Comparator.comparingInt(FxFieldSave::getNumberOfColumn));
     }
 
     @Override
-    protected void setFieldFontAndSize(int i) {
-        fontPath = saves.get(i).getFontPath();
-        fontSize = saves.get(i).getFontSize();
+    protected void setFieldFontAndSize(String columnId) {
+        fontPath = saves.get(columnId).getFontPath();
+        fontSize = saves.get(columnId).getFontSize();
     }
 
     @Override
     protected void setFieldsParameters(FxField fxField) {
-        FxFieldSave save = saves.get(fxField.getNumberOfColumn());
+        FxFieldSave save = saves.get(fxField.getColumnId());
         alignment = save.getAlignment();
         fxField.setCapitalized(save.isCapitalized());
         switch (alignment) {
@@ -51,8 +54,6 @@ public class SavedFieldsLayouter extends AbstractFieldsLayouter {
                 x = save.getX();
         }
         y = save.getY();
-        red = save.getRed();
-        green = save.getGreen();
-        blue = save.getBlue();
+        color = Color.color(save.getRed(), save.getGreen(), save.getBlue());
     }
 }

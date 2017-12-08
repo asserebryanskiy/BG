@@ -29,17 +29,21 @@ public class LaunchPdfEditorTask extends Task {
     private final ExcelReader excelReader;
     private final String pdfPath;
     private final String fxFieldsPath;
-    private PDDocument pdf;
+    private final String emptyPdfPath;
 
-    public LaunchPdfEditorTask(ExcelReader excelReader, String pdfPath)  {
-        this(excelReader, pdfPath, null);
+    public LaunchPdfEditorTask(ExcelReader excelReader,
+                               String pdfPath,
+                               String emptyPdfPath)  {
+        this(excelReader, pdfPath, emptyPdfPath, null);
     }
 
     public LaunchPdfEditorTask(ExcelReader excelReader,
                                String pdfPath,
+                               String emptyPdfPath,
                                String fxFieldsPath)  {
         this.excelReader = excelReader;
         this.pdfPath = pdfPath;
+        this.emptyPdfPath = emptyPdfPath;
         this.fxFieldsPath = fxFieldsPath;
     }
 
@@ -48,21 +52,32 @@ public class LaunchPdfEditorTask extends Task {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root;
         try {
+            PdfFieldExtractor extractor = null;
+            if (fxFieldsPath == null) {
+                try {
+                    extractor = new PdfFieldExtractor(pdfPath, excelReader);
+                } catch (WrongHeadingsException e) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                e.getMessage(),
+                                ButtonType.OK);
+                        alert.show();
+                    });
+                    return null;
+                }
+            }
             root = loader.load();
             PdfEditorController controller = loader.getController();
             updateMessage("Загружаю pdf");
-            pdf = PDDocument.load(new File(pdfPath));
+            PDDocument pdf = PDDocument.load(new File(emptyPdfPath));
             double imageHeight = 500;
-            double pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
+            float pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
             controller.setImageToPdfRatio(imageHeight / pdfHeight);
-            controller.setPdfPreview(createImageFromPdf(), imageHeight);
-            controller.setPdfPath(pdfPath);
+            controller.setPdfPreview(createImageFromPdf(pdf), imageHeight);
+            controller.setPdfPath(emptyPdfPath);
             controller.setExcelReader(excelReader);
-            if(fxFieldsPath != null) {
-                controller.init(fxFieldsPath);
-            } else {
-                controller.init();
-            }
+            if(fxFieldsPath != null) controller.init(fxFieldsPath);
+            else                     controller.init(extractor.getFields());
         } catch (Exception e) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
@@ -72,13 +87,14 @@ public class LaunchPdfEditorTask extends Task {
             });
             LoggerManager.initializeLogger(logger);
             logger.log(Level.SEVERE, "Ошибка при загрузке PdfEditor.fxml", e);
+            e.printStackTrace();
             return null;
         }
 
         return root;
     }
 
-    private byte[] createImageFromPdf() throws IOException {
+    private byte[] createImageFromPdf(PDDocument pdf) throws IOException {
         PDFRenderer renderer = new PDFRenderer(pdf);
         BufferedImage bim = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
         ByteArrayOutputStream out = new ByteArrayOutputStream();

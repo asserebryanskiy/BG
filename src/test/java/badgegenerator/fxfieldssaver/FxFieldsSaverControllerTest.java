@@ -9,6 +9,9 @@ import javafx.scene.layout.VBox;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -88,11 +91,13 @@ public class FxFieldsSaverControllerTest extends FxFieldsSaverTestBase{
         String[] expectedNames = new String[]{"deleteTest", "test1", "test2", "", ""};
 
         // Act
-        String[] gainedNames = box.getChildren().stream()
+        Set<String> gainedNames = box.getChildren().stream()
                 .map(node -> ((TextField) node).getText())
-                .toArray(String[]::new);
+                .collect(Collectors.toSet());
 
         // Assert
-        assertThat(gainedNames, is(expectedNames));
+        for (String name : expectedNames) {
+            assertThat(name, gainedNames.contains(name), is(true));
+        }
     }
 }

@@ -7,9 +7,13 @@ import javafx.scene.shape.Line;
  * Currently only vertical guides are available.
  */
 public class Guide extends Line {
-    public Guide(badgegenerator.custompanes.FxField fxField,
-                 Position position) throws NoParentFoundException, NoIdFoundException {
+    private final long guideId;
+    private final Position position;
+
+    public Guide(FxField fxField, Position position) throws NoParentFoundException, NoIdFoundException {
         super();
+        guideId = fxField.getColumnId().hashCode();
+        this.position = position;
         setManaged(false);
         setVisible(false);
         if (fxField.getParent() == null) {
@@ -20,7 +24,6 @@ public class Guide extends Line {
             setStartY(0);
             setEndY(fxField.getParent().getBoundsInLocal().getHeight());
             if(position.equals(Position.RIGHT)) {
-                setId(String.format("%sEndGuide", fxField.getId()));
                 setStartX(fxField.getLayoutX() + fxField.getPrefWidth());
                 setEndX(fxField.getLayoutX() + fxField.getPrefWidth());
                 startXProperty()
@@ -28,12 +31,19 @@ public class Guide extends Line {
                 endXProperty()
                         .bind(fxField.layoutXProperty().add(fxField.prefWidthProperty()));
             } else {
-                setId(String.format("%sStartGuide", fxField.getId()));
                 setStartX(fxField.getLayoutX());
                 setEndX(fxField.getLayoutX());
                 startXProperty().bind(fxField.layoutXProperty());
                 endXProperty().bind(fxField.layoutXProperty());
             }
         }
+    }
+
+    public long getGuideId() {
+        return guideId;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

@@ -4,7 +4,6 @@ import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
-import com.sun.javafx.PlatformUtil;
 import javafx.stage.Stage;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -13,10 +12,8 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.net.URISyntaxException;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,32 +26,34 @@ import static org.junit.Assert.assertThat;
  * Created by andreyserebryanskiy on 02/10/2017.
  */
 public class FxFieldsSaverTest extends ApplicationTest{
-    private static File directory;
+    private static File saveDir;
     @Before
-    public void setUp() throws IOException {
-        FxField field1 = new SingleLineField("Example", 0, 100);
-        String fontPath = getClass().getResource("/freeset.ttf").getPath();
-        if(PlatformUtil.isWindows()) fontPath = fontPath.substring(1);
-        FxField field2 = new FieldWithHyphenation("Example words", 1, 120);
+    public void setUp() throws IOException, URISyntaxException {
+        FxField field1 = new SingleLineField("Example", "Example", 100);
+        String fontPath = Paths.get(getClass()
+                .getResource("/fonts/freeset.ttf").toURI())
+                .toFile()
+                .getAbsolutePath();
+        FxField field2 = new FieldWithHyphenation("Example words", "Example2", 120);
         field2.setFont(fontPath);
         List<FxField> fields = new ArrayList<>();
         fields.add(field1);
         fields.add(field2);
 
         FxFieldsSaver.createSave(fields, "test");
-        directory = new File(SavesManager.getSavesFolder().getAbsolutePath()
+        saveDir = new File(SavesManager.getSavesFolder().getAbsolutePath()
                 + File.separator
                 + "test");
     }
 
     @Test
     public void saveExists() throws Exception {
-        assertThat(directory.exists(), is(true));
+        assertThat(saveDir.exists(), is(true));
     }
 
     @Test
     public void saveContainsFxfFiles() throws Exception {
-        assertThat(Arrays.stream(directory.list())
+        assertThat(Arrays.stream(saveDir.list())
                 .filter(name -> name.endsWith(".fxf"))
                 .count(), is(2L));
     }
@@ -63,11 +62,11 @@ public class FxFieldsSaverTest extends ApplicationTest{
     public void saveContainsFont() throws Exception {
         // Arrange
         File fontFile = new File(String.format("%s%s%s%s%s",
-                directory.getAbsolutePath(),
+                saveDir.getAbsolutePath(),
                 File.separator,
                 "fonts",
                 File.separator,
-                "freeset.ttf"));
+                "FreeSet.ttf"));
 
         // Assert
         assertThat(fontFile.exists(), is(true));
@@ -75,7 +74,7 @@ public class FxFieldsSaverTest extends ApplicationTest{
 
     @AfterClass
     public static void afterAllTests() throws Exception {
-        delete(directory.toPath());
+        delete(saveDir.toPath());
     }
 
     private static void delete(Path path) throws IOException {

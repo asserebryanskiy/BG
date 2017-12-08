@@ -4,6 +4,7 @@ import badgegenerator.appfilesmanager.AssessableFonts;
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
+import badgegenerator.fileloader.PdfField;
 import badgegenerator.fxfieldssaver.FxFieldsSaverController;
 import badgegenerator.helppopup.HelpPopUp;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
@@ -40,10 +41,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -126,30 +124,33 @@ public class PdfEditorController {
     private List<Button> alignmentButtons;
     private List<Line> gridLines = new ArrayList<>();
 
-    public void init() {
-        init(null);
+    public void init(Map<String, PdfField> pdfFields) {
+        AbstractFieldsLayouter layouter = new NewFieldsLayouter(editingArea,
+                verticalScaleBar,
+                horizontalScaleBar,
+                gridLines,
+                excelReader.getLargestFields(),
+                excelReader.getLongestWords(),
+                excelReader.getHeadings(),
+                imageToPdfRatio,
+                pdfFields);
+        init(layouter);
     }
 
     public void init(String savesPath) {
-        AbstractFieldsLayouter layouter;
-        if(savesPath != null) {
-            layouter = new SavedFieldsLayouter(editingArea,
-                    verticalScaleBar,
-                    horizontalScaleBar,
-                    gridLines,
-                    excelReader.getLargestFields(),
-                    excelReader.getLongestWords(),
-                    imageToPdfRatio,
-                    savesPath);
-        } else {
-            layouter = new NewFieldsLayouter(editingArea,
-                    verticalScaleBar,
-                    horizontalScaleBar,
-                    gridLines,
-                    excelReader.getLargestFields(),
-                    excelReader.getLongestWords(),
-                    imageToPdfRatio);
-        }
+        AbstractFieldsLayouter layouter = new SavedFieldsLayouter(editingArea,
+                verticalScaleBar,
+                horizontalScaleBar,
+                gridLines,
+                excelReader.getLargestFields(),
+                excelReader.getLongestWords(),
+                excelReader.getHeadings(),
+                imageToPdfRatio,
+                savesPath);
+        init(layouter);
+    }
+
+    private void init(AbstractFieldsLayouter layouter) {
         layouter.positionFields();
         layouter.addScaleMarks();
         fxFields = layouter.getFxFields();
@@ -247,7 +248,6 @@ public class PdfEditorController {
                         }
                         Font font = Font.loadFont(fis, field.getFontSize());
                         field.setFont(font);
-                        System.out.println(field.getFont().getName());
                     });
         }
     }
@@ -472,7 +472,6 @@ public class PdfEditorController {
                         .forEach(field -> {
                             field.setFont(Font.font(field.getFont().getFamily(),
                                     FontWeight.NORMAL, field.getFontSize()));
-                            System.out.println(field.getFont().getName());
                         });
             } else {
                 fxFields.stream()
@@ -480,7 +479,6 @@ public class PdfEditorController {
                         .forEach(field -> {
                             field.setFont(Font.font(field.getFont().getFamily(),
                                     FontWeight.BOLD, field.getFontSize()));
-                            System.out.println(field.getFont().getName());
                         });
             }
         }
@@ -496,7 +494,6 @@ public class PdfEditorController {
                         .forEach(field -> {
                             field.setFont(Font.font(field.getFont().getFamily(),
                                     FontPosture.REGULAR, field.getFontSize()));
-                            System.out.println(field.getFont().getName());
                         });
             } else {
                 fxFields.stream()
@@ -504,7 +501,6 @@ public class PdfEditorController {
                         .forEach(field -> {
                             field.setFont(Font.font(field.getFont().getFamily(),
                                     FontPosture.ITALIC, field.getFontSize()));
-                            System.out.println(field.getFont().getName());
                         });
             }
         }

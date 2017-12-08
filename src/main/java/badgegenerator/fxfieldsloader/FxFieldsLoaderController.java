@@ -49,6 +49,7 @@ public class FxFieldsLoaderController implements Initializable{
 
     private ExcelReader excelReader;
     private String pdfPath;
+    private String emptyPdfPath;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,6 +88,7 @@ public class FxFieldsLoaderController implements Initializable{
                         (Stage) ((Node) event.getSource()).getScene().getWindow();
                 Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader,
                         pdfPath,
+                        emptyPdfPath,
                         save.getAbsolutePath());
                 loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
                 launchPdfEditorTask.setOnSucceeded(event1 -> {
@@ -131,7 +133,7 @@ public class FxFieldsLoaderController implements Initializable{
         showProgressScreen(true);
         final Stage pdfRedactorWindow =
                 (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath);
+        Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader, pdfPath, emptyPdfPath);
         loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
         launchPdfEditorTask.setOnSucceeded(event1 -> {
             showProgressScreen(false);
@@ -147,5 +149,9 @@ public class FxFieldsLoaderController implements Initializable{
         Thread thread = new Thread(launchPdfEditorTask);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    public void setEmptyPdfPath(String emptyPdfPath) {
+        this.emptyPdfPath = emptyPdfPath;
     }
 }

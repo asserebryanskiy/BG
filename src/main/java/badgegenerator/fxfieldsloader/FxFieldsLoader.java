@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -22,7 +22,7 @@ public class FxFieldsLoader {
     private FxFieldsLoader() {
     }
 
-    public static List<FxFieldSave> load(String savePath) {
+    public static Map<String, FxFieldSave> load(String savePath) {
         File directory = new File(savePath);
 
         return Arrays.stream(directory.list())
@@ -52,7 +52,7 @@ public class FxFieldsLoader {
                         return null;
                     }
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(FxFieldSave::getColumnId, fieldFile -> fieldFile));
     }
 
     private static String searchForFont(String savePath, String fontName) throws Exception {

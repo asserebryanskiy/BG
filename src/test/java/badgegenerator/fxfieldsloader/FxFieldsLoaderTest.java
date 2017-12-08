@@ -20,6 +20,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,8 +33,8 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
     @Before
     public void setUp() throws Exception {
-        FxField field = new SingleLineField("Example", 0, 200);
-        FxField fieldWithHyp = new FieldWithHyphenation("Example words", 1, 200);
+        FxField field = new SingleLineField("Example", "Example", 200);
+        FxField fieldWithHyp = new FieldWithHyphenation("Example words", "Example1", 200);
         fields = new ArrayList<>(2);
         fields.add(field);
         fields.add(fieldWithHyp);
@@ -70,11 +71,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
 
         // Assert
         assertThat(loadedSave.getFontSize(), is(fontSize));
@@ -88,11 +89,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
 
         // Assert
         assertThat(loadedSave.isCapitalized(), is(true));
@@ -107,11 +108,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
         Color color1 = new Color(loadedSave.getRed(),
                 loadedSave.getGreen(),
                 loadedSave.getBlue(),
@@ -134,11 +135,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
 
         // Assert
         assertThat(loadedSave.getX(), is(initialX));
@@ -153,11 +154,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
 
         // Assert
         assertThat(loadedSave.getY(), is(initialY));
@@ -167,17 +168,17 @@ public class FxFieldsLoaderTest extends ApplicationTest{
     @Test
     public void fontPathPreservesAfterSaveLoad() throws Exception {
         // Arrange
-        URL url = getClass().getResource("/freeset.ttf");
+        URL url = getClass().getResource("/fonts/freeset.ttf");
         String path = Paths.get(url.toURI()).toFile().getAbsolutePath();
         fields.forEach(f -> f.setFont(path));
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
         String expectedPath = SavesManager.getSavesFolder().getAbsolutePath()
                 + File.separator
                 + "test"
@@ -199,11 +200,11 @@ public class FxFieldsLoaderTest extends ApplicationTest{
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
-        List<FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
+        Map<String, FxFieldSave> saves = FxFieldsLoader.load(SavesManager.getSavesFolder()
                 + File.separator
                 + "test");
-        FxFieldSave loadedSave = saves.get(0);
-        FxFieldSave loadedSaveWithHyp = saves.get(1);
+        FxFieldSave loadedSave = saves.get("Example");
+        FxFieldSave loadedSaveWithHyp = saves.get("Example1");
 
         // Assert
         assertThat(loadedSave.getAlignment(), is(initialAlignment));

@@ -15,16 +15,14 @@ import java.util.List;
 
 public class ExcelReader {
     private final String srcPath;
-    private boolean hasHeadings;
     private int numberOfColumns;
-    private List<String> headings;
+    private String[] headings;
     private String[] largestFields;
     private String[] longestWords;
     private String[][] values;
 
-    public ExcelReader(String srcPath, boolean hasHeadings) {
+    public ExcelReader(String srcPath) {
         this.srcPath = srcPath;
-        this.hasHeadings = hasHeadings;
     }
 
     public void processFile() throws IOException {
@@ -44,14 +42,13 @@ public class ExcelReader {
             throw new IOException("Загруженный файл пустой");
         }
         // retrieve headings
-        if(hasHeadings) getHeadingsFromTable(sheet);
-        numberOfColumns = getNumberOfColumns(sheet, numberOfRows);
+        getHeadingsFromTable(sheet);
         values = new String[numberOfRows][numberOfColumns];
         largestFields = new String[numberOfColumns];
         Arrays.fill(largestFields, "");
         longestWords = new String[numberOfColumns];
         Arrays.fill(longestWords, "");
-        for(int row = hasHeadings ? 1 : 0; row < numberOfRows; row++) {
+        for(int row = 1; row < numberOfRows; row++) {
             for(int column = 0; column < numberOfColumns; column++) {
                 Cell cell = sheet.getRow(row).getCell(column, Row.CREATE_NULL_AS_BLANK);
                 values[row][column] = cell.getStringCellValue();
@@ -66,37 +63,25 @@ public class ExcelReader {
                 }
             }
         }
-        if(hasHeadings) {
-            Arrays.fill(values[0], "");
-        }
+        Arrays.fill(values[0], "");
     }
 
     private void getHeadingsFromTable(Sheet sheet) throws IOException {
-        headings = new ArrayList<>();
+        List<String> temp = new ArrayList<>();
         sheet.getRow(0)
                 .cellIterator()
-                .forEachRemaining(cell -> headings.add(cell.getStringCellValue()));
-        if(headings.size() > 10) throw new IOException("Больше 10 столбцов в таблице");
-        numberOfColumns = headings.size();
+                .forEachRemaining(cell -> {
+                    try {
+                        temp.add(cell.getStringCellValue());
+                    } catch (IllegalStateException e) {
+                        temp.add(String.valueOf((int) cell.getNumericCellValue()));
+                    }
+                });
+        if(temp.size() > 10) throw new IOException("Больше 10 столбцов в таблице");
+        numberOfColumns = temp.size();
+        headings = temp.toArray(new String[numberOfColumns]);
     }
 
-    private int getNumberOfColumns(Sheet sheet, int numberOfRows) throws IOException {
-        if(hasHeadings) {
-            return headings.size();
-        } else {
-            int maxNumberOfColumns = 0;
-            for(int i = 0; i<numberOfRows; i++) {
-                Row row = sheet.getRow(i);
-                if(row == null) continue;
-                int counter = row.getLastCellNum();
-                if(counter > 10) {
-                    throw new IOException("Больше 10 столбцов в таблице");
-                }
-                if(counter>maxNumberOfColumns) maxNumberOfColumns = counter;
-            }
-            return maxNumberOfColumns;
-        }
-    }
 
     public String[] getLargestFields() {
         return largestFields;
@@ -106,12 +91,8 @@ public class ExcelReader {
         return values;
     }
 
-    public List<String> getHeadings() {
+    public String[] getHeadings() {
         return headings;
-    }
-
-    public boolean getHasHeadings() {
-        return hasHeadings;
     }
 
     public String[] getLongestWords() {

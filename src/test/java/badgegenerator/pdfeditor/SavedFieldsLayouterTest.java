@@ -6,6 +6,7 @@ import badgegenerator.custompanes.FxField;
 import badgegenerator.custompanes.SingleLineField;
 import badgegenerator.fxfieldssaver.FxFieldsSaver;
 import javafx.scene.layout.Pane;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,8 +28,8 @@ public class SavedFieldsLayouterTest {
 
 
     private void prepareSaves(String alignment) {
-        FxField field = new SingleLineField("Example", 0, 200);
-        FxField fieldWithHyp = new FieldWithHyphenation("Example words", 1, 200);
+        FxField field = new SingleLineField("Example", "Example", 200);
+        FxField fieldWithHyp = new FieldWithHyphenation("Example words", "Example1", 200);
         List<FxField> fields = new ArrayList<>(2);
         fields.add(field);
         fields.add(fieldWithHyp);
@@ -65,6 +66,7 @@ public class SavedFieldsLayouterTest {
                 new ArrayList<>(),
                 new String[]{"Short", "Shortestest words"},
                 new String[]{"Short", "Shortestest words"},
+                new String[]{"Example", "Example1"},
                 1,
                 savePath);
         layouter.positionFields();
@@ -90,6 +92,7 @@ public class SavedFieldsLayouterTest {
                 new ArrayList<>(),
                 new String[]{"Short", "Shortestest words"},
                 new String[]{"Short", "Shortestest words"},
+                new String[]{"Example", "Example1"},
                 1,
                 savePath);
         layouter.positionFields();
@@ -101,5 +104,12 @@ public class SavedFieldsLayouterTest {
         // Assert
         assertThat("Single line", finalFieldRightX, is(initRightX));
         assertThat("Multi line", finalFieldWHRightX, is(initRightX_WH));
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        for (File file : SavesManager.getSavesFolder().listFiles()) {
+            file.delete();
+        }
     }
 }

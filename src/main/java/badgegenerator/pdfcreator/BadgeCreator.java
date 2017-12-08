@@ -16,14 +16,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class BadgeCreator {
 //    private static Logger logger = Logger.getLogger(BadgeCreator.class.getSimpleName());
 
-    private final float OFFSET = 0.5f;                      // offset to nivialate float point effects
+    private final float OFFSET = 0.5f; // offset to nivilate float point effects
     private final List<FxField> fxFields;
     private final ArrayList<FxToPdfFieldAdapter> adapters;
+    private final List<String> headings;
     private float ratio;
     private String[][] participants;
 
@@ -39,6 +41,7 @@ class BadgeCreator {
     BadgeCreator(List<FxField> fxFields,
                  String srcPdfPath,
                  String[][] participants,
+                 String[] headings,
                  double imageToPdfRatio,
                  boolean compressFieldIfLineMissing) throws IOException {
         // in memory test
@@ -58,6 +61,7 @@ class BadgeCreator {
             throw new IOException("Не удалось загрузить файл шрифта");
         }
         this.participants = participants;
+        this.headings = Arrays.asList(headings);
         ratio = (float) imageToPdfRatio;
         this.compressFieldIfLineMissing = compressFieldIfLineMissing;
 
@@ -78,8 +82,8 @@ class BadgeCreator {
             FxField fxField = fxFields.get(j);
             FxToPdfFieldAdapter adapter = adapters.get(j);
             String value = adapter.isCapitalized() ?
-                    participantRow[adapter.getNumberOfColumn()].toUpperCase()
-                    : participantRow[adapter.getNumberOfColumn()];
+                    participantRow[headings.indexOf(adapter.getColumnId())].toUpperCase() :
+                    participantRow[headings.indexOf(adapter.getColumnId())];
             String alignment = adapter.getAlignment();
             float yCoordinate = adapter.getY();
             if(compressFieldIfLineMissing && sumOfMissingLines > 0) {

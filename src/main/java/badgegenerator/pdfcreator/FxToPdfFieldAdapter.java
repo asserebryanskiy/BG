@@ -34,7 +34,7 @@ public class FxToPdfFieldAdapter {
     private Color pdfColor;
     private float leading;
     private int numberOfLines;
-    private int numberOfColumn;
+    private String columnId;
     private boolean capitalized;
 
     public FxToPdfFieldAdapter(FxField fxField,
@@ -85,7 +85,7 @@ public class FxToPdfFieldAdapter {
         if (fxField instanceof FieldWithHyphenation) {
             numberOfLines = ((FieldWithHyphenation) fxField).getNumberOfLines();
         } else numberOfLines = 1;
-        numberOfColumn = fxField.getNumberOfColumn();
+        columnId = fxField.getColumnId();
         capitalized = fxField.isCapitalized();
     }
 
@@ -125,8 +125,8 @@ public class FxToPdfFieldAdapter {
         return numberOfLines;
     }
 
-    int getNumberOfColumn() {
-        return numberOfColumn;
+    String getColumnId() {
+        return columnId;
     }
 
     boolean isCapitalized() {

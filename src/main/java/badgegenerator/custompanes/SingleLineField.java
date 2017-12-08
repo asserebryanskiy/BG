@@ -15,12 +15,12 @@ public class SingleLineField extends FxField {
     private Text text;                   // javaFx Text that holds String value
 
     public SingleLineField(String value,
-                           int numberOfColumn,
+                           String columnId,
                            double imageToPdfRatio,
                            double maxAllowableWidth,
                            double fontSize,
                            String fontPath) {
-        super(numberOfColumn,
+        super(columnId,
                 imageToPdfRatio,
                 maxAllowableWidth,
                 fontPath,
@@ -34,7 +34,7 @@ public class SingleLineField extends FxField {
         setMaxHeight(computeMaxHeight());
     }
 
-    public SingleLineField(String value, int id, double maxAllowableWidth) {
+    public SingleLineField(String value, String id, double maxAllowableWidth) {
         this(value, id, 1, maxAllowableWidth, 13, null);
     }
 

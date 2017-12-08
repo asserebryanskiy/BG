@@ -46,12 +46,12 @@ public class CreateBadgeArchiveTask extends Task {
             BadgeCreator badgeCreator = new BadgeCreator(fxFields,
                     pdfPath,
                     excelReader.getValues(),
+                    excelReader.getHeadings(),
                     imageToPdfRatio,
                     compressFieldIfLineMissing);
             BadgeArchive badgeArchive = new BadgeArchive(targetDirectoryPath, badgeCreator);
             final int numberOfFiles = excelReader.getValues().length;
-            for(int i = excelReader.getHasHeadings() ? 1 : 0;
-                i < numberOfFiles; i++) {
+            for(int i = 1; i < numberOfFiles; i++) {
                 if(isCancelled()) break;
                 badgeArchive.createBadgeEntry(i);
                 updateProgress(i, numberOfFiles + 1);

@@ -20,8 +20,8 @@ public class MockApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FieldWithHyphenation fieldWithHyp =
-                new FieldWithHyphenation("Example words", 0, 200);
-        SingleLineField field = new SingleLineField("Example", 1, 200);
+                new FieldWithHyphenation("Example words", "Example", 200);
+        SingleLineField field = new SingleLineField("Example", "Example2", 200);
 
         fields = new ArrayList<>();
         fields.add(fieldWithHyp);

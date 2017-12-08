@@ -22,8 +22,8 @@ public class CapitalizationTest extends ApplicationTest{
 
     @Before
     public void setUp() throws Exception {
-        fieldWithHyp = new FieldWithHyphenation("Example words", 0, 200);
-        field = new SingleLineField("Example", 1, 200);
+        fieldWithHyp = new FieldWithHyphenation("Example words", "Example1", 200);
+        field = new SingleLineField("Example", "Example", 200);
         fields = new ArrayList<>();
         fields.add(fieldWithHyp);
         fields.add(field);

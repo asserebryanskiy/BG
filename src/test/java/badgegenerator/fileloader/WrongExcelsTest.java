@@ -22,8 +22,8 @@ public class WrongExcelsTest {
         thrown.expect(IOException.class);
         thrown.expectMessage("Больше 10 столбцов в таблице");
 
-        ExcelReader reader = new ExcelReader(getClass().getResource("/wrongExcel2.xls").getFile(),
-                false);
+        ExcelReader reader = new ExcelReader(getClass().getResource("/excels/manyColumns.xls").getFile()
+        );
         reader.processFile();
     }
 
@@ -33,8 +33,8 @@ public class WrongExcelsTest {
         thrown.expectMessage("Список участников должен начинаться с первого ряда");
 
         ExcelReader reader = new ExcelReader(getClass()
-                .getResource("/wrongExcel1.xls").getFile(),
-                false);
+                .getResource("/excels/noFirstRow.xls").getFile()
+        );
         reader.processFile();
     }
 
@@ -43,8 +43,8 @@ public class WrongExcelsTest {
         thrown.expect(IOException.class);
         thrown.expectMessage("Загруженный файл пустой");
 
-        ExcelReader reader = new ExcelReader(getClass().getResource("/emptyExcel.xls").getFile(),
-                false);
+        ExcelReader reader = new ExcelReader(getClass().getResource("/excels/emptyExcel.xls").getFile()
+        );
         reader.processFile();
     }
 
@@ -52,10 +52,12 @@ public class WrongExcelsTest {
     public void activeCellLocatesProperly() throws Exception {
         // Arrange
         Workbook book = new XSSFWorkbook(getClass()
-                .getResourceAsStream("/wrongExcel3.xlsx"));
+                .getResourceAsStream("/excels/wrongExcel3.xlsx"));
         Sheet sheet = book.getSheetAt(0);
 
         // Assert
         assertThat(sheet.getFirstRowNum(), is(2));
     }
+
+
 }

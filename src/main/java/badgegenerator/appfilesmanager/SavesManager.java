@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,8 +24,15 @@ public class SavesManager {
 
     public static List<String> getSavesNames() {
         File savesFolder = getSavesFolder();
-        if(savesFolder != null) {
-            return Arrays.stream(savesFolder.list())
+        if(savesFolder != null && savesFolder.listFiles() != null) {
+            File[] saves = savesFolder.listFiles();
+            if (saves.length > 5) {
+                Arrays.sort(saves, Comparator.comparing(File::lastModified));
+                for (int i = 5; i < saves.length; i++)
+                    saves[i].delete();
+            }
+            return Arrays.stream(saves)
+                    .map(File::getName)
                     .filter(fileName -> !fileName.startsWith("."))
                     .collect(Collectors.toList());
         } else {

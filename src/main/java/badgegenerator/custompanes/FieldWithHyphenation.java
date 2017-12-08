@@ -33,12 +33,12 @@ public class FieldWithHyphenation extends FxField {
 
     public FieldWithHyphenation(String value,
                                 String longestWord,
-                                int numberOfColumn,
+                                String columnId,
                                 double imageToPdfRatio,
                                 double maxAllowableWidth,
                                 String fontPath,
                                 double fontSize) {
-        super(numberOfColumn, imageToPdfRatio, maxAllowableWidth, fontPath, fontSize);
+        super(columnId, imageToPdfRatio, maxAllowableWidth, fontPath, fontSize);
         this.originalValue = value;
         words = value.split("\\s");
         computeWordsWidth();
@@ -64,7 +64,7 @@ public class FieldWithHyphenation extends FxField {
     }
 
     public FieldWithHyphenation(String value,
-                                int id,
+                                String id,
                                 double maxAllowableWidth) {
         this(value, Arrays.stream(value.split("\\s"))
                         .max(Comparator.comparingInt(String::length))
@@ -79,7 +79,7 @@ public class FieldWithHyphenation extends FxField {
         spaceWidth = computeStringWidth(" ");
     }
 
-    void computeHyphenation() {
+    public void computeHyphenation() {
         longestLineWidth = 0;
         Paint color = lines.get(0).getFill();
         textFlow.getChildren().clear();

@@ -1,8 +1,8 @@
 package badgegenerator.pdfeditor;
 
 import badgegenerator.custompanes.*;
-import badgegenerator.fxfieldssaver.FxFieldSave;
 import com.sun.javafx.tk.Toolkit;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -11,6 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -21,20 +22,18 @@ import java.util.stream.IntStream;
  */
 abstract class AbstractFieldsLayouter {
     private final List<Line> gridLines;
-    private Pane horizontalScaleBar;
-    private Pane verticalScaleBar;
+    private final Pane horizontalScaleBar;
+    private final Pane verticalScaleBar;
     protected double imageToPdfRatio;
-    List<FxFieldSave> saves;
-    Pane fieldsParent;
-    String[] largestFields;
-    private String[] longestWords;
+    private Pane fieldsParent;
+    private String[] largestFields;
+    private final String[] longestWords;
+    private final String[] headings;
     private List<FxField> fxFields;
 
     double x;
     double y;
-    double red;
-    double green;
-    double blue;
+    Color color;
     double fontSize;
     String fontPath;
     String alignment;
@@ -45,6 +44,7 @@ abstract class AbstractFieldsLayouter {
                            List<Line> gridLines,
                            String[] largestFields,
                            String[] longestWords,
+                           String[] headings,
                            double imageToPdfRatio) {
         this.fieldsParent = fieldsParent;
         this.verticalScaleBar = verticalScaleBar;
@@ -52,6 +52,7 @@ abstract class AbstractFieldsLayouter {
         this.gridLines = gridLines;
         this.largestFields = largestFields;
         this.longestWords = longestWords;
+        this.headings = headings;
         this.imageToPdfRatio = imageToPdfRatio;
     }
 
@@ -60,18 +61,18 @@ abstract class AbstractFieldsLayouter {
         IntStream.range(0, largestFields.length)
                 .forEach(i -> {
                     FxField fxField;
-                    setFieldFontAndSize(i);
+                    setFieldFontAndSize(headings[i]);
                     if(largestFields[i].length() > longestWords[i].length()) {
                         fxField = new FieldWithHyphenation(largestFields[i],
                                 longestWords[i],
-                                i,
+                                headings[i],
                                 imageToPdfRatio,
                                 fieldsParent.getMaxWidth(),
                                 fontPath,
                                 fontSize);
                     } else {
                         fxField = new SingleLineField(largestFields[i],
-                                i,
+                                headings[i],
                                 imageToPdfRatio,
                                 fieldsParent.getMaxWidth(),
                                 fontSize,
@@ -90,7 +91,7 @@ abstract class AbstractFieldsLayouter {
                     }
                     fxField.setLayoutX(x);
                     fxField.setLayoutY(y);
-                    fxField.setFill(Color.color(red,green,blue));
+                    fxField.setFill(color);
                     fxField.setAlignment(alignment);
                     fieldsParent.getChildren().add(fxField);
                     try {
@@ -120,6 +121,75 @@ abstract class AbstractFieldsLayouter {
         fieldsParent.getChildren().addAll(verticalGuide, horizontalGuide);
         FxField.setVerticalGuide(verticalGuide);
         FxField.setHorizontalGuide(horizontalGuide);
+        moveFieldsInBounds();
+    }
+
+    private void moveFieldsInBounds() {
+        fxFields.forEach(field -> {
+            switch (field.getAlignment()) {
+                case ("RIGHT"): {
+                    if (field.getLayoutX() < 0) {
+                        double rightX = field.getLayoutX() + field.getPrefWidth();
+                        if (field instanceof FieldWithHyphenation
+                                && field.getMinWidth() < rightX) {
+                            FieldWithHyphenation fieldWH = (FieldWithHyphenation) field;
+                            fieldWH.setPrefWidth(rightX);
+                            fieldWH.computeHyphenation();
+                            fieldWH.setLayoutX(rightX - fieldWH.getPrefWidth());
+                        } else {
+                            while (field.getPrefWidth() >= rightX)
+                                field.setFontSize(field.getFontSize() - 1);
+                        }
+                    }
+                    break;
+                }case ("CENTER"): {
+                    if (field.getLayoutX() < 0) {
+                        double centerX = fieldsParent.getMaxHeight() / 2;
+                        if (field instanceof FieldWithHyphenation
+                                && field.getMinWidth() < fieldsParent.getMaxWidth()) {
+                            FieldWithHyphenation fieldWH = (FieldWithHyphenation) field;
+                            fieldWH.setPrefWidth(fieldsParent.getMaxWidth());
+                            fieldWH.computeHyphenation();
+                            fieldWH.setLayoutX(centerX - fieldWH.getPrefWidth() / 2);
+                        } else {
+                            while (field.getPrefWidth() >= fieldsParent.getMaxWidth()) {
+                                System.out.println(field.getFontSize());
+                                field.setFontSize(field.getFontSize() - 1);
+                            }
+                        }
+                    }
+                    break;
+                } default: {
+                    if (field.getLayoutX() + field.getPrefWidth() > fieldsParent.getMaxWidth()) {
+                        if (field instanceof FieldWithHyphenation
+                                && field.getLayoutX() + field.getMinWidth()
+                                < fieldsParent.getMaxWidth() - field.getLayoutX()) {
+                            FieldWithHyphenation fieldWH = (FieldWithHyphenation) field;
+                            fieldWH.setPrefWidth(fieldsParent.getMaxWidth() - field.getLayoutX());
+                            fieldWH.computeHyphenation();
+                        } else {
+                            while (field.getPrefWidth() >= fieldsParent.getMaxWidth() - field.getLayoutX())
+                                field.setFontSize(field.getFontSize() - 1);
+                        }
+                    }
+                }
+            }
+        });
+
+        // move down field if upper one run into it
+        fxFields.sort(Comparator.comparingDouble(Node::getLayoutY));
+        int shift = 0;
+        final int INTENT = 10;
+        double lastY = fxFields.get(0).getLayoutY() + fxFields.get(0).getMaxHeight();
+        for (int i = 1; i < fxFields.size(); i++) {
+            FxField field = fxFields.get(i);
+            if (lastY < field.getLayoutY())
+                shift += lastY - field.getLayoutY() + INTENT;
+            if (field.getLayoutY() + field.getMaxHeight() + shift < fieldsParent.getMaxHeight()) {
+                field.setLayoutY(field.getLayoutY() + shift);
+            } else break;
+            lastY = field.getLayoutY() + field.getMaxHeight();
+        }
     }
 
     void addScaleMarks() {
@@ -201,7 +271,7 @@ abstract class AbstractFieldsLayouter {
         return fxFields;
     }
 
-    protected abstract void setFieldFontAndSize(int i);
+    protected abstract void setFieldFontAndSize(String columnId);
 
     protected abstract void setFieldsParameters(FxField fxField);
 }
