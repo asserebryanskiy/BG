@@ -2,7 +2,9 @@ package badgegenerator.fxfieldssaver;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -19,12 +21,19 @@ public class DeleteTest extends FxFieldsSaverTestBase {
     @Test
     public void onDeleteFieldBecomesReadyToSave() throws Exception {
         // Arrange
-        clickOn("#0");
+        VBox box = find("#savesBox");
+        // find pos number of text1 in VBox
+        int i;
+        for (i = 0; i < box.getChildren().size(); i++) {
+            if (((TextField) box.getChildren().get(i)).getText().equals("test1"))
+                break;
+        }
+        clickOn("test1");
         clickOn("#deleteBtn");
         Button saveBtn = find("#saveBtn");
 
         // Act
-        clickOn("#0");
+        clickOn("#" + i);
         type(KeyCode.I);
         clickOn(saveBtn);
 

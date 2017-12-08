@@ -1,5 +1,6 @@
 package badgegenerator.fileloader;
 
+import com.sun.javafx.PlatformUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,12 +23,21 @@ public class PdfFieldExtractorTest {
 
         Map<String, PdfField> result = extractor.getFields();
 
-        assertThat(result.get("Имя").toString(),
-                is("Имя: x - 50.000000, y - 300.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
-        assertThat(result.get("Фамилия").toString(),
-                is("Фамилия: x - 50.000000, y - 270.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
-        assertThat(result.get("Должность").toString(),
-                is("Должность: x - 50.000000, y - 240.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
+        if (PlatformUtil.isMac()) {
+            assertThat(result.get("Имя").toString(),
+                    is("Имя: x - 50.000000, y - 300.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
+            assertThat(result.get("Фамилия").toString(),
+                    is("Фамилия: x - 50.000000, y - 270.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
+            assertThat(result.get("Должность").toString(),
+                    is("Должность: x - 50.000000, y - 240.000000, color - 0-0-0, font - null, fontSize - 15.000000"));
+        } else {
+            assertThat(result.get("Имя").toString(),
+                    is("Имя: x - 50,000000, y - 300,000000, color - 0-0-0, font - null, fontSize - 15,000000"));
+            assertThat(result.get("Фамилия").toString(),
+                    is("Фамилия: x - 50,000000, y - 270,000000, color - 0-0-0, font - null, fontSize - 15,000000"));
+            assertThat(result.get("Должность").toString(),
+                    is("Должность: x - 50,000000, y - 240,000000, color - 0-0-0, font - null, fontSize - 15,000000"));
+        }
     }
 
     @Test
