@@ -174,9 +174,12 @@ public class ResizeableBorder extends StackPane{
                         // we need to set pref width again because
                         // after hyphenation computation it was updated
                         fxField.setPrefWidth(newWidth);
+                        // if size is increasing
+                        if (delta > 0) fxField.setTextFlowPos(0);
+                        else           fxField.setTextFlowPos(newWidth
+                                            - fxField.getLongestLineWidth());
                     } else {
-                        fxField.setTextFlowPos(fxField.getTextFlowPos() + delta);
-                        fxField.setTextFlowAligned();
+                        fxField.setTextFlowPos(Math.max(0, fxField.getTextFlowPos() + delta));
                     }
                     fxField.setLayoutX(fieldStartX - delta);
                 }
@@ -199,6 +202,8 @@ public class ResizeableBorder extends StackPane{
                     fxField.setLayoutX(fxField.getLayoutX() + delta);
                 }
             } else {
+                if (positionLeft) fxField.setLayoutX(fxField.getLayoutX()
+                        + (fxField.getPrefWidth() - Math.max(llw, minWidth)));
                 fxField.setPrefWidth(Math.max(llw, minWidth));
                 fxField.setTextFlowAligned();
             }

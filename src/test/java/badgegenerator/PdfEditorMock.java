@@ -43,7 +43,7 @@ public class PdfEditorMock extends Application {
         String excelPath = getResourcePath("/excels/test.xlsx");
         ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        String fullPdfPath = getResourcePath("/pdfs/hShiftCenter.pdf");
+        String fullPdfPath = getResourcePath("/pdfs/hShiftRight.pdf");
         String emptyPdfPath = getResourcePath("/pdfs/empty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
