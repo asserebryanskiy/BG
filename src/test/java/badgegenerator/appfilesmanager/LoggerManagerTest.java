@@ -17,7 +17,7 @@ public class LoggerManagerTest {
     private static Logger logger = Logger.getLogger(LoggerManagerTest.class.getSimpleName());
     private String dirPath;
 
-//    @Test
+//    @PdfTest
 //    public void loggerCreatesFiles() throws Exception {
 //        // Arrange
 //        LoggerManager.initializeLogger(logger);

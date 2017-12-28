@@ -23,13 +23,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         // load fonts
-        InputStream helveticaStream = getClass().getResourceAsStream("/fonts/Helvetica.otf");
-        Font.loadFont(helveticaStream, 13);
-        helveticaStream.close();
-        InputStream boldStream = getClass().getResourceAsStream("/fonts/CIRCE-BOLD.otf");
+        InputStream boldStream = getClass().getResourceAsStream("/fonts/CIRCE-BOLD.OTF");
         Font.loadFont(boldStream, 13);
         boldStream.close();
-        InputStream lightStream = getClass().getResourceAsStream("/fonts/CRC35.otf");
+        InputStream lightStream = getClass().getResourceAsStream("/fonts/CRC35.OTF");
         Font.loadFont(lightStream, 13);
         lightStream.close();
 

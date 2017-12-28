@@ -33,9 +33,6 @@ public class PdfEditorMock extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // load fonts
-        InputStream helveticaStream = getClass().getResourceAsStream("/fonts/Helvetica.otf");
-        Font.loadFont(helveticaStream, 13);
-        helveticaStream.close();
         InputStream boldStream = getClass().getResourceAsStream("/fonts/CIRCE-BOLD.otf");
         Font.loadFont(boldStream, 13);
         boldStream.close();
@@ -43,10 +40,10 @@ public class PdfEditorMock extends Application {
         Font.loadFont(lightStream, 13);
         lightStream.close();
 
-        String excelPath = getResourcePath("/excels/multiWordsHeading.xlsx");
+        String excelPath = getResourcePath("/excels/test.xlsx");
         ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        String fullPdfPath = getResourcePath("/pdfs/hShiftRight.pdf");
+        String fullPdfPath = getResourcePath("/pdfs/hShiftCenter.pdf");
         String emptyPdfPath = getResourcePath("/pdfs/empty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();

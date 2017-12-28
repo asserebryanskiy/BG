@@ -80,6 +80,7 @@ public class AlertCenter {
         last = new Label();
         last.prefWidthProperty().bind(base.prefWidthProperty()
                 .subtract(BUTTON_WIDTH));
+        last.setWrapText(false);
         last.setId("lastNotification");
         last.setOnMouseClicked(e -> showPopup());
         last.setCursor(Cursor.HAND);
@@ -109,7 +110,7 @@ public class AlertCenter {
             // show popup
             Point2D coord = base.localToScreen(
                     base.getLayoutX(),
-                    base.getLayoutY() + base.getBoundsInLocal().getHeight());
+                    last.getBoundsInParent().getHeight());
             popup.show(base, coord.getX(), coord.getY());
             // if hasNewNotifications change it to false, swap colors, set last text to ""
             FadeTransition fade = new FadeTransition(Duration.millis(ANIMATION_DURATION), last);
@@ -232,7 +233,7 @@ public class AlertCenter {
 
     public void showNotification(String message) {
         // change last label
-        int lineBreak = message.indexOf(System.lineSeparator());
+        int lineBreak = message.indexOf("\n");
         if (lineBreak != -1) last.setText(message.substring(0, lineBreak));
         else                 last.setText(message);
         fade(last, 1);

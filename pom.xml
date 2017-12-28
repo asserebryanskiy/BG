@@ -6,7 +6,7 @@
 
     <groupId>com.andreyserebryanskiy</groupId>
     <artifactId>BG</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <build>
         <plugins>
             <plugin>

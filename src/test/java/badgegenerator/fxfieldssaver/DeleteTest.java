@@ -1,6 +1,7 @@
 package badgegenerator.fxfieldssaver;
 
 import badgegenerator.Main;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.input.KeyCode;
@@ -31,12 +32,13 @@ public class DeleteTest extends FxFieldsSaverTestBase {
     @Test
     public void onDeleteFieldBecomesReadyToSave() throws Exception {
         // Arrange
-        clickOn("#0");
+        Node node = find("test1");
+        clickOn(node);
         clickOn("#deleteBtn");
         Button saveBtn = find("#saveBtn");
 
         // Act
-        clickOn("#0");
+        clickOn(node);
         type(KeyCode.I);
         clickOn(saveBtn);
 
@@ -46,7 +48,7 @@ public class DeleteTest extends FxFieldsSaverTestBase {
         // tearDown
         Button okBtn = (Button) ((ButtonBar) window(0).getScene().getRoot()
                 .getChildrenUnmodifiable().stream()
-                .filter(node -> node instanceof ButtonBar)
+                .filter(n -> n instanceof ButtonBar)
                 .findFirst()
                 .get()).getButtons().get(0);
 

@@ -23,7 +23,7 @@ import java.io.InputStream;
 /**
  * Created by andreyserebryanskiy on 05/12/2017.
  */
-public class Test {
+public class PdfTest {
     private static final String helveticaPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/Helvetica.otf";
     private static final String freesetPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/freeset.ttf";
     private static final String circePath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/CRC35.OTF";

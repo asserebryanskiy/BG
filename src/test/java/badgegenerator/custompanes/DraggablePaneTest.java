@@ -71,7 +71,7 @@ public class DraggablePaneTest extends TestBase {
                 is(300 - field.getPrefWidth()));
     }
 
-    /*@Test
+    /*@PdfTest
     public void fieldCouldNotBeDraggedOutOfBottomBorder() throws Exception {
         // Act
         drag(field).moveBy(0, 300);

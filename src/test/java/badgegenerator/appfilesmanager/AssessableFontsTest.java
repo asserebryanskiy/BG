@@ -25,13 +25,13 @@ public class AssessableFontsTest {
         assertThat(fontNames.contains("Times New Roman"), is(true));
     }
 
-    @Test
+    /*@Test
     public void helveticaIsAvailable() throws Exception {
         assertThat(fontNames.contains("Helvetica"), is(true));
-    }
+    }*/
 
-    /*@Test
+    @Test
     public void circeFontLoad() throws Exception {
         assertThat(fontNames.contains("Circe Light"), is(true));
-    }*/
+    }
 }

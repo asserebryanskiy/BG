@@ -74,7 +74,7 @@ public class LayoutFromSavesTest extends ApplicationTest{
 
         assertThat(layouter.getFxFields().size(), is(3));
         assertThat("No message in the alert center",
-                alertCenter.getNotifications().contains("Ни в сохранениях ни в pdf-документе не удалось найти параметры для поля \"Another\". Используются стандартные параметры: черный цвет, 13.0 размер шрифта, шрифт Circe Light."),
+                alertCenter.getNotifications().contains("Ни в сохранениях ни в pdf-документе не удалось найти параметры для поля \"Another\". Используются стандартные параметры: черный цвет, 13,0 размер шрифта, шрифт Circe Light."),
                 is(true));
     }
 
