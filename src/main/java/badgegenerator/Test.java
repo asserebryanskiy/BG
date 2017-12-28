@@ -28,7 +28,7 @@ public class Test {
     private static final String freesetPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/freeset.ttf";
     private static final String circePath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/CRC35.OTF";
     private static final String srcPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/empty.pdf";
-    private static final String targetPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/hShiftCenter.pdf";
+    private static final String targetPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/multiWordsHeading.pdf";
 
     public static void main(String[] args) throws IOException {
 //        parse();
@@ -59,7 +59,7 @@ public class Test {
                 TextRenderInfo renderInfo = (TextRenderInfo) data;
                 String text = renderInfo.getText();
                 if (text != null) {
-
+                    System.out.println(text);
                 }
                 return false;
             }
@@ -74,20 +74,22 @@ public class Test {
         PdfFont helvetica = getPdfFont(helveticaPath);
         PdfFont circe = getPdfFont(circePath);
         float pdfWidth = pdf.getFirstPage().getPageSize().getWidth();
-        float duty = helvetica.getWidth("Должность", 15);
+        float duty = helvetica.getWidth("ДОЛЖНОСТЬ В КОМПАНИИ", 15);
         pdfCanvas.beginText()
                 .setFontAndSize(helvetica, 15)
                 .setColor(Color.RED, true)
-                .moveText(pdfWidth / 2 - duty / 2, 300)
-                .showText("Должность");
-        float surname = freeset.getWidth("Фамилия", 10);
-        float shift = duty / 2 - surname / 2;
+                .moveText(50, 300)
+//                .moveText(pdfWidth / 2 - duty / 2, 300)
+                .showText("Должность в компании");
+        float surname = freeset.getWidth("ФАМИЛИЯ", 10);
+        float shift = 0;
+//        float shift = duty / 2 - surname / 2;
         pdfCanvas.setFontAndSize(freeset, 10)
                 .setColor(Color.GREEN, true)
                 .moveText(shift, -30)
                 .showText("Фамилия");
-        shift = surname / 2 - circe.getWidth("Имя", 20) / 2;
-        System.out.println(shift);
+        shift = 0;
+//        shift = surname / 2 - circe.getWidth("Имя", 20) / 2;
         pdfCanvas.setFontAndSize(circe, 20)
                 .setColor(Color.BLUE, true)
                 .moveText(shift, -30)

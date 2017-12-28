@@ -13,9 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -80,38 +78,36 @@ public class FxFieldsLoaderController implements Initializable{
             File save = new File(SavesManager.getSavesFolder().getAbsolutePath()
                     + "/" + saveName);
             SavesManager.setCurrentSaveName(saveName);
-            if(save.list().length - 1 ==
+            // getSavesNames fields
+            showProgressScreen(true);
+            final Stage pdfRedactorWindow =
+                    (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader,
+                    pdfPath,
+                    emptyPdfPath,
+                    save.getAbsolutePath());
+            loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
+            launchPdfEditorTask.setOnSucceeded(event1 -> {
+                showProgressScreen(false);
+                Parent parent = (Parent) launchPdfEditorTask.getValue();
+                if (parent != null) {
+                    pdfRedactorWindow.setScene(new Scene(parent));
+                    pdfRedactorWindow.setResizable(false);
+                    pdfRedactorWindow.show();
+                    pdfRedactorWindow.centerOnScreen();
+                }
+            });
+            Thread thread = new Thread(launchPdfEditorTask);
+            thread.setDaemon(true);
+            thread.start();
+            /*if(save.list().length - 1 ==
                     excelReader.getLargestFields().length) {
-                // getSavesNames fields
-                showProgressScreen(true);
-                final Stage pdfRedactorWindow =
-                        (Stage) ((Node) event.getSource()).getScene().getWindow();
-                Task launchPdfEditorTask = new LaunchPdfEditorTask(excelReader,
-                        pdfPath,
-                        emptyPdfPath,
-                        save.getAbsolutePath());
-                loaderMessage.textProperty().bind(launchPdfEditorTask.messageProperty());
-                launchPdfEditorTask.setOnSucceeded(event1 -> {
-                    showProgressScreen(false);
-                    if(launchPdfEditorTask.getValue() != null) {
-                        pdfRedactorWindow.setScene(
-                                new Scene((Parent) launchPdfEditorTask.getValue()));
-                        pdfRedactorWindow.setResizable(false);
-                        pdfRedactorWindow.setX(pdfRedactorWindow.getX() - 200);
-                        pdfRedactorWindow.setY(pdfRedactorWindow.getY() - 100);
-                        pdfRedactorWindow.show();
-                        pdfRedactorWindow.centerOnScreen();
-                    }
-                });
-                Thread thread = new Thread(launchPdfEditorTask);
-                thread.setDaemon(true);
-                thread.start();
             } else {
                 Alert alert = new Alert(Alert.AlertType.WARNING,
                         "Количество колонок в excel и количество сохраненных полей различается",
                         ButtonType.OK);
                 alert.show();
-            }
+            }*/
         }
     }
 

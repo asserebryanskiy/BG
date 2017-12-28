@@ -1,11 +1,13 @@
 package badgegenerator.custompanes;
 
 import badgegenerator.appfilesmanager.AssessableFonts;
-import badgegenerator.appfilesmanager.LoggerManager;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.SVGPath;
@@ -14,9 +16,11 @@ import javafx.scene.text.Font;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * A special class, created to realize text dragging and further convertation to pdf.
@@ -24,6 +28,8 @@ import java.util.logging.Logger;
  */
 public abstract class FxField extends DraggablePane implements StyleableText {
     private static Logger logger = Logger.getLogger(FxField.class.getSimpleName());
+
+    static final Color PRESSED_COLOR = Color.color(244.0 / 255, 144.0 / 255, 57.0 / 255);
 
     // min distance to grid line for field to be attracted to it
     private static final int GUIDE_OFFSET = 5;
@@ -53,44 +59,24 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     private double hGridLineStep;
     private double vGridLineStep;
     private boolean alignFieldWithGrid;
-    private boolean isBold;
-    private boolean isItalic;
 
     public FxField(String columnId,
                    double imageToPdfRatio,
-                   double maxAllowableWidth,
-                   String fontPath,
-                   double fontSize) {
+                   double maxAllowableWidth)  {
         super();
         this.columnId = columnId;
         this.imageToPdfRatio = imageToPdfRatio;
         this.maxAllowableWidth = maxAllowableWidth;
-        if(fontPath != null) {
-            try {
-                this.font = Font.loadFont(new FileInputStream(fontPath), fontSize);
-                this.fontPath = fontPath;
-            } catch (FileNotFoundException e) {
-                LoggerManager.initializeLogger(logger);
-                e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Не удалось загрузить файл шрифта для бейджа.");
-                alert.show();
-                logger.log(Level.SEVERE, String.format("Ошибка при загрузке шрифта из%s",
-                        fontPath), e);
-                this.font = Font.loadFont(getClass()
-                        .getResourceAsStream("/fonts/Helvetica.otf"), fontSize);
-            }
-        } else {
-            this.font = Font.loadFont(getClass()
-                    .getResourceAsStream("/fonts/Helvetica.otf"), fontSize);
-        }
-        this.fontSize = new SimpleDoubleProperty(fontSize);
-        if(fontPath != null) this.fontPath = fontPath;
+        this.font = new Font("Circe Light", 13);
+        // if Circe Light is not already loaded, load it
+        if (font.getName().equals("System Regular")) font = Font.loadFont(getClass()
+                .getResourceAsStream("/fonts/CRC35.OTF"), 13);
+        this.fontSize = new SimpleDoubleProperty(13);
         setId(String.format("field%d", columnId.hashCode()));
     }
 
-    public FxField(String id, double maxAllowableWidth) throws FileNotFoundException {
-        this(id, 1, maxAllowableWidth, null, 13);
+    public FxField(String id, double maxAllowableWidth) {
+        this(id, 1, maxAllowableWidth);
     }
 
     public static List<Guide> getGuides() {
@@ -198,8 +184,6 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         return newY;
     }
 
-    abstract void setTextFlowAligned(String alignment);
-
     @Override
     void makeGuidesInvisible() {
         if(guides != null) {
@@ -217,13 +201,16 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         return font;
     }
 
-    public void setFont(Font font) {
+    public void setFont(Font font) throws IllegalFontSizeException {
         this.font = font;
         fontPath = AssessableFonts.getFontPath(font.getName());
         setFont();
+        if (Double.compare(font.getSize(), getFontSize()) != 0) {
+            setFontSize(font.getSize());
+        }
     }
 
-    private void setFont() {
+    private void setFont() throws IllegalFontSizeException {
         double oldWidth = getPrefWidth();
         setFontImpl();
         setMaxHeight(computeMaxHeight());
@@ -238,12 +225,15 @@ public abstract class FxField extends DraggablePane implements StyleableText {
             }
         }
 
+        // is needed to catch cases when new font with old fontSize exceeds maxAllowableWidth
+        setFontSize(getFontSize());
+
         if(fontNameField != null) {
             fontNameField.setText(this.font.getName());
         }
     }
 
-    public void setFont(String fontPath)  {
+    public void setFont(String fontPath) throws IllegalFontSizeException {
         FileInputStream fontInputStream = null;
         try {
             fontInputStream = new FileInputStream(fontPath);
@@ -262,13 +252,34 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         return fontSize.get();
     }
 
-    public void setFontSize(double newFontSize) {
-        font = new Font(font.getName(), newFontSize);
-        if (newFontSize > 200
-                || computeStringWidth(getLongestWord()) > maxAllowableWidth) {
-            setFontSize(--newFontSize);
-            return;
+    public double getMaxFontSize() {
+        return computeMaxFontSize();
+    }
+
+    public void setMaxFontSize() {
+        try {
+            setFontSize(computeMaxFontSize());
+        } catch (IllegalFontSizeException e) {
+            System.out.println("Entered");
+            e.printStackTrace();
         }
+    }
+
+    private double computeMaxFontSize() {
+        int minFontSize = 5;
+        double maxFontSize = computeStringWidth(getLongestWord()) < maxAllowableWidth ?
+                getFontSize() : minFontSize;
+        while (computeStringWidth(getLongestWord(), new Font(font.getName(), maxFontSize))
+                < maxAllowableWidth) maxFontSize++;
+        return --maxFontSize;
+    }
+
+    public void setFontSize(double newFontSize) throws IllegalFontSizeException {
+        if (computeStringWidth(getLongestWord(), new Font(font.getName(), newFontSize))
+                > maxAllowableWidth) {
+            throw new IllegalFontSizeException();
+        }
+        font = new Font(font.getName(), newFontSize);
         double oldWidth = getPrefWidth();
         fontSize.set(newFontSize);
         setFontSizeImpl(newFontSize);
@@ -283,15 +294,23 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                 break;
             }
         }
+
+        if (fontSizeField != null) {
+            fontSizeField.setText(String.valueOf((int) (getFontSize() / imageToPdfRatio)));
+        }
     }
 
     abstract String getLongestWord();
 
-    abstract String getText();
+    public abstract String getText();
 
     abstract void setFontSizeImpl(double newFontSize);
 
     public double computeStringWidth(String str) {
+        return Toolkit.getToolkit().getFontLoader().computeStringWidth(str, font);
+    }
+
+    private double computeStringWidth(String str, Font font) {
         return Toolkit.getToolkit().getFontLoader().computeStringWidth(str, font);
     }
 
@@ -329,9 +348,10 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         if(alignmentButtons != null) {
             alignmentButtons.forEach(btn -> {
                 if(btn.getId().contains(alignment.toLowerCase())) {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.BLACK);
+                    ((SVGPath)btn.getGraphic()).setFill(
+                            PRESSED_COLOR);
                 } else {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.GRAY);
+                    ((SVGPath)btn.getGraphic()).setFill(Color.WHITE);
                 }
             });
         }
@@ -377,11 +397,11 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         }
     }
 
+    abstract void setCapitalizedImpl(boolean value);
+
     public void setAlignmentButtons(List<Button> alignmentButtons) {
         this.alignmentButtons = alignmentButtons;
     }
-
-    abstract void setCapitalizedImpl(boolean value);
 
     public boolean isCapitalized() {
         return capitalized;
@@ -407,25 +427,55 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         this.alignFieldWithGrid = alignFieldWithGrid;
     }
 
-    public void setBold(boolean value) {
-        this.isBold = value;
-        setBoldImpl(value);
+    /**
+     * Computes string width for every value in a provided list
+     * with fxField current font and provided fontSize.
+     *
+     * Collects and returns values whose values exceeds maxAllowableWidth.
+     *
+     * @param fontSize - size on which out of range values should be computed
+     * @param values - list of strings to be compared
+     * @return filtered list of values that are bigger than maxAllowableWidth
+     */
+    public List<String> getValuesOutOfRange(final double fontSize, List<String> values) {
+        return getValuesOutOfRange(fontSize, values, maxAllowableWidth);
     }
 
-    public boolean isBold() {
-        return isBold;
+    public List<String> getValuesOutOfRange(final double fontSize, List<String> values, double maxWidth) {
+        return values.stream()
+                .map(s -> {
+                    if (capitalized) return s.toUpperCase();
+                    else return s;
+                })
+                .filter(text -> {
+                    Font newFont = new Font(this.font.getName(), fontSize);
+                    String[] words = text.split("\\s");
+                    if (words.length > 1) return Arrays.stream(words)
+                        .anyMatch(word -> computeStringWidth(word, newFont) > maxWidth);
+                    return computeStringWidth(text, newFont) > maxWidth;
+                })
+                .collect(Collectors.toList());
     }
 
-    abstract void setBoldImpl(boolean value);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    public void setItalic(boolean value) {
-        this.isItalic = value;
-        setItalicImpl(value);
+        FxField fxField = (FxField) o;
+
+        if (Double.compare(fxField.imageToPdfRatio, imageToPdfRatio) != 0) return false;
+        if (Double.compare(fxField.maxAllowableWidth, maxAllowableWidth) != 0) return false;
+        if (Double.compare(fxField.getFontSize(), fontSize.get()) != 0) return false;
+        if (capitalized != fxField.capitalized) return false;
+        if (!columnId.equals(fxField.columnId)) return false;
+        if (!font.equals(fxField.font)) return false;
+        if (!alignment.equals(fxField.alignment)) return false;
+        return color.equals(fxField.color);
     }
 
-    public boolean isItalic() {
-        return isItalic;
+    @Override
+    public int hashCode() {
+        return columnId.hashCode();
     }
-
-    abstract void setItalicImpl(boolean value);
 }

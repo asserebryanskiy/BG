@@ -1,14 +1,26 @@
 package badgegenerator.fxfieldssaver;
 
+import badgegenerator.Main;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.input.KeyCode;
+import javafx.scene.text.Font;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DeleteTest extends FxFieldsSaverTestBase {
+    @BeforeClass
+    public static void beforeAllTests() throws Exception {
+        InputStream lightStream = Main.class.getResourceAsStream("/fonts/CRC35.otf");
+        Font.loadFont(lightStream, 13);
+        lightStream.close();
+    }
+
     @Test
     public void onDeleteClickFilesAreDeleted() throws Exception {
         clickOn("deleteTest");

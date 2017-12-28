@@ -1,10 +1,8 @@
 package badgegenerator.appfilesmanager;
 
 import com.sun.javafx.PlatformUtil;
-import com.sun.javafx.tk.Toolkit;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
-import org.apache.commons.lang3.time.StopWatch;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,6 +82,6 @@ public class AssessableFonts {
             }
         });
 
-        allAssessableFonts.putIfAbsent("Helvetica", null);
+        allAssessableFonts.putIfAbsent("Circe Light", null);
     }
 }

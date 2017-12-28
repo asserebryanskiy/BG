@@ -8,11 +8,11 @@ import javafx.scene.text.Font;
  */
 interface StyleableText {
     Font getFont();
-    void setFont(Font font);
-    void setFont(String fontPath);
+    void setFont(Font font) throws IllegalFontSizeException;
+    void setFont(String fontPath) throws IllegalFontSizeException;
 
     double getFontSize();
-    void setFontSize(double newFontSize);
+    void setFontSize(double newFontSize) throws IllegalFontSizeException;
 
     Color getFill();
     void setFill(Color color);
@@ -22,10 +22,4 @@ interface StyleableText {
 
     boolean isCapitalized();
     void setCapitalized(boolean value);
-
-    boolean isBold();
-    void setBold(boolean value);
-
-    boolean isItalic();
-    void setItalic(boolean value);
 }

@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Created by andreyserebryanskiy on 06/12/2017.
@@ -20,7 +22,8 @@ public class PdfToFxAdapterTest {
                 .getResource("/pdfs/threeFonts.pdf").toURI())
                 .toFile()
                 .getAbsolutePath();
-        PdfFieldExtractor extractor = new PdfFieldExtractor(pdfPath, excelReader);
+        PdfFieldExtractor extractor = new PdfFieldExtractor(pdfPath,
+                new HashSet<>(Arrays.asList(excelReader.getHeadings())));
 
         extractor.getFields().values().forEach(f -> new PdfToFxAdapter(f, 1));
     }

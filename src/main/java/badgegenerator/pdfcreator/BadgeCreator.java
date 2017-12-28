@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class BadgeCreator {
+public class BadgeCreator {
 //    private static Logger logger = Logger.getLogger(BadgeCreator.class.getSimpleName());
 
     private final float OFFSET = 0.5f; // offset to nivilate float point effects
@@ -38,7 +38,7 @@ class BadgeCreator {
     private int numberOfLines;
     private boolean compressFieldIfLineMissing;
 
-    BadgeCreator(List<FxField> fxFields,
+    public BadgeCreator(List<FxField> fxFields,
                  String srcPdfPath,
                  String[][] participants,
                  String[] headings,

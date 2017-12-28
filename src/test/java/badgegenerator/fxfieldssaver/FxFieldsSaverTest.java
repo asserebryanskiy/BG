@@ -1,17 +1,22 @@
 package badgegenerator.fxfieldssaver;
 
+import badgegenerator.Main;
 import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
+import badgegenerator.custompanes.IllegalFontSizeException;
 import badgegenerator.custompanes.SingleLineField;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -27,8 +32,16 @@ import static org.junit.Assert.assertThat;
  */
 public class FxFieldsSaverTest extends ApplicationTest{
     private static File saveDir;
+
+    @BeforeClass
+    public static void beforeAllTests() throws Exception {
+        InputStream lightStream = Main.class.getResourceAsStream("/fonts/CRC35.otf");
+        Font.loadFont(lightStream, 13);
+        lightStream.close();
+    }
+
     @Before
-    public void setUp() throws IOException, URISyntaxException {
+    public void setUp() throws IOException, URISyntaxException, IllegalFontSizeException {
         FxField field1 = new SingleLineField("Example", "Example", 100);
         String fontPath = Paths.get(getClass()
                 .getResource("/fonts/freeset.ttf").toURI())

@@ -51,7 +51,7 @@ public class CreateBadgeArchiveTask extends Task {
                     compressFieldIfLineMissing);
             BadgeArchive badgeArchive = new BadgeArchive(targetDirectoryPath, badgeCreator);
             final int numberOfFiles = excelReader.getValues().length;
-            for(int i = 1; i < numberOfFiles; i++) {
+            for(int i = 0; i < numberOfFiles; i++) {
                 if(isCancelled()) break;
                 badgeArchive.createBadgeEntry(i);
                 updateProgress(i, numberOfFiles + 1);

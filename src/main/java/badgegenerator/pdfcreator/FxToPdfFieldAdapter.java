@@ -46,10 +46,10 @@ public class FxToPdfFieldAdapter {
         alignment = fxField.getAlignment();
         fontSize = (float) (fxField.getFontSize() / imageToPdfRatio);
 
-        if(fxField.getFont().getName().equals("Helvetica")) {
+        if(fxField.getFont().getName().equals("Circe Light")) {
             try {
                 InputStream fontInputStream = getClass()
-                        .getResourceAsStream("/fonts/Helvetica.otf");
+                        .getResourceAsStream("/fonts/CRC35.OTF");
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[2048];
                 int a;
@@ -60,7 +60,7 @@ public class FxToPdfFieldAdapter {
                 fontProgram = FontProgramFactory.createFont(baos.toByteArray());
             } catch (Exception e) {
                 LoggerManager.initializeLogger(logger);
-                logger.log(Level.SEVERE, "Не удалось загрузить Helvetica", e);
+                logger.log(Level.SEVERE, "Не удалось загрузить Circe Light", e);
                 e.printStackTrace();
             }
         } else {

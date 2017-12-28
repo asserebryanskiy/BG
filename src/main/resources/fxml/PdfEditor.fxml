@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.pdfeditor.PdfEditorController">
+<StackPane styleClass="background" stylesheets="@../css/mainTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.pdfeditor.PdfEditorController">
    <children>
       <VBox>
          <children>
@@ -32,6 +32,7 @@
                 </Menu>
               </menus>
             </MenuBar>
+            <StackPane fx:id="alertPane" />
             <GridPane fx:id="pdfRedactorRoot" alignment="CENTER_LEFT" hgap="20.0" vgap="10.0">
                <columnConstraints>
                   <ColumnConstraints />
@@ -78,7 +79,7 @@
                      <children>
                         <HBox spacing="10.0">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Или загрузи свой" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text_text" text="Или загрузи свой" />
                               <Button fx:id="btnBrowseFont" mnemonicParsing="false" onMouseClicked="#handleBrowseFont" prefWidth="70.0" text="Обзор">
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
@@ -90,13 +91,13 @@
                   </VBox>
                   <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <children>
-                        <Label layoutX="359.0" layoutY="176.0" minWidth="100.0" text="Размер шрифта" />
+                        <Label layoutX="359.0" layoutY="176.0" minWidth="100.0" styleClass="text_text" text="Размер шрифта" />
                         <TextField fx:id="fontSizeField" layoutX="475.0" layoutY="169.0" onAction="#handleChangeFieldFontSize" prefHeight="27.0" prefWidth="41.0">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>
                         </TextField>
-                        <Label layoutX="527.0" layoutY="175.0" text="Цвет" />
+                        <Label layoutX="527.0" layoutY="175.0" styleClass="text_text" text="Цвет" />
                         <ColorPicker fx:id="fontColorPicker" layoutX="592.0" layoutY="171.0" onAction="#handleChangeFontColor">
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -131,7 +132,7 @@
                               </Button>
                               <Pane fx:id="savesHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                                  <children>
-                                    <SVGPath fx:id="ctrlHelpIcon2" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                                    <SVGPath fx:id="ctrlHelpIcon2" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                                  </children>
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
@@ -142,12 +143,15 @@
                         <Button mnemonicParsing="false" onAction="#handleBack" text="Назад" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
                            <GridPane.margin>
                               <Insets top="20.0" />
-                           </GridPane.margin></Button>
+                           </GridPane.margin>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
                      </children>
                   </GridPane>
                   <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                      <children>
-                        <Button fx:id="leftAlignmentButton" mnemonicParsing="false" onAction="#handleSetAlignment" prefHeight="24.0" prefWidth="24.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <Button fx:id="leftAlignmentButton" mnemonicParsing="false" onAction="#handleSetAlignment" prefHeight="24.0" prefWidth="24.0" textFill="#ebe9e9" GridPane.columnIndex="1" GridPane.rowIndex="5">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -175,13 +179,13 @@
                         </Button>
                         <Pane fx:id="boldHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                            <children>
-                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                            </children>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </Pane>
-                        <Button fx:id="makeItalicBtn" mnemonicParsing="false" onAction="#handleMakeItalic" prefHeight="27.0" prefWidth="35.0" text="К">
+                        <Button fx:id="makeItalicBtn" mnemonicParsing="false" onAction="#handleMakeItalic" prefHeight="27.0" prefWidth="35.0" text="К" textFill="#ebcccc">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -191,7 +195,7 @@
                         </Button>
                         <Pane fx:id="italicHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                            <children>
-                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                            </children>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -203,10 +207,10 @@
                      <children>
                         <HBox>
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="4. Связывать поля? " />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text_text" text="4. Связывать поля? " />
                               <Pane fx:id="bindingHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                                  <children>
-                                    <SVGPath fx:id="ctrlHelpIcon3" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                                    <SVGPath fx:id="ctrlHelpIcon3" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                                  </children>
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
@@ -214,7 +218,7 @@
                               </Pane>
                            </children>
                         </HBox>
-                        <RadioButton fx:id="bindingYesButton" mnemonicParsing="false" selected="true" text="Да">
+                        <RadioButton fx:id="bindingYesButton" mnemonicParsing="false" selected="true" styleClass="text_text" text="Да">
                            <toggleGroup>
                               <ToggleGroup fx:id="toggleGroup" />
                            </toggleGroup>
@@ -222,7 +226,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </RadioButton>
-                        <RadioButton fx:id="bindingNoButton" mnemonicParsing="false" text="Нет" toggleGroup="$toggleGroup" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <RadioButton fx:id="bindingNoButton" mnemonicParsing="false" styleClass="text_text" text="Нет" toggleGroup="$toggleGroup" GridPane.columnIndex="1" GridPane.rowIndex="6">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -231,10 +235,10 @@
                   </VBox>
                   <HBox GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="3. Кликни на поле. Настрой его размер шрифта, цвет, выравнивание и регистр" wrappingWidth="312.7705078125" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text_text" text="3. Кликни на поле. Настрой его размер шрифта, цвет, выравнивание и регистр" wrappingWidth="312.7705078125" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <Pane fx:id="ctrlHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                            <children>
-                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                              <SVGPath content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                            </children>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -244,10 +248,10 @@
                   </HBox>
                   <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
-                        <Label text="1. Расположи поля на бейдже" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label styleClass="text_text" text="1. Расположи поля на бейдже" textFill="#d78a8a" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Pane fx:id="allocationHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor">
                            <children>
-                              <SVGPath fx:id="ctrlHelpIcon11" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                              <SVGPath fx:id="ctrlHelpIcon11" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                            </children>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -257,19 +261,19 @@
                   </HBox>
                   <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="2. Введи название шрифта" wrappingWidth="138.30908203125" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text_text" text="2. Введи название шрифта" wrappingWidth="138.30908203125" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Pane fx:id="fontsHelpIcon" maxHeight="12.0" maxWidth="12.0" onMouseClicked="#handleShowHelpBox" onMouseEntered="#handleChangeColor" onMouseExited="#handleResetColor" translateX="-5.0">
                            <children>
-                              <SVGPath fx:id="ctrlHelpIcon1" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" translateX="-6.0" translateY="-6.0" />
+                              <SVGPath fx:id="ctrlHelpIcon1" content="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z" scaleX="0.5" scaleY="0.5" styleClass="help_icon" translateX="-6.0" translateY="-6.0" />
                            </children>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </Pane>
-                        <TextField fx:id="fontNameField" editable="false" onAction="#handleChangeFont" />
+                        <TextField fx:id="fontNameField" editable="false" onAction="#handleChangeFont" styleClass="text_input" />
                      </children>
                   </HBox>
-                  <CheckBox fx:id="capsLockCheckBox" mnemonicParsing="false" onAction="#setCapitalized" text="Сделать все буквы заглавными" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <CheckBox fx:id="capsLockCheckBox" mnemonicParsing="false" onAction="#setCapitalized" styleClass="text_text" stylesheets="@../css/mainTheme.css" text="Сделать все буквы заглавными" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                </children>
                <padding>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

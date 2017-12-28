@@ -1,0 +1,69 @@
+/***********
+POPUP STYLES
+************/
+.popup_background {
+    back_color: rgb(62,41,54);
+    time_color: rgb(124, 120, 120, 0.6);
+    text_color: white;
+    -fx-background-color: back_color;
+    -fx-font-family: "Circe Light";
+    -fx-font-size: 13;
+}
+
+.notification {
+    -fx-fill: text_color;
+}
+
+.button {
+    -fx-background-color: rgb(62,41,54);
+    -fx-font-family: "Circe Bold";
+    -fx-cursor: hand;
+    -fx-text-fill: text_color;
+}
+
+.time {
+    -fx-text-fill: time_color;
+}
+
+.cross {
+    -fx-scale-x: 0.5;
+    -fx-scale-y: 0.5;
+    -fx-max-width: 24;
+    -fx-max-height: 24;
+}
+
+#scrollPane {
+    back_color: rgb(62,41,54);
+    -fx-padding: 10 0 0 0;
+    -fx-background-color: back_color;
+    -fx-fill: red;
+    -fx-focus-color: back_color;
+    -fx-faint-focus-color: back_color;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
+/****************
+ALERT LINE STYLES
+*****************/
+.alert_line_background{
+    warning_color: rgb(244, 144, 57);
+    counter_color: rgb(239,105,74);
+    read_color: rgb(62,41,54,0.5);
+    read_counter_color: rgb(62,41,54);
+    text_color: rgb(62,41,54);
+}
+
+#counterBtn {
+    -fx-font-family: "Circe Bold";
+    -fx-font-size: 13;
+}
+
+#lastNotification {
+    -fx-padding: 10 0 10 10;
+    -fx-text-fill: text_color;
+    -fx-font-family: "Circe Light";
+    -fx-font-size: 13;
+    -fx-text-overrun: word-ellipsis;
+}
+

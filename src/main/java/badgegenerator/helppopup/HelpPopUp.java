@@ -3,6 +3,7 @@ package badgegenerator.helppopup;
 import badgegenerator.appfilesmanager.HelpMessages;
 import badgegenerator.appfilesmanager.LoggerManager;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.stage.Popup;
@@ -16,11 +17,20 @@ import java.util.logging.Logger;
  * HelpPopUp has custom design.
  */
 public class HelpPopUp extends Popup{
-    private static Logger logger = Logger.getLogger(HelpPopUp.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(HelpPopUp.class.getSimpleName());
     private String parentsNodeId;
 
-    public HelpPopUp(String nodeId) throws IOException {
-        parentsNodeId = nodeId;
+    public HelpPopUp(Node node) {
+        parentsNodeId = node.getId();
+        String message = HelpMessages.getMessage(parentsNodeId);
+        preparePopup(message);
+    }
+
+    public HelpPopUp(String message) {
+        preparePopup(message);
+    }
+
+    private void preparePopup(String message) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HelpPopUp.fxml"));
         Parent root;
         try {
@@ -34,7 +44,7 @@ public class HelpPopUp extends Popup{
             return;
         }
         HelpPopUpController controller = loader.getController();
-        controller.setContent(HelpMessages.getMessage(nodeId));
+        controller.setContent(message);
 
         getContent().add(root);
 

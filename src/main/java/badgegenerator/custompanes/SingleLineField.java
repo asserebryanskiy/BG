@@ -17,14 +17,10 @@ public class SingleLineField extends FxField {
     public SingleLineField(String value,
                            String columnId,
                            double imageToPdfRatio,
-                           double maxAllowableWidth,
-                           double fontSize,
-                           String fontPath) {
+                           double maxAllowableWidth) {
         super(columnId,
                 imageToPdfRatio,
-                maxAllowableWidth,
-                fontPath,
-                fontSize);
+                maxAllowableWidth);
         originalValue = value;
         text = new Text(value);
         text.setTextOrigin(VPos.TOP);
@@ -35,11 +31,15 @@ public class SingleLineField extends FxField {
     }
 
     public SingleLineField(String value, String id, double maxAllowableWidth) {
-        this(value, id, 1, maxAllowableWidth, 13, null);
+        this(value, id, 1, maxAllowableWidth);
     }
 
     @Override
     void setFontImpl() {
+        changeFont();
+    }
+
+    private void changeFont() {
         text.setFont(font);
         setPrefWidth(computeStringWidth(text.getText()));
     }
@@ -56,8 +56,7 @@ public class SingleLineField extends FxField {
 
     @Override
     void setFontSizeImpl(double newFontSize) {
-        text.setFont(font);
-        setPrefWidth(computeStringWidth(text.getText()));
+        changeFont();
     }
 
     @Override
@@ -76,19 +75,15 @@ public class SingleLineField extends FxField {
         if(alignmentButtons != null) {
             alignmentButtons.forEach(btn -> {
                 if(btn.getId().contains(getAlignment().toLowerCase())) {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.BLACK);
+                    ((SVGPath)btn.getGraphic()).setFill(PRESSED_COLOR);
                 } else {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.GRAY);
+                    ((SVGPath)btn.getGraphic()).setFill(Color.WHITE);
                 }
             });
         }
         if(capsLockCheckBox != null) {
             capsLockCheckBox.setSelected(isCapitalized());
         }
-    }
-
-    @Override
-    void setTextFlowAligned(String alignment) {
     }
 
     @Override
@@ -110,16 +105,5 @@ public class SingleLineField extends FxField {
     void setCapitalizedImpl(boolean value) {
         text.setText(value ? originalValue.toUpperCase() : originalValue);
         setPrefWidth(computeStringWidth(text.getText()));
-    }
-
-    @Override
-    void setBoldImpl(boolean bold) {
-        if (bold) text.setStyle("-fx-font-weight: bold");
-        else text.setStyle("-fx-font-weight: regular");
-    }
-
-    @Override
-    void setItalicImpl(boolean value) {
-
     }
 }

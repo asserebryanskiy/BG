@@ -1,16 +1,12 @@
 package badgegenerator.fileloader;
 
-import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * PdfField collect all necessary information for further
+ * PdfField collects all necessary information for further
  * creation of badges.
  *
  * Created by andreyserebryanskiy on 05/12/2017.
@@ -26,13 +22,13 @@ public class PdfField {
     private PdfFont font;
     private float fontSize = 12;
     private String alignment;
+    private boolean capitalized;
 
     public PdfField(String name, float x, float y, float pdfHeight) throws IOException {
         this.name = name;
         this.x = x;
         this.y = y;
         this.pdfHeight = pdfHeight;
-        createDefaultFont();
     }
 
     public void setColor(Color color) {
@@ -45,6 +41,10 @@ public class PdfField {
 
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
+    }
+
+    public void setCapitalized() {
+        this.capitalized = true;
     }
 
     public String getName() {
@@ -71,6 +71,10 @@ public class PdfField {
         return fontSize;
     }
 
+    public boolean isCapitalized() {
+        return capitalized;
+    }
+
     @Override
     public String toString() {
         float[] colorValue = color.getColorValue();
@@ -79,7 +83,7 @@ public class PdfField {
                 font.getFontProgram().getFontNames().getCidFontName(), fontSize);
     }
 
-    private void createDefaultFont() throws IOException {
+    /*private void createDefaultFont() throws IOException {
         InputStream fontInputStream = getClass()
                 .getResourceAsStream("/fonts/Helvetica.otf");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -91,7 +95,7 @@ public class PdfField {
         baos.flush();
         font = PdfFontFactory.createFont(baos.toByteArray(),
                 PdfEncodings.IDENTITY_H, true);
-    }
+    }*/
 
     public float getPdfHeight() {
         return pdfHeight;

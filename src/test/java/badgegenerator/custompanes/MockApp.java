@@ -20,7 +20,7 @@ public class MockApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FieldWithHyphenation fieldWithHyp =
-                new FieldWithHyphenation("Example words", "Example", 200);
+                new FieldWithHyphenation("Example words words words", "Example", 200);
         SingleLineField field = new SingleLineField("Example", "Example2", 200);
 
         fields = new ArrayList<>();
@@ -48,7 +48,6 @@ public class MockApp extends Application {
         root.getChildren().addAll(verticalGuide, horizontalGuide);
         FxField.setVerticalGuide(verticalGuide);
         FxField.setHorizontalGuide(horizontalGuide);
-        System.out.println(root.getBoundsInLocal().getWidth());
         root.setMaxSize(300,300);
 
         fieldWithHyp.addResizeableBorder(new ResizeableBorder(fieldWithHyp, Position.LEFT));

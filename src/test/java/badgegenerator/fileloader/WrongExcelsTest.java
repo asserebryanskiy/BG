@@ -43,8 +43,8 @@ public class WrongExcelsTest {
         thrown.expect(IOException.class);
         thrown.expectMessage("Загруженный файл пустой");
 
-        ExcelReader reader = new ExcelReader(getClass().getResource("/excels/emptyExcel.xls").getFile()
-        );
+        ExcelReader reader = new ExcelReader(getClass()
+                .getResource("/excels/emptyExcel.xls").getFile());
         reader.processFile();
     }
 

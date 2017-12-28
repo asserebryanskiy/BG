@@ -8,14 +8,15 @@ import javafx.scene.paint.Color;
  * Created by andreyserebryanskiy on 06/12/2017.
  */
 public class PdfToFxAdapter {
-    private final String columnId;
-    private final double x;
-    private final double y;
-    private final Color color;
-    private final double fontSize;
-    private final String fontName;
-    private final String fontPath;
-    private String alignment;
+    private final String columnId;      // name of column in excel
+    private final double x;             // x-coord in JavaFX environment
+    private final double y;             // y-coord in JavaFX environment
+    private final Color color;          // javafx.color
+    private final double fontSize;      // fontSize in JavaFX
+    private final String fontName;      // name of the font in the form it could be found on local machine
+    private final String fontPath;      // path to the font
+    private final boolean capitalized;  // should all letters of this field be capitalized
+    private final String alignment;     // alignment (left/center/right) of the field
 
     public PdfToFxAdapter(PdfField field, double imageToPdfRatio) {
         columnId = field.getName();
@@ -27,9 +28,11 @@ public class PdfToFxAdapter {
         fontName = getFontName(pdfFont.getFontProgram().toString());
         fontPath = AssessableFonts.getFontPath(fontName);
         fontSize = field.getFontSize() * imageToPdfRatio;
+        capitalized = field.isCapitalized();
         alignment = field.getAlignment();
     }
 
+    // retrieves human-readable font name from pdfFontName
     private String getFontName(String s) {
         StringBuilder builder = new StringBuilder();
         int styleIndex = s.indexOf('-');
@@ -71,5 +74,9 @@ public class PdfToFxAdapter {
 
     public String getAlignment() {
         return alignment;
+    }
+
+    public boolean isCapitalized() {
+        return capitalized;
     }
 }

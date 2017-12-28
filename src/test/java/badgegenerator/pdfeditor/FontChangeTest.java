@@ -2,12 +2,15 @@ package badgegenerator.pdfeditor;
 
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
+import badgegenerator.custompanes.IllegalFontSizeException;
 import badgegenerator.custompanes.SingleLineField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.net.URL;
@@ -47,7 +50,9 @@ public class FontChangeTest extends ApplicationTest{
         String fontPath = Paths.get(fontUrl.toURI()).toFile().getAbsolutePath();
 
         // Act
-        fields.forEach(f -> f.setFont(fontPath));
+        for (FxField f : fields) {
+            f.setFont(fontPath);
+        }
 
         // Assert
         assertThat("SingleLine", field.getPrefWidth(), is(field.computeStringWidth("Example")));
@@ -58,7 +63,7 @@ public class FontChangeTest extends ApplicationTest{
     @Test
     public void ifNewFontGreaterThanMaxAllowableWidthItHyphenates() throws Exception {
         // Act
-        fieldWithHyp.setFontSize(30);
+        fieldWithHyp.setFontSize(40);
 
         // Assert
         assertThat(fieldWithHyp.getNumberOfLines(), is(2));
@@ -67,7 +72,12 @@ public class FontChangeTest extends ApplicationTest{
     @Test
     public void prefSizeIncreasesOnFontSizeIncrease() throws Exception {
         // Act
-        fields.forEach(f -> f.setFontSize(20));
+        fields.forEach(f -> {
+            try {
+                f.setFontSize(20);
+            } catch (IllegalFontSizeException ignored) {
+            }
+        });
 
         // Assert
         assertThat("SingleLine", field.getPrefWidth(), is(field.computeStringWidth("Example")));
@@ -78,7 +88,13 @@ public class FontChangeTest extends ApplicationTest{
     @Test
     public void prefSizeDecreasesOnFontSizeDecrease() throws Exception {
         // Act
-        fields.forEach(f -> f.setFontSize(10));
+        fields.forEach(f -> {
+            try {
+                f.setFontSize(10);
+            } catch (IllegalFontSizeException e) {
+                e.printStackTrace();
+            }
+        });
 
         // Assert
         assertThat("SingleLine", field.getPrefWidth(), is(field.computeStringWidth("Example")));
@@ -86,16 +102,17 @@ public class FontChangeTest extends ApplicationTest{
                 is(fieldWithHyp.computeStringWidth("Example words")));
     }
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void fontSizeCouldNotBeSetGreaterThanMax() throws Exception {
-        // Act
-        fields.forEach(f -> {
-            f.setFontSize(60);
-        });
+        thrown.expect(IllegalFontSizeException.class);
 
-        // Assert
-        assertThat("SingleLine", field.getFontSize(), is(51.0));
-        assertThat("With hyphenation", fieldWithHyp.getFontSize(), is(51.0));
+        // Act
+        for (FxField f : fields) {
+            f.setFontSize(60);
+        }
     }
 
 
@@ -109,7 +126,9 @@ public class FontChangeTest extends ApplicationTest{
 
 
         // Act
-        fields.forEach(f -> f.setFont(fontPath));
+        for (FxField f : fields) {
+            f.setFont(fontPath);
+        }
 
         // Assert
         assertThat("SingleLine", field.getFill(), is(Color.RED));
@@ -122,7 +141,13 @@ public class FontChangeTest extends ApplicationTest{
         fields.forEach(f -> f.setFill(Color.RED));
 
         // Act
-        fields.forEach(f -> f.setFontSize(20));
+        fields.forEach(f -> {
+            try {
+                f.setFontSize(20);
+            } catch (IllegalFontSizeException e) {
+                e.printStackTrace();
+            }
+        });
 
         // Assert
         assertThat("SingleLine", field.getFill(), is(Color.RED));
@@ -140,7 +165,9 @@ public class FontChangeTest extends ApplicationTest{
 
 
         // Act
-        fields.forEach(f -> f.setFont(fontPath));
+        for (FxField f : fields) {
+            f.setFont(fontPath);
+        }
 
         // Assert
         assertThat("Single line", field.getLayoutX() + field.getPrefWidth(),
@@ -157,7 +184,13 @@ public class FontChangeTest extends ApplicationTest{
         double fieldWithHypRightX = fieldWithHyp.getPrefWidth();
 
         // Act
-        fields.forEach(f -> f.setFontSize(20));
+        fields.forEach(f -> {
+            try {
+                f.setFontSize(20);
+            } catch (IllegalFontSizeException e) {
+                e.printStackTrace();
+            }
+        });
 
         // Assert
         assertThat("Single line", field.getLayoutX() + field.getPrefWidth(),

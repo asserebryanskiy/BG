@@ -26,10 +26,10 @@ public class FxFieldsSaverMock extends Application{
     public void start(Stage primaryStage) throws Exception {
         FxField field1 = new SingleLineField("Example",
                 "Example", 1,
-                100, 13, null);
+                100);
         FxField field2 = new FieldWithHyphenation("Example words",
                 "Example", "Example2", 1,
-                120, null, 13);
+                120);
         List<FxField> fields = new ArrayList<>();
         fields.add(field1);
         fields.add(field2);

@@ -35,14 +35,17 @@ public class FieldWithHyphenation extends FxField {
                                 String longestWord,
                                 String columnId,
                                 double imageToPdfRatio,
-                                double maxAllowableWidth,
-                                String fontPath,
-                                double fontSize) {
-        super(columnId, imageToPdfRatio, maxAllowableWidth, fontPath, fontSize);
+                                double maxAllowableWidth) {
+        super(columnId, imageToPdfRatio, maxAllowableWidth);
         this.originalValue = value;
         words = value.split("\\s");
         computeWordsWidth();
-        LONGEST_WORD = longestWord;
+        // is needed because it may be that
+        String longestInInput = Arrays.stream(words)
+                .max(Comparator.comparingDouble(this::computeStringWidth))
+                .get();
+        LONGEST_WORD = computeStringWidth(longestInInput) < computeStringWidth(longestWord) ?
+                longestWord : longestInInput;
         lines = new ArrayList<>();
         Text text = new Text(value);
         text.setFont(font);
@@ -69,7 +72,7 @@ public class FieldWithHyphenation extends FxField {
         this(value, Arrays.stream(value.split("\\s"))
                         .max(Comparator.comparingInt(String::length))
                         .get(),
-                id, 1, maxAllowableWidth, null, 13);
+                id, 1, maxAllowableWidth);
     }
 
     private void computeWordsWidth() {
@@ -88,6 +91,7 @@ public class FieldWithHyphenation extends FxField {
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
             double lineWidth = computeStringWidth(line.toString());
+            // add only one first word to to line and start next line
             if (line.length() == 0 && wordsWidth[i] + spaceWidth > getPrefWidth()) {
                 Text newLine =
                         new Text(String.format(word + "%n"));
@@ -95,7 +99,10 @@ public class FieldWithHyphenation extends FxField {
                 newLine.setFill(color);
                 textFlow.getChildren().add(newLine);
                 lines.add(newLine);
-            } else if (lineWidth + spaceWidth + wordsWidth[i] > getPrefWidth()) {
+                if (longestLineWidth < wordsWidth[i]) longestLineWidth = wordsWidth[i];
+            }
+            // new word doesn't fir in this line, add it to the next line
+            else if (lineWidth + spaceWidth + wordsWidth[i] > getPrefWidth()) {
                 Text newLine =
                         new Text(String.format(line.toString() + "%n"));
                 newLine.setFont(font);
@@ -104,24 +111,24 @@ public class FieldWithHyphenation extends FxField {
                 lines.add(newLine);
                 line.delete(0, line.length());
                 line.append(word);
+                if (longestLineWidth < lineWidth) longestLineWidth = lineWidth;
             } else {
                 if (line.length() > 0) line.append(" ").append(word);
-                else line.append(word);
-
-                lineWidth = computeStringWidth(line.toString());
-                if (lineWidth > longestLineWidth) {
-                    longestLineWidth = lineWidth;
-                }
+                else                   line.append(word);
             }
         }
-
+        // append last line if necessary
         if(line.length() > 0) {
-            Text newLine = new Text(line.toString());
+            String text = line.toString();
+            Text newLine = new Text(text);
             newLine.setFont(font);
             newLine.setFill(color);
             textFlow.getChildren().add(newLine);
             lines.add(newLine);
+            double lineWidth = computeStringWidth(text);
+            if (longestLineWidth < lineWidth) longestLineWidth = lineWidth;
         }
+
         if (longestLineWidth > getMinWidth()) {
             setPrefWidth(longestLineWidth);
         } else setPrefWidth(getMinWidth());
@@ -130,39 +137,89 @@ public class FieldWithHyphenation extends FxField {
     }
 
     /**
+     * Method computes hyphenation and returns true if new
+     * longestLineWidth differs from the old one.
+     *
+     * @return true if there are possibilities to change longestLineWidth
+     */
+    boolean couldBeHyphenated() {
+        if (getPrefWidth() < getMinWidth()) return false;
+
+        double nllw = 0;    // new longest line width
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            double lineWidth = line.length() == 0 ? 0 : computeStringWidth(line.toString());
+            // add only one first word to to line and start next line
+            if (line.length() == 0 && wordsWidth[i] + spaceWidth > getPrefWidth()) {
+                if (nllw < wordsWidth[i]) nllw = wordsWidth[i];
+            }
+            // new word doesn't fit in this line, add it to the next line
+            else if (lineWidth + spaceWidth + wordsWidth[i] > getPrefWidth()) {
+                line.delete(0, line.length());
+                line.append(word);
+                if (nllw < lineWidth) nllw = lineWidth;
+            } else {
+                if (line.length() > 0) line.append(" ").append(word);
+                else                   line.append(word);
+            }
+            if (nllw > longestLineWidth) return true;
+        }
+        // append last line if necessary
+        if(line.length() > 0) {
+            double lineWidth = computeStringWidth(line.toString());
+            if (nllw < lineWidth) nllw = lineWidth;
+        }
+
+        return Double.compare(nllw, longestLineWidth) != 0;
+    }
+
+    /**
      * Is used in case when lines are smaller then min width
      */
-    @Override
-    public void setTextFlowAligned(String alignment) {
+    void setTextFlowAligned() {
         if(longestLineWidth < getMinWidth()) {
             double x;
-            switch(alignment) {
+            switch(getAlignment()) {
                 case("RIGHT"):
                     x = getPrefWidth() - longestLineWidth;
                     break;
                 case("CENTER"):
-                    x = (getPrefWidth() - longestLineWidth) / 2;
+                    x = (getMinWidth() - longestLineWidth) / 2;
                     break;
                 default:
                     x = 0;
             }
             textFlow.setLayoutX(x);
-            textFlow.setTextAlignment(TextAlignment.valueOf(alignment));
         } else {
             textFlow.setLayoutX(0);
-            textFlow.setTextAlignment(TextAlignment.valueOf(alignment));
         }
+        textFlow.setTextAlignment(TextAlignment.valueOf(getAlignment()));
+    }
+
+    /**
+     * Is used only by Resizeable border in case when alignment is Center
+     * and it is necessary to move either Left RB (resizeable border) or Right RB.
+     *
+     * @param newX double value in range from 0 to (getPrefWidth() - getMinWidth())
+     */
+    void setTextFlowPos(double newX) {
+        textFlow.setLayoutX(newX);
+    }
+
+    /**
+     * Is used only by Resizeable border in case when alignment is Center
+     * and it is necessary to move either Left RB (resizeable border) or Right RB.
+     *
+     * @return current layoutX of TextFlow inside its wrapping pane.
+     */
+    double getTextFlowPos() {
+        return textFlow.getLayoutX();
     }
 
     @Override
     void setFontImpl() {
-        lines.forEach(text -> text.setFont(font));
-        computeWordsWidth();
-        longestLineWidth = lines.stream()
-                .mapToDouble(line -> computeStringWidth(line.getText()))
-                .max()
-                .orElse(longestLineWidth);
-        setPrefWidth(longestLineWidth);
+        changeFont();
     }
 
     @Override
@@ -178,6 +235,10 @@ public class FieldWithHyphenation extends FxField {
 
     @Override
     void setFontSizeImpl(double newFontSize) {
+        changeFont();
+    }
+
+    private void changeFont() {
         setMinWidth(computeStringWidth(LONGEST_WORD));
         lines.forEach(text -> text.setFont(font));
         computeWordsWidth();
@@ -185,16 +246,11 @@ public class FieldWithHyphenation extends FxField {
                 .mapToDouble(txt -> computeStringWidth(txt.getText()))
                 .max()
                 .getAsDouble();
-//        computeHyphenation(); // is called to reduce prefWidth up to longest line
         if(longestLineWidth > maxAllowableWidth) {
             setPrefWidth(maxAllowableWidth);
             computeHyphenation();
-        } else setPrefWidth(longestLineWidth);
-        setTextFlowAligned(getAlignment());
-
-        if (fontSizeField != null) {
-            fontSizeField.setText(String.valueOf((int) (getFontSize() / imageToPdfRatio)));
-        }
+        } else setPrefWidth(Math.max(longestLineWidth, getMinWidth()));
+        setTextFlowAligned();
     }
 
     @Override
@@ -219,9 +275,9 @@ public class FieldWithHyphenation extends FxField {
         if(alignmentButtons != null) {
             alignmentButtons.forEach(btn -> {
                 if(btn.getId().contains(getAlignment().toLowerCase())) {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.BLACK);
+                ((SVGPath)btn.getGraphic()).setFill(PRESSED_COLOR);
                 } else {
-                    ((SVGPath)btn.getGraphic()).setFill(Color.GRAY);
+                    ((SVGPath)btn.getGraphic()).setFill(Color.WHITE);
                 }
             });
         }
@@ -241,23 +297,25 @@ public class FieldWithHyphenation extends FxField {
 
     @Override
     void setAlignmentImpl(String alignment) {
-        setTextFlowAligned(alignment);
+        setTextFlowAligned();
     }
 
     @Override
     void setCapitalizedImpl(boolean value) {
         words = value ? originalValue.toUpperCase().split("\\s") : originalValue.split("\\s");
+        setMinWidth(computeStringWidth(value ? LONGEST_WORD.toUpperCase() : LONGEST_WORD));
+        computeWordsWidth();
         computeHyphenation();
-    }
-
-    @Override
-    void setBoldImpl(boolean value) {
-
-    }
-
-    @Override
-    void setItalicImpl(boolean value) {
-
+        longestLineWidth = lines.stream()
+                .mapToDouble(txt -> computeStringWidth(txt.getText()))
+                .max()
+                .getAsDouble();
+        if(longestLineWidth > maxAllowableWidth) {
+            setPrefWidth(maxAllowableWidth);
+            computeHyphenation();
+        }
+        else setPrefWidth(longestLineWidth);
+        setTextFlowAligned();
     }
 
     public void addResizeableBorder(ResizeableBorder border) {
@@ -266,5 +324,9 @@ public class FieldWithHyphenation extends FxField {
 
     public List<ResizeableBorder> getResizeableBorders() {
         return resizeableBorders;
+    }
+
+    double getLongestLineWidth() {
+        return longestLineWidth;
     }
 }

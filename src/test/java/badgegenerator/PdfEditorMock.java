@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -18,8 +19,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Created by andreyserebryanskiy on 11/09/2017.
@@ -28,25 +32,39 @@ public class PdfEditorMock extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        String excelPath = getResourcePath("/excels/test.xlsx");
+        // load fonts
+        InputStream helveticaStream = getClass().getResourceAsStream("/fonts/Helvetica.otf");
+        Font.loadFont(helveticaStream, 13);
+        helveticaStream.close();
+        InputStream boldStream = getClass().getResourceAsStream("/fonts/CIRCE-BOLD.otf");
+        Font.loadFont(boldStream, 13);
+        boldStream.close();
+        InputStream lightStream = getClass().getResourceAsStream("/fonts/CRC35.otf");
+        Font.loadFont(lightStream, 13);
+        lightStream.close();
+
+        String excelPath = getResourcePath("/excels/multiWordsHeading.xlsx");
         ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        String fullPdfPath = getResourcePath("/pdfs/hShiftCenter.pdf");
+        String fullPdfPath = getResourcePath("/pdfs/hShiftRight.pdf");
         String emptyPdfPath = getResourcePath("/pdfs/empty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
         PdfEditorController controller = loader.getController();
         PDDocument pdf = PDDocument.load(new File(emptyPdfPath));
         HelpMessages.load();
+        String savesPath = null;
+//        String savesPath = SavesManager.getSavesFolder().listFiles()[0].getAbsolutePath();
 
-        PdfFieldExtractor extractor = new PdfFieldExtractor(fullPdfPath, excelReader);
+        PdfFieldExtractor extractor = new PdfFieldExtractor(fullPdfPath,
+                new HashSet<>(Arrays.asList(excelReader.getHeadings())));
         double imageHeight = 500;
         float pdfHeight = pdf.getPage(0).getMediaBox().getHeight();
         controller.setImageToPdfRatio(imageHeight / pdfHeight);
         controller.setPdfPreview(createImageFromPdf(pdf), imageHeight);
         controller.setPdfPath(emptyPdfPath);
         controller.setExcelReader(excelReader);
-        controller.init(extractor.getFields());
+        controller.init(savesPath, extractor.getFields());
 
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

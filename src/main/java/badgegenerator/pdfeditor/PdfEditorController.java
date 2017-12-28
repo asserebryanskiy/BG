@@ -3,6 +3,7 @@ package badgegenerator.pdfeditor;
 import badgegenerator.appfilesmanager.AssessableFonts;
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FxField;
+import badgegenerator.custompanes.IllegalFontSizeException;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fileloader.PdfField;
 import badgegenerator.fxfieldssaver.FxFieldsSaverController;
@@ -40,7 +41,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,6 +115,8 @@ public class PdfEditorController {
     @FXML private RadioButton bindingNoButton;
     @FXML private CheckMenuItem bindingCheckMenuItem;
 
+    @FXML private StackPane alertPane;
+
     private List<FxField> fxFields;
 
     private double imageToPdfRatio;
@@ -123,37 +129,21 @@ public class PdfEditorController {
     private List<HelpPopUp> helpPopUps = new ArrayList<>();
     private List<Button> alignmentButtons;
     private List<Line> gridLines = new ArrayList<>();
+    private AlertCenter alertCenter;
 
-    public void init(Map<String, PdfField> pdfFields) {
-        AbstractFieldsLayouter layouter = new NewFieldsLayouter(editingArea,
-                verticalScaleBar,
-                horizontalScaleBar,
-                gridLines,
-                excelReader.getLargestFields(),
-                excelReader.getLongestWords(),
-                excelReader.getHeadings(),
-                imageToPdfRatio,
-                pdfFields);
-        init(layouter);
-    }
-
-    public void init(String savesPath) {
-        AbstractFieldsLayouter layouter = new SavedFieldsLayouter(editingArea,
-                verticalScaleBar,
-                horizontalScaleBar,
-                gridLines,
-                excelReader.getLargestFields(),
-                excelReader.getLongestWords(),
-                excelReader.getHeadings(),
-                imageToPdfRatio,
-                savesPath);
-        init(layouter);
-    }
-
-    private void init(AbstractFieldsLayouter layouter) {
-        layouter.positionFields();
-        layouter.addScaleMarks();
+    public void init(String savesPath, Map<String, PdfField> fields) {
+        alertCenter = new AlertCenter(alertPane);
+        FieldsLayouter layouter = new FieldsLayouter(editingArea,
+                alertCenter,
+                excelReader,
+                savesPath,
+                fields,
+                imageToPdfRatio);
         fxFields = layouter.getFxFields();
+
+        ScaleMarks.addTo(editingArea, verticalScaleBar, horizontalScaleBar,
+                imageToPdfRatio, fxFields, gridLines);
+
         // adds possibility to remove selection
         pdfRedactorRoot.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (fxFields.stream()
@@ -180,7 +170,7 @@ public class PdfEditorController {
         alignmentButtons.add(leftAlignmentButton);
         alignmentButtons.add(centerAlignmentButton);
         alignmentButtons.add(rightAlignmentButton);
-        alignmentButtons.forEach(btn -> ((SVGPath)btn.getGraphic()).setFill(Color.GRAY));
+        alignmentButtons.forEach(btn -> ((SVGPath)btn.getGraphic()).setFill(Color.WHITE));
         btnBrowseFont.setPrefWidth(Toolkit.getToolkit().getFontLoader()
                 .computeStringWidth(btnBrowseFont.getText(), btnBrowseFont.getFont()) + 40);
         fontSizeField.setText(String.format("%d",
@@ -210,7 +200,7 @@ public class PdfEditorController {
                         bindingNoButton.setSelected(!newValue));
         bindingNoButton.selectedProperty()
                 .addListener((observable, oldValue, newValue) ->
-                bindingCheckMenuItem.setSelected(!newValue));
+                        bindingCheckMenuItem.setSelected(!newValue));
         compressFieldIfLineMissing.bind(bindingYesButton.selectedProperty());
         visualizeGridCheckMenuItem.selectedProperty()
                 .addListener((o, oldVal, newVal) ->
@@ -218,6 +208,12 @@ public class PdfEditorController {
         GridPane grid = (GridPane) horizontalScaleBar.getParent();
         grid.getRowConstraints().get(0).setMaxHeight(horizontalScaleBar
                 .getBoundsInLocal().getHeight());
+
+        // is done after screen show because size of alertPane is recomputed
+        pdfRedactorRoot.boundsInParentProperty().addListener(((observable, oldValue, newValue) -> {
+            alertPane.setPrefWidth(newValue.getWidth());
+            if (alertCenter.hasNotifications()) alertCenter.flagLast();
+        }));
     }
 
     public void handleChangeFont() {
@@ -227,7 +223,15 @@ public class PdfEditorController {
                     .filter(f -> f.isSelected)
                     .forEach(field -> {
                         Font font = new Font(fontName, field.getFontSize());
-                        field.setFont(font);
+                        try {
+                            field.setFont(font);
+                        } catch (IllegalFontSizeException e) {
+                            double previousFontSize = field.getFontSize();
+                            field.setMaxFontSize();
+                            String message = ErrorMessages.tooBigOldFontSize(field, previousFontSize,
+                                    imageToPdfRatio, excelReader);
+                            alertCenter.showNotification(message, true);
+                        }
                     });
         } else {
             fxFields.stream()
@@ -237,7 +241,7 @@ public class PdfEditorController {
                         try {
                             fis = new FileInputStream(AssessableFonts
                                     .getFontPath(fontName));
-                        } catch (FileNotFoundException e) {
+                        } catch (Exception e) {
                             Alert alert = new Alert(Alert.AlertType.ERROR,
                                     "Не удалось установить шрифт " + fontName);
                             alert.show();
@@ -247,7 +251,15 @@ public class PdfEditorController {
                             return;
                         }
                         Font font = Font.loadFont(fis, field.getFontSize());
-                        field.setFont(font);
+                        try {
+                            field.setFont(font);
+                        } catch (IllegalFontSizeException e) {
+                            double previousFontSize = field.getFontSize();
+                            field.setMaxFontSize();
+                            String message = ErrorMessages.tooBigOldFontSize(field, previousFontSize,
+                                    imageToPdfRatio, excelReader);
+                            alertCenter.showNotification(message, true);
+                        }
                     });
         }
     }
@@ -264,7 +276,17 @@ public class PdfEditorController {
         if(selectedFile != null) {
             fxFields.stream()
                     .filter(field -> field.isSelected)
-                    .forEach(field -> field.setFont(selectedFile.getAbsolutePath()));
+                    .forEach(field -> {
+                        try {
+                            field.setFont(selectedFile.getAbsolutePath());
+                        } catch (IllegalFontSizeException e) {
+                            double previousFontSize = field.getFontSize();
+                            field.setMaxFontSize();
+                            String message = ErrorMessages.tooBigOldFontSize(field, previousFontSize,
+                                    imageToPdfRatio, excelReader);
+                            alertCenter.showNotification(message, true);
+                        }
+                    });
         } else {
             System.out.println("File is incorrect");
         }
@@ -274,7 +296,16 @@ public class PdfEditorController {
         double newFontSize = Double.valueOf(fontSizeField.getText()) * imageToPdfRatio;
         fxFields.stream()
                 .filter(field -> field.isSelected)
-                .forEach(field -> field.setFontSize(newFontSize));
+                .forEach(field -> {
+                    try {
+                        field.setFontSize(newFontSize);
+                    } catch (IllegalFontSizeException e) {
+                        String message = ErrorMessages.tooBigFontSize(field, newFontSize,
+                                imageToPdfRatio, excelReader);
+                        alertCenter.showNotification(message, true);
+                        field.setMaxFontSize();
+                    }
+                });
     }
 
     public void handleChangeFontColor() {
@@ -424,11 +455,12 @@ public class PdfEditorController {
     }
 
     public void handleShowHelpBox(MouseEvent event) throws IOException {
-        String sourceId = ((Node) event.getSource()).getId();
+        Node source = (Node) event.getSource();
+        String sourceId = source.getId();
         if(helpPopUps.stream()
                 .anyMatch(popUp -> popUp.getParentsNodeId().equals(sourceId))) return;
-        HelpPopUp helpPopUp = new HelpPopUp(sourceId);
-        helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+        HelpPopUp helpPopUp = new HelpPopUp(source);
+        helpPopUp.show(source, event.getScreenX(), event.getScreenY());
         helpPopUps.add(helpPopUp);
         helpPopUp.setOnHidden(e -> helpPopUps.remove(helpPopUp));
     }
@@ -443,7 +475,7 @@ public class PdfEditorController {
         pdfPreview.setFitHeight(height);
         pdfPreview.setPreserveRatio(true);
         editingArea.setMaxHeight(pdfPreview.getFitHeight());
-        editingArea.setMaxWidth(pdfPreview.getBoundsInLocal().getWidth());
+        editingArea.setMaxWidth(pdfPreview.getBoundsInParent().getWidth());
     }
 
     public void setImageToPdfRatio(double imageToPdfRatio) {
@@ -462,7 +494,7 @@ public class PdfEditorController {
                 field.setAlignFieldWithGrid(alignFieldsCheckMenuItem.isSelected()));
     }
 
-    public void handleMakeBold(ActionEvent event) {
+    public void handleMakeBold() {
         FxField firstSelected = fxFields.stream()
                 .filter(f -> f.isSelected).findFirst().orElse(null);
         if (firstSelected != null) {
@@ -470,21 +502,39 @@ public class PdfEditorController {
                 fxFields.stream()
                         .filter(f -> f.isSelected)
                         .forEach(field -> {
-                            field.setFont(Font.font(field.getFont().getFamily(),
-                                    FontWeight.NORMAL, field.getFontSize()));
+                            try {
+                                field.setFont(Font.font(field.getFont().getFamily(),
+                                        FontWeight.NORMAL, field.getFontSize()));
+                            } catch (IllegalFontSizeException e) {
+                                e.printStackTrace();
+                                double previousFontSize = field.getFontSize();
+                                String message = ErrorMessages.fontStyleError(field, previousFontSize,
+                                        "Стандартный", imageToPdfRatio, excelReader);
+                                alertCenter.showNotification(message, true);
+                                field.setMaxFontSize();
+                            }
                         });
             } else {
                 fxFields.stream()
                         .filter(f -> f.isSelected)
                         .forEach(field -> {
-                            field.setFont(Font.font(field.getFont().getFamily(),
-                                    FontWeight.BOLD, field.getFontSize()));
+                            try {
+                                field.setFont(Font.font(field.getFont().getFamily(),
+                                        FontWeight.BOLD, field.getFontSize()));
+                            } catch (IllegalFontSizeException e) {
+                                e.printStackTrace();
+                                double previousFontSize = field.getFontSize();
+                                String message = ErrorMessages.fontStyleError(field, previousFontSize,
+                                        "Жирный", imageToPdfRatio, excelReader);
+                                alertCenter.showNotification(message, true);
+                                field.setMaxFontSize();
+                            }
                         });
             }
         }
     }
 
-    public void handleMakeItalic(ActionEvent event) {
+    public void handleMakeItalic() {
         FxField firstSelected = fxFields.stream()
                 .filter(f -> f.isSelected).findFirst().orElse(null);
         if (firstSelected != null) {
@@ -492,15 +542,33 @@ public class PdfEditorController {
                 fxFields.stream()
                         .filter(f -> f.isSelected)
                         .forEach(field -> {
-                            field.setFont(Font.font(field.getFont().getFamily(),
-                                    FontPosture.REGULAR, field.getFontSize()));
+                            try {
+                                field.setFont(Font.font(field.getFont().getFamily(),
+                                        FontPosture.REGULAR, field.getFontSize()));
+                            } catch (IllegalFontSizeException e) {
+                                e.printStackTrace();
+                                double previousFontSize = field.getFontSize();
+                                String message = ErrorMessages.fontStyleError(field, previousFontSize,
+                                        "Стандартный", imageToPdfRatio, excelReader);
+                                alertCenter.showNotification(message, true);
+                                field.setMaxFontSize();
+                            }
                         });
             } else {
                 fxFields.stream()
                         .filter(f -> f.isSelected)
                         .forEach(field -> {
-                            field.setFont(Font.font(field.getFont().getFamily(),
-                                    FontPosture.ITALIC, field.getFontSize()));
+                            try {
+                                field.setFont(Font.font(field.getFont().getFamily(),
+                                        FontPosture.ITALIC, field.getFontSize()));
+                            } catch (IllegalFontSizeException e) {
+                                e.printStackTrace();
+                                double previousFontSize = field.getFontSize();
+                                String message = ErrorMessages.fontStyleError(field, previousFontSize,
+                                        "Курсив", imageToPdfRatio, excelReader);
+                                alertCenter.showNotification(message, true);
+                                field.setMaxFontSize();
+                            }
                         });
             }
         }

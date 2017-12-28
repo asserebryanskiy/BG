@@ -1,5 +1,6 @@
 package badgegenerator.fxfieldsloader;
 
+import badgegenerator.Main;
 import badgegenerator.appfilesmanager.SavesManager;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
@@ -7,14 +8,17 @@ import badgegenerator.custompanes.SingleLineField;
 import badgegenerator.fxfieldssaver.FxFieldSave;
 import badgegenerator.fxfieldssaver.FxFieldsSaver;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -30,6 +34,13 @@ import static org.junit.Assert.assertThat;
  */
 public class FxFieldsLoaderTest extends ApplicationTest{
     private List<FxField> fields;
+
+    @BeforeClass
+    public static void beforeAllTests() throws Exception {
+        InputStream lightStream = Main.class.getResourceAsStream("/fonts/CRC35.otf");
+        Font.loadFont(lightStream, 13);
+        lightStream.close();
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -67,7 +78,9 @@ public class FxFieldsLoaderTest extends ApplicationTest{
     public void fontSizeSavesAfterSavesLoad() throws Exception {
         // Arrange
         double fontSize = 20;
-        fields.forEach(f -> f.setFontSize(fontSize));
+        for (FxField f : fields) {
+            f.setFontSize(fontSize);
+        }
 
         // Act
         FxFieldsSaver.createSave(fields, "test");
@@ -170,7 +183,9 @@ public class FxFieldsLoaderTest extends ApplicationTest{
         // Arrange
         URL url = getClass().getResource("/fonts/freeset.ttf");
         String path = Paths.get(url.toURI()).toFile().getAbsolutePath();
-        fields.forEach(f -> f.setFont(path));
+        for (FxField f : fields) {
+            f.setFont(path);
+        }
 
         // Act
         FxFieldsSaver.createSave(fields, "test");

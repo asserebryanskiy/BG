@@ -2,7 +2,6 @@ package badgegenerator.fxfieldssaver;
 
 import badgegenerator.custompanes.FxField;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import java.io.Serializable;
 
@@ -22,7 +21,6 @@ public class FxFieldSave implements Serializable{
     private String fontPath;
     private String alignment;
     private String columnId;
-    private Font font;
     private boolean capitalized;
 
     public FxFieldSave(FxField field) {
@@ -35,6 +33,7 @@ public class FxFieldSave implements Serializable{
         green = color.getGreen();
         blue = color.getBlue();
         fontName = field.getFont().getName();
+        fontPath = field.getFontPath();
         alignment = field.getAlignment();
         columnId = field.getColumnId();
         capitalized = field.isCapitalized();
@@ -82,14 +81,6 @@ public class FxFieldSave implements Serializable{
 
     public String getFontName() {
         return fontName;
-    }
-
-    public void setFont(Font font) {
-        this.font = font;
-    }
-
-    public Font getFont() {
-        return font;
     }
 
     public double getWidth() {

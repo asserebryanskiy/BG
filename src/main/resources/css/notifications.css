@@ -1,0 +1,21 @@
+/*.list-view {
+    warning_color: #feff89;
+    -fx-border-width: 0.5px 0px 0px 0px;
+    -fx-border-color: black;
+    -fx-background-color: warning_color;
+    -fx-focus-color: warning_color;
+    -fx-faint-focus-color: warning_color;
+    -fx-font-size: 9px;
+}
+
+.list-cell {
+    -fx-background-color: #feff89;
+    -fx-border-width: 0px 0px 0.5px 0px;
+    -fx-border-color: black;
+}
+
+.button {
+    -fx-background-color: #feff89;
+    -fx-cursor: hand;
+}*/
+

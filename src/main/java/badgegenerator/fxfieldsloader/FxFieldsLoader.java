@@ -2,7 +2,6 @@ package badgegenerator.fxfieldsloader;
 
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.fxfieldssaver.FxFieldSave;
-import javafx.scene.text.Font;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,13 +35,10 @@ public class FxFieldsLoader {
                         FxFieldSave fieldFile = (FxFieldSave) ois.readObject();
                         ois.close();
                         fis.close();
-                        if(!fieldFile.getFontName().equals("Helvetica")) {
+                        if(!fieldFile.getFontName().equals("Circe Light")) {
                             String fontPath = searchForFont(savePath,
                                     fieldFile.getFontName());
                             fieldFile.setFontPath(fontPath);
-                            FileInputStream fontInStream = new FileInputStream(fontPath);
-                            fieldFile.setFont(Font.loadFont(fontInStream, 13));
-                            fontInStream.close();
                         }
                         return fieldFile;
                     } catch (Exception e) {

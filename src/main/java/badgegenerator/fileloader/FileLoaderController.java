@@ -296,7 +296,7 @@ public class FileLoaderController implements Initializable{
 
     public void handleShowHelpBox(MouseEvent event) throws IOException {
         if(helpPopUp != null && helpPopUp.isShowing()) return;
-        helpPopUp = new HelpPopUp(((Node) event.getSource()).getId());
+        helpPopUp = new HelpPopUp((Node) event.getSource());
         helpPopUp.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
     }
 }

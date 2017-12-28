@@ -4,20 +4,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
-<StackPane alignment="TOP_LEFT" prefWidth="295.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fxfieldssaver.FxFieldsSaverController">
+<StackPane alignment="TOP_LEFT" prefWidth="295.0" styleClass="background" stylesheets="@../css/mainTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fxfieldssaver.FxFieldsSaverController">
    <children>
       <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="294.0">
          <children>
             <VBox fx:id="savesBox" prefWidth="197.0">
                <children>
-                  <TextField />
-                  <TextField />
-                  <TextField />
-                  <TextField />
-                  <TextField />
+                  <TextField styleClass="text_text" />
+                  <TextField styleClass="text_text" />
+                  <TextField styleClass="text_text" />
+                  <TextField styleClass="text_text" />
+                  <TextField styleClass="text_text" />
                </children>
             </VBox>
-            <VBox fx:id = "btnBox" alignment="TOP_CENTER" spacing="5.0">
+            <VBox fx:id="btnBox" alignment="TOP_CENTER" spacing="5.0">
                <children>
                   <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#handleSaveBtn" prefWidth="90.0" text="Сохранить" />
                   <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#handleDeleteSave" prefWidth="90.0" text="Удалить" textAlignment="CENTER" />

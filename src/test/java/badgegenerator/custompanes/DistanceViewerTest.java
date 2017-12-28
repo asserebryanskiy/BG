@@ -12,8 +12,7 @@ public class DistanceViewerTest extends ApplicationTest{
     @Test
     public void yChangeChangesText() throws Exception {
         FxField field = new SingleLineField("Example",
-                "Example", 1, 100,
-                13, null);
+                "Example", 1, 100);
         DistanceViewer viewer = new DistanceViewer(field, Orientation.VERTICAL);
 
         // Act

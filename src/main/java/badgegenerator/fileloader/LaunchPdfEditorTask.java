@@ -17,6 +17,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,20 +54,8 @@ public class LaunchPdfEditorTask extends Task {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root;
         try {
-            PdfFieldExtractor extractor = null;
-            if (fxFieldsPath == null) {
-                try {
-                    extractor = new PdfFieldExtractor(pdfPath, excelReader);
-                } catch (WrongHeadingsException e) {
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR,
-                                e.getMessage(),
-                                ButtonType.OK);
-                        alert.show();
-                    });
-                    return null;
-                }
-            }
+            PdfFieldExtractor extractor = new PdfFieldExtractor(pdfPath,
+                    new HashSet<>(Arrays.asList(excelReader.getHeadings())));;
             root = loader.load();
             PdfEditorController controller = loader.getController();
             updateMessage("Загружаю pdf");
@@ -76,8 +66,7 @@ public class LaunchPdfEditorTask extends Task {
             controller.setPdfPreview(createImageFromPdf(pdf), imageHeight);
             controller.setPdfPath(emptyPdfPath);
             controller.setExcelReader(excelReader);
-            if(fxFieldsPath != null) controller.init(fxFieldsPath);
-            else                     controller.init(extractor.getFields());
+            controller.init(fxFieldsPath, extractor.getFields());
         } catch (Exception e) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
