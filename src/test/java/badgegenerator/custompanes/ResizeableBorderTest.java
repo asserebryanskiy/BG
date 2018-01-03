@@ -1,6 +1,8 @@
 package badgegenerator.custompanes;
 
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -148,19 +150,12 @@ public class ResizeableBorderTest extends TestBase{
 
     @Test
     public void onRightAlignedFieldResizeToTheLeftSavesX() throws Exception {
-        double newX = fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth()
-                    - fieldWithHyp.computeStringWidth("Example");
-        for (int i = 0; i < 20; i++) {
             // Arrange
             double delta = fieldWithHyp.getPrefWidth();
             double initialEndX = fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth();
             fieldWithHyp.setAlignment("RIGHT");
-            System.out.println(newX);
-//            System.out.println(fieldWithHyp.getPrefWidth());
             drag(leftBorder).moveBy(delta, 0).release(MouseButton.PRIMARY);
-//            sleep(2000);
-            System.out.println(fieldWithHyp.getLayoutX());
-            System.out.println("-------");
+
             assertThat("Decrease", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),
                     greaterThan(initialEndX - OFFSET));
             assertThat("Decrease", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),
@@ -174,6 +169,5 @@ public class ResizeableBorderTest extends TestBase{
                     greaterThan(initialEndX - OFFSET));
             assertThat("Increase", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),
                     lessThan(initialEndX + OFFSET));
-        }
     }
 }
