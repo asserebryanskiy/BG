@@ -29,7 +29,7 @@
             <Label alignment="CENTER" layoutX="72.0" layoutY="37.0" nodeOrientation="LEFT_TO_RIGHT" styleClass="text_text" text="Привет! Загрузи сюда свои файлы" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="TOP">
                <children>
-                  <Button fx:id="btnBrowsePdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
+                  <Button fx:id="btnBrowsePdf" alignment="CENTER" contentDisplay="CENTER" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor></Button>
@@ -51,7 +51,7 @@
             </HBox>
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP">
                <children>
-                  <Button fx:id="btnBrowseXlsx" alignment="CENTER" mnemonicParsing="false" onMouseClicked="#handleBrowseExcel" text="Обзор" GridPane.rowIndex="2">
+                  <Button fx:id="btnBrowseXlsx" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#handleBrowseExcel" text="Обзор" GridPane.rowIndex="2">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -134,7 +134,7 @@
             <Label alignment="CENTER" contentDisplay="CENTER" styleClass="text_text" text="Пустой макет в формате .pdf" GridPane.rowIndex="5" GridPane.valignment="BOTTOM" />
             <HBox spacing="20.0" GridPane.rowIndex="6">
                <children>
-                  <Button fx:id="btnBrowseEmptyPdf" alignment="TOP_LEFT" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onAction="#browseEmptyPdf" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
+                  <Button fx:id="btnBrowseEmptyPdf" alignment="CENTER" contentDisplay="CENTER" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onAction="#browseEmptyPdf" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
