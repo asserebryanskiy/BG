@@ -1,8 +1,6 @@
 package badgegenerator.custompanes;
 
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Line;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -160,7 +158,7 @@ public class ResizeableBorderTest extends TestBase{
             System.out.println(newX);
 //            System.out.println(fieldWithHyp.getPrefWidth());
             drag(leftBorder).moveBy(delta, 0).release(MouseButton.PRIMARY);
-            sleep(2000);
+//            sleep(2000);
             System.out.println(fieldWithHyp.getLayoutX());
             System.out.println("-------");
             assertThat("Decrease", fieldWithHyp.getLayoutX() + fieldWithHyp.getPrefWidth(),

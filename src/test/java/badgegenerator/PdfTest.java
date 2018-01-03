@@ -27,13 +27,26 @@ public class PdfTest {
     private static final String helveticaPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/Helvetica.otf";
     private static final String freesetPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/freeset.ttf";
     private static final String circePath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/fonts/CRC35.OTF";
-    private static final String srcPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/empty.pdf";
-    private static final String targetPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/multiWordsHeading.pdf";
+    private static final String srcPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/newYear.pdf";
+    private static final String targetPdf = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/newYearWithLine.pdf";
 
     public static void main(String[] args) throws IOException {
 //        parse();
 //        getStream();
-        create();
+//        create();
+        addCenterLine();
+    }
+
+    private static void addCenterLine() throws IOException {
+        PdfDocument pdf = new PdfDocument(new PdfReader(srcPdf), new PdfWriter(targetPdf));
+        Rectangle pageSize = pdf.getFirstPage().getPageSize();
+        float middle = pageSize.getWidth() / 2;
+        PdfCanvas pdfCanvas = new PdfCanvas(pdf.getFirstPage());
+        pdfCanvas.moveTo(middle, 0)
+                .lineTo(middle, pageSize.getHeight())
+                .stroke();
+
+        pdf.close();
     }
 
     private static void parse() throws IOException {

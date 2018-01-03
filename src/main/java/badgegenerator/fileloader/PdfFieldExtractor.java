@@ -14,6 +14,7 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStra
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Extracts fields from provided pdf by searching for excelReader headings
@@ -39,6 +40,7 @@ public class PdfFieldExtractor {
                 .collect(Collectors.toSet());
         fields = new HashMap<>(fieldNames.size());
         PdfDocument pdf = new PdfDocument(new PdfReader(pdfPath));
+        System.out.println(pdf.getFirstPage().getPageSize().getWidth() / 2);
         pdfHeight = pdf.getFirstPage().getPageSize().getHeight();
         widths = new ArrayList<>(fieldNames.size());
         xCoords = new ArrayList<>(fieldNames.size());
@@ -91,7 +93,15 @@ public class PdfFieldExtractor {
         final float OFFSET = 1;  // acceptable difference in pixels
         int centerCounter = 0;
         int rightCounter = 0;
+        int leftCounter = 0;
+        IntStream.range(0, fields.size())
+                .forEach(i -> System.out.println((xCoords.get(i) + widths.get(i) / 2)));
         for (int i = 1; i < fields.size(); i++) {
+            float lxi = xCoords.get(i);                         // left x coord of i-th field
+            float lxp = xCoords.get(i - 1);                         // left x coord of (i-1)th field
+            if (lxi > lxp - OFFSET && lxi < lxp + OFFSET)
+                leftCounter++;
+
             float rxi = xCoords.get(i) + widths.get(i);         // right x coord of i-th field
             float rxp = xCoords.get(i - 1) + widths.get(i - 1); // right x coord of (i-1)th field
             if (rxi > rxp - OFFSET && rxi < rxp + OFFSET)
@@ -103,11 +113,24 @@ public class PdfFieldExtractor {
                 centerCounter++;
         }
 
+        System.out.println(leftCounter);
+        System.out.println(centerCounter);
+        System.out.println(rightCounter);
+
         int target = fields.size() - 1;
         String alignment;
-        if      (rightCounter == target)  alignment = "RIGHT";
+        if      (rightCounter  == target) alignment = "RIGHT";
         else if (centerCounter == target) alignment = "CENTER";
-        else                              alignment = "LEFT";
+        else if (leftCounter   == target) alignment = "LEFT";
+        else {
+            if (leftCounter >= centerCounter && leftCounter >= rightCounter) {
+                alignment = "LEFT";
+            } else if (centerCounter > rightCounter) {
+                alignment = "CENTER";
+            } else {
+                alignment = "RIGHT";
+            }
+        }
 
         fields.values().forEach(f -> f.setAlignment(alignment));
     }

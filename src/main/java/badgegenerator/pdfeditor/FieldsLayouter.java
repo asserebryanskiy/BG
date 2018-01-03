@@ -216,7 +216,6 @@ class FieldsLayouter {
                 }
                 default: {
                     if (current.getLayoutX() != previous.getLayoutX()) {
-                        System.out.println("Entered");
                         current.setLayoutX(previous.getLayoutX());
                     }
                 }
@@ -294,8 +293,7 @@ class FieldsLayouter {
                 } default: {
                     if (field.getLayoutX() + field.getPrefWidth() > fieldsParent.getMaxWidth()) {
                         if (field instanceof FieldWithHyphenation
-                                && field.getLayoutX() + field.getMinWidth()
-                                < fieldsParent.getMaxWidth() - field.getLayoutX()) {
+                                && field.getLayoutX() + field.getMinWidth() < fieldsParent.getMaxWidth()) {
                             FieldWithHyphenation fieldWH = (FieldWithHyphenation) field;
                             fieldWH.setPrefWidth(fieldsParent.getMaxWidth() - field.getLayoutX());
                             fieldWH.computeHyphenation();

@@ -260,7 +260,6 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         try {
             setFontSize(computeMaxFontSize());
         } catch (IllegalFontSizeException e) {
-            System.out.println("Entered");
             e.printStackTrace();
         }
     }

@@ -148,9 +148,20 @@ public class ErrorMessages {
             builder.append("значения \"")
                     .append(bigStrings.stream().collect(Collectors.joining(", ")))
                     .append("\" поля \"" + field.getColumnId() + "\" не помещаются.");
-        } else builder.append(String.format("%d значений (из файла Excel, колонки \"%s\") не помещаются.",
-                bigStrings.size(), field.getColumnId()));
-        builder.append("Поэтому размер шрифта был изменен до ")
+        } else {
+            int number = bigStrings.size(); // number of out of range values
+            builder.append(number).append(" ");
+            // number is between 25 and 30 for example
+            if (number < 21 || number / 5 % 2 > 0 || number % 10 == 0)
+                builder.append("значений");
+            else if (!String.valueOf(number).endsWith("1"))
+                builder.append("значения");
+            else builder.append("значение");
+            builder.append((" из файла Excel, колонки \""))
+                    .append(field.getColumnId())
+                    .append("\" не помещаются.");
+        }
+        builder.append(" Поэтому размер шрифта был изменен до ")
                 .append(String.format("%.1f.", field.getFontSize() / imageToPdfRatio));
         return builder.toString();
     }

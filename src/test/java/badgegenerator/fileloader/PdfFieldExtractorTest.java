@@ -31,6 +31,14 @@ public class PdfFieldExtractorTest {
     }
 
     @Test
+    public void extractsProperlyBadlyCenterAlignedFields() throws Exception {
+        PdfFieldExtractor extractor = prepareExtractor("/pdfs/newYear.pdf",
+                "/excels/newYear.xlsx");
+
+        assertThat(extractor.getFields().get("ИМЯ").getAlignment(), is("CENTER"));
+    }
+
+    @Test
     public void properlyExtractsCenterAlignedFields() throws Exception {
         PdfFieldExtractor extractor = prepareExtractor("/pdfs/hShiftCenter.pdf",
                 "/excels/test.xlsx");
@@ -100,7 +108,7 @@ public class PdfFieldExtractorTest {
     @Test
     public void extractsBrokenWordsCompleteSimple() throws Exception {
         // Act
-        PdfFieldExtractor extractor = prepareExtractor("/pdfs/wrongEncoding.pdf",
+        PdfFieldExtractor extractor = prepareExtractor("/pdfs/newYear.pdf",
                 "/excels/wrongEncoding.xlsx");
 
         // Assert
