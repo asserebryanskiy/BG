@@ -15,8 +15,7 @@ public class PdfToFxAdapterTest {
     public void fontAdaptationTest() throws Exception {
         Path excelPath = Paths.get(getClass()
                 .getResource("/excels/test.xlsx").toURI());
-        ExcelReader excelReader = new ExcelReader(excelPath.toFile().getAbsolutePath()
-        );
+        ExcelReader excelReader = new ExcelReader(excelPath.toFile().getAbsolutePath());
         excelReader.processFile();
         String pdfPath = Paths.get(getClass()
                 .getResource("/pdfs/threeFonts.pdf").toURI())

@@ -79,6 +79,21 @@ public class LayoutFromSavesTest extends ApplicationTest{
     }
 
     @Test
+    public void setsUsePdfColorToFalseAfterExtractingFromSave() throws Exception {
+        // Arrange
+        prepareSaves("CENTER");
+
+        // Act
+        FieldsLayouter layouter = new FieldsLayouter(new Pane(),
+                new AlertCenter(new Pane()),
+                excelReader,
+                savePath, new HashMap<>(), 1);
+
+        // Assert
+        layouter.getFxFields().forEach(f -> assertThat(f.usePdfColor(), is(false)));
+    }
+
+    @Test
     public void ifCouldNotFindSaveWithProperColumnIdTakesFromPdf() throws Exception {
         prepareSaves("CENTER");
         when(excelReader.getLargestFields())

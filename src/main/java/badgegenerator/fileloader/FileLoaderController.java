@@ -76,6 +76,7 @@ public class FileLoaderController implements Initializable{
     private HelpPopUp helpPopUp;
     private Thread loadFontsThread;
     private String emptyPdfPath;
+    private File lastFolder;            // last opened with fileChooser directory
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -101,6 +102,7 @@ public class FileLoaderController implements Initializable{
 
     public void handleBrowseExcel() {
         FileChooser fileChooser = new FileChooser();
+        if (lastFolder != null) fileChooser.setInitialDirectory(lastFolder);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Excel files", "*.xlsx", "*.xls"));
         File selectedFile = fileChooser.showOpenDialog(null);
@@ -108,6 +110,7 @@ public class FileLoaderController implements Initializable{
         if(selectedFile != null) {
             excelFileField.setText(selectedFile.getName());
             excelFilePath = selectedFile.getAbsolutePath();
+            lastFolder = selectedFile.getParentFile();
         } else {
             System.out.println("File is incorrect");
         }
@@ -115,6 +118,7 @@ public class FileLoaderController implements Initializable{
 
     public void browseEmptyPdf() {
         FileChooser fileChooser = new FileChooser();
+        if (lastFolder != null) fileChooser.setInitialDirectory(lastFolder);
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
         File selectedFile = fileChooser.showOpenDialog(null);
@@ -122,6 +126,7 @@ public class FileLoaderController implements Initializable{
         if(selectedFile != null) {
             emptyPdfField.setText(selectedFile.getName());
             emptyPdfPath = selectedFile.getAbsolutePath();
+            lastFolder = selectedFile.getParentFile();
         } else {
             System.out.println("File is incorrect");
         }
@@ -129,6 +134,7 @@ public class FileLoaderController implements Initializable{
 
     public void handleBrowsePdf() {
         FileChooser fileChooser = new FileChooser();
+        if (lastFolder != null) fileChooser.setInitialDirectory(lastFolder);
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
         File selectedFile = fileChooser.showOpenDialog(null);
@@ -136,9 +142,11 @@ public class FileLoaderController implements Initializable{
         if(selectedFile != null) {
             pdfField.setText(selectedFile.getName());
             pdfPath = selectedFile.getAbsolutePath();
+            lastFolder = selectedFile.getParentFile();
         } else {
             System.out.println("File is incorrect");
         }
+
     }
 
     public void handleProceed(MouseEvent event) throws IOException {

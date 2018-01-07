@@ -30,7 +30,7 @@ public class DistanceViewer extends Pane {
         fxField.addEventHandler(MouseEvent.MOUSE_RELEASED, event ->
                 setVisible(false));
         if(orientation.name().equals("VERTICAL")) {
-            text.setText(String.valueOf((int) ((500 - fxField.getLayoutY())
+            text.setText(String.valueOf((int) ((fxField.getLayoutY())
                     / fxField.getImageToPdfRatio())));
             setLayoutX(20);
             line.setStartX(0);

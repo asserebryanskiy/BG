@@ -58,7 +58,7 @@ public class CreateBadgeArchiveTask extends Task {
                 updateMessage(String.format("Готов %d файл из %d", i, numberOfFiles));
             }
             updateProgress(numberOfFiles, numberOfFiles + 1);
-            updateMessage("Создаю общий бейдж");
+            updateMessage("Создаю общий файл");
             badgeArchive.createCommonBadge();
             badgeArchive.getOutputStream().close();
             return true;

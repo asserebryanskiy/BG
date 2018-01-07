@@ -75,10 +75,16 @@ public class FxToPdfFieldAdapter {
             }
         }
 
-        javafx.scene.paint.Color fxColor = fxField.getFill();
-        pdfColor = new DeviceRgb((int) (fxColor.getRed() * 255),
-                (int) (fxColor.getGreen() * 255),
-                (int) (fxColor.getBlue() * 255));
+        // color adaptation
+        if (!fxField.usePdfColor() || fxField.getPdfColor() == null) {
+            javafx.scene.paint.Color fxColor = fxField.getFill();
+            pdfColor = new DeviceRgb((float) fxColor.getRed(),
+                    (float) fxColor.getGreen(),
+                    (float) fxColor.getBlue());
+        } else {
+            System.out.println("Set pdf color");
+            pdfColor = fxField.getPdfColor();
+        }
 
         leading = (float) ((getFontMetrics(fxField).getMaxAscent()
                         + getFontMetrics(fxField).getMaxDescent()) / imageToPdfRatio);

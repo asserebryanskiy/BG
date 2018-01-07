@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -35,7 +36,7 @@ public class FxFieldsLoaderController implements Initializable{
     @FXML
     private StackPane root;
     @FXML
-    private ListView<Text> savedFields;
+    private ListView<Label> savedFields;
     @FXML
     private Rectangle loaderBackground;
     @FXML
@@ -59,13 +60,13 @@ public class FxFieldsLoaderController implements Initializable{
 
     public void setSavedFieldsNames(List<String> savedFieldsNames) {
 //        ObservableList<Text> values = FXCollections.observableArrayList(savedFieldsNames);
-        ObservableList<Text> values = savedFieldsNames.stream()
-                .map(Text::new)
+        ObservableList<Label> values = savedFieldsNames.stream()
+                .map(Label::new)
                 .collect(Collectors.toCollection(FXCollections::observableArrayList));
         if(savedFieldsNames.size() < 5) {
             for(int i = savedFieldsNames.size(); i < 5; i++) {
-                Text text = new Text(PLACEHOLDER);
-                text.setFill(Color.GRAY);
+                Label text = new Label(PLACEHOLDER);
+                text.setTextFill(Color.GRAY);
                 values.add(text);
             }
         }

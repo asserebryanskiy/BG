@@ -6,17 +6,24 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class FxFieldsLoaderMock extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ExcelReader excelReader = new ExcelReader("/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/test.xlsx"
-        );
-        String pdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/empty.pdf";
+        InputStream lightStream = getClass().getResourceAsStream("/fonts/CRC35.OTF");
+        Font.loadFont(lightStream, 13);
+        lightStream.close();
+        ExcelReader excelReader =
+                new ExcelReader("/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/excels/test.xlsx");
+        excelReader.processFile();
+        String pdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/threeFonts.pdf";
+        String emptyPdfPath = "/Users/andreyserebryanskiy/IdeaProjects/badgeGenerator/src/test/testResources/pdfs/empty.pdf";
         /*File savedFilesDirectory = new File(Main.class
                 .getResource("/savedFields").getFile());
         String[] names = savedFilesDirectory.list();*/
@@ -28,6 +35,7 @@ public class FxFieldsLoaderMock extends Application{
         controller.setSavedFieldsNames(savesNames);
         controller.setExcelReader(excelReader);
         controller.setPdfPath(pdfPath);
+        controller.setEmptyPdfPath(emptyPdfPath);
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.show();

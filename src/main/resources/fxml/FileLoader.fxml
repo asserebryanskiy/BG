@@ -15,7 +15,7 @@
             <ColumnConstraints />
          </columnConstraints>
          <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
             <RowConstraints />
@@ -26,7 +26,10 @@
             <RowConstraints vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label alignment="CENTER" layoutX="72.0" layoutY="37.0" nodeOrientation="LEFT_TO_RIGHT" styleClass="text_text" text="Привет! Загрузи сюда свои файлы" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
+            <Label fx:id="heading" alignment="CENTER" layoutX="72.0" layoutY="37.0" nodeOrientation="LEFT_TO_RIGHT" styleClass="text_text" text="Привет! Загрузи сюда свои файлы:" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+               <padding>
+                  <Insets bottom="10.0" top="20.0" />
+               </padding></Label>
             <HBox spacing="20.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="TOP">
                <children>
                   <Button fx:id="btnBrowsePdf" alignment="CENTER" contentDisplay="CENTER" layoutX="24.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#handleBrowsePdf" text="Обзор" GridPane.rowIndex="5">
@@ -157,7 +160,7 @@
             </HBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="20.0" left="20.0" right="20.0" />
          </padding>
       </GridPane>
       <StackPane fx:id="loadingScreen" visible="false">

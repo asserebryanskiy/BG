@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,18 +92,19 @@ class FieldsLayouter {
         IntStream.range(0, largestFields.length)
                 .forEach(i -> {
                     FxField fxField;
+                    double OFFSET = 2;  // OFFSET from parent's borders
                     // create FxField
                     if(largestFields[i].length() > longestWords[i].length()) {
                         fxField = new FieldWithHyphenation(largestFields[i],
                                 longestWords[i],
                                 headings[i],
                                 imageToPdfRatio,
-                                fieldsParent.getMaxWidth());
+                                fieldsParent.getMaxWidth() - 2 * OFFSET);
                     } else {
                         fxField = new SingleLineField(largestFields[i],
                                 headings[i],
                                 imageToPdfRatio,
-                                fieldsParent.getMaxWidth());
+                                fieldsParent.getMaxWidth() - 2 * OFFSET);
                     }
                     // set field's fontSize, font, color, alignment, position
                     setFieldsParameters(fxField);
@@ -312,21 +312,6 @@ class FieldsLayouter {
                 }
             }
         });
-
-        // moves down field if upper one runs into it
-        fxFields.sort(Comparator.comparingDouble(Node::getLayoutY));
-        int shift = 0;
-        final int INTENT = 10;
-        double lastY = fxFields.get(0).getLayoutY() + fxFields.get(0).getMaxHeight();
-        for (int i = 1; i < fxFields.size(); i++) {
-            FxField field = fxFields.get(i);
-            if (lastY < field.getLayoutY())
-                shift += lastY - field.getLayoutY() + INTENT;
-            if (field.getLayoutY() + field.getMaxHeight() + shift < fieldsParent.getMaxHeight()) {
-                field.setLayoutY(field.getLayoutY() + shift);
-            } else break;
-            lastY = field.getLayoutY() + field.getMaxHeight();
-        }
     }
 
 
@@ -374,6 +359,8 @@ class FieldsLayouter {
             fxField.setMaxFontSize();
         }
         fxField.setFill(adapter.getColor());
+        fxField.setPdfColor(adapter.getPdfColor());
+        fxField.setUsePdfColor(true);
         fxField.setCapitalized(adapter.isCapitalized());
         double x;
         switch (adapter.getAlignment()) {

@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 /**
  * HelpPopUp has custom design.
  */
-public class HelpPopUp extends Popup{
+public class HelpPopUp extends Popup {
     private static final Logger logger = Logger.getLogger(HelpPopUp.class.getSimpleName());
     private String parentsNodeId;
 
@@ -31,6 +31,7 @@ public class HelpPopUp extends Popup{
     }
 
     private void preparePopup(String message) {
+        setAutoHide(true);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HelpPopUp.fxml"));
         Parent root;
         try {

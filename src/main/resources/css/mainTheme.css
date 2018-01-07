@@ -11,12 +11,8 @@
     -fx-fill: dark;
 }
 
-.label {
-    -fx-fill: dark;
-}
-
-.text_text {
-    -fx-text-fill: dark;
+.text-text {
+    -fx-text-fill: black;
 }
 
 .button {
@@ -24,3 +20,17 @@
     -fx-text-fill: white;
     -fx-cursor: hand;
 }
+
+.cell: selected {
+    -fx-background-color: dark;
+    -fx-fill: white;
+}
+
+#progressIndicator {
+    -fx-progress-color: dark;
+}
+
+#heading {
+    -fx-font-size: 14;
+}
+

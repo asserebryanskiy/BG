@@ -1,6 +1,8 @@
 package badgegenerator.fileloader;
 
 import badgegenerator.appfilesmanager.AssessableFonts;
+import com.itextpdf.kernel.color.DeviceCmyk;
+import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import javafx.scene.paint.Color;
 
@@ -12,6 +14,8 @@ public class PdfToFxAdapter {
     private final double x;             // x-coord in JavaFX environment
     private final double y;             // y-coord in JavaFX environment
     private final Color color;          // javafx.color
+    private final com.itextpdf.kernel.color.
+            Color pdfColor;
     private final double fontSize;      // fontSize in JavaFX
     private final String fontName;      // name of the font in the form it could be found on local machine
     private final String fontPath;      // path to the font
@@ -21,8 +25,18 @@ public class PdfToFxAdapter {
     public PdfToFxAdapter(PdfField field, double imageToPdfRatio) {
         columnId = field.getName();
         x = field.getX() * imageToPdfRatio;
+        // we subtract from pdfHeight, because in pdf y-coord is computed from bottom
+        // and in JavaFX from top
         y = (field.getPdfHeight() - field.getY()) * imageToPdfRatio;
-        float[] colorValue = field.getColor().getColorValue();
+        pdfColor = field.getColor();
+        float[] colorValue;
+        if (pdfColor instanceof DeviceCmyk) {
+            DeviceRgb rgb = com.itextpdf.kernel.color.Color
+                    .convertCmykToRgb((DeviceCmyk) field.getColor());
+            colorValue = rgb.getColorValue();
+        } else {
+            colorValue = pdfColor.getColorValue();
+        }
         color = Color.color(colorValue[0], colorValue[1], colorValue[2]);
         PdfFont pdfFont = field.getFont();
         fontName = getFontName(pdfFont.getFontProgram().toString());
@@ -78,5 +92,9 @@ public class PdfToFxAdapter {
 
     public boolean isCapitalized() {
         return capitalized;
+    }
+
+    public com.itextpdf.kernel.color.Color getPdfColor() {
+        return pdfColor;
     }
 }

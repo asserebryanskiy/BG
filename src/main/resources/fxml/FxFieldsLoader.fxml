@@ -9,15 +9,15 @@
 <?import javafx.scene.text.Text?>
 <StackPane fx:id="root" styleClass="background" stylesheets="@../css/mainTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="badgegenerator.fxfieldsloader.FxFieldsLoaderController">
    <children>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="130.0" prefWidth="294.0">
+      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
          <children>
-            <ListView fx:id="savedFields" fixedCellSize="25.0" prefHeight="240.0" prefWidth="200.0" />
+            <ListView id="progressIndicator" fx:id="savedFields" fixedCellSize="25.0" prefHeight="120.0" prefWidth="200.0" />
             <VBox fx:id="btnBox" alignment="TOP_CENTER" spacing="5.0">
                <children>
                   <Button fx:id="loadFieldBtn" mnemonicParsing="false" onAction="#handleLoadField" prefWidth="90.0" text="Загрузить" />
-                  <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые&#10;бейджи" textAlignment="CENTER" /></children>
+                  <Button fx:id="loadNewFieldsBtn" mnemonicParsing="false" onAction="#handleLoadNewFields" prefWidth="90.0" text="Создать&#10;новые&#10;бейджи" textAlignment="CENTER" VBox.vgrow="ALWAYS" /></children>
                <padding>
-                  <Insets left="5.0" right="5.0" top="20.0" />
+                  <Insets bottom="20.0" left="5.0" right="5.0" top="20.0" />
                </padding>
             </VBox>
          </children>

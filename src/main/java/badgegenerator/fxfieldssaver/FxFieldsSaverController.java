@@ -24,8 +24,9 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class FxFieldsSaverController {
-    private static Logger logger = Logger.getLogger(FxFieldsSaverController.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(FxFieldsSaverController.class.getSimpleName());
 
+    private static final Color DARK_COLOR = Color.rgb(62, 41, 54);
     private final String PLACEHOLDER = "--Нет сохранения--";
 
     @FXML
@@ -65,7 +66,7 @@ public class FxFieldsSaverController {
             lastClickedItemIndex = saveIndices.size();
         }
         DropShadow shadow = new DropShadow();
-        shadow.setColor(Color.BLUE);
+        shadow.setColor(DARK_COLOR);
         shadow.setSpread(1);
         shadow.setRadius(0);
         shadow.setOffsetX(5);

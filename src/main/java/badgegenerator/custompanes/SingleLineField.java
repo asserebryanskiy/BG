@@ -84,6 +84,10 @@ public class SingleLineField extends FxField {
         if(capsLockCheckBox != null) {
             capsLockCheckBox.setSelected(isCapitalized());
         }
+        if (usePdfColorMenuItem != null) {
+            usePdfColorMenuItem.setSelected(usePdfColor() && getPdfColor() != null);
+            usePdfColorMenuItem.setDisable(getPdfColor() == null);
+        }
     }
 
     @Override

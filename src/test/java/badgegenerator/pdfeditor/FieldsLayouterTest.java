@@ -136,8 +136,23 @@ public class FieldsLayouterTest extends ApplicationTest{
                 .findAny().get();
 
         assertThat(target.getLayoutX() + target.getPrefWidth(), is(rightX));
+        System.out.println(alertCenter.getNotifications());
         assertThat(alertCenter.getNotifications().contains("Не удалось найти в pdf поле \"Должность в компании\". Для него установлены стандартные параметры: черный цвет, 13,0 размер шрифта, шрифт Circe Light."),
                 is(true));
+    }
+
+    @Test
+    public void setsUsePdfColorToTrueAfterExtractingFromPdf() throws Exception {
+        ExcelReader excelReader = prepareExcelReader("/excels/test.xlsx");
+        PdfFieldExtractor extractor = prepareExtractor(excelReader, "/pdfs/threeFonts.pdf");
+
+        FieldsLayouter layouter = new FieldsLayouter(fieldsParent,
+                new AlertCenter(new Pane()),
+                excelReader,
+                null,
+                extractor.getFields(), 1);
+
+        layouter.getFxFields().forEach(f -> assertThat(f.usePdfColor(), is(true)));
     }
 
     @Test

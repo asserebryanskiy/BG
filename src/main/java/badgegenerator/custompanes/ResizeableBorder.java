@@ -17,7 +17,6 @@ import javafx.scene.shape.SVGPath;
 public class ResizeableBorder extends StackPane{
     private static final int COUNTS_TILL_TOOLTIP = 100;  // value of counter on which a popup with information
                                                          // about impossibility of further resize will show
-
     private final FieldWithHyphenation fxField;
     private final boolean positionLeft; // is this ResizeableBorder placed at the start of FxField?
 
@@ -30,7 +29,6 @@ public class ResizeableBorder extends StackPane{
     private HelpPopUp popup;            // popup that is shown if user is trying
                                         // to resize FxField more than allowed
 
-    // Pane structure
     public ResizeableBorder(FieldWithHyphenation fxField,
                             Position position) {
         super();
@@ -71,7 +69,7 @@ public class ResizeableBorder extends StackPane{
             deltaX = getLayoutX() + getMaxWidth() / 2 - event.getSceneX();
             if (positionLeft) oldX = getLayoutX() + getMaxWidth();
             else              oldX = getLayoutX();
-            maxAllowableWidth = getParent().getBoundsInLocal().getWidth();
+            maxAllowableWidth = fxField.getMaxAllowableWidth();
         });
 
         // dragging property
@@ -103,8 +101,9 @@ public class ResizeableBorder extends StackPane{
                 }
                 else counter = 0;
                 // if out of screen or if FxField is already one-line return
+                // ToDo: move outOfScreen conditions to FxField.setLayoutX() and setPrefWidth()
                 if (newX < fieldStartX + fxField.getMinWidth()
-                        || newX >= maxAllowableWidth
+                        || newX > maxAllowableWidth
                         || (fxField.getNumberOfLines() == 1
                         && newX > fieldStartX + fxField.getPrefWidth())) return;
 

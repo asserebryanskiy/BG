@@ -110,6 +110,8 @@ public class PdfEditorController {
 
     @FXML private CheckMenuItem visualizeGridCheckMenuItem;
     @FXML private CheckMenuItem alignFieldsCheckMenuItem;
+    @FXML private CheckMenuItem usePdfColorMenuItem;
+    @FXML private Menu badgesMenuItem;
 
     @FXML private RadioButton bindingYesButton;
     @FXML private RadioButton bindingNoButton;
@@ -190,9 +192,17 @@ public class PdfEditorController {
             fxField.setFontColorPicker(fontColorPicker);
             fxField.setAlignmentButtons(alignmentButtons);
             fxField.setCapsLockCheckBox(capsLockCheckBox);
+            fxField.setUsePdfColorMenuItem(usePdfColorMenuItem);
         });
         saveFieldsBtn.autosize();
+
+        // menu settings
         menuBar.setUseSystemMenuBar(true);
+        badgesMenuItem.setOnShown(e -> {
+            // if no field is selected it is not possible to determine on what field to apply
+            // extracted from pdf color
+            if (fxFields.stream().noneMatch(f -> f.isSelected)) usePdfColorMenuItem.setDisable(true);
+        });
         bindingCheckMenuItem.selectedProperty()
                 .bindBidirectional(bindingYesButton.selectedProperty());
         bindingCheckMenuItem.selectedProperty()
@@ -205,6 +215,7 @@ public class PdfEditorController {
         visualizeGridCheckMenuItem.selectedProperty()
                 .addListener((o, oldVal, newVal) ->
                         alignFieldsCheckMenuItem.setDisable(!newVal));
+
         GridPane grid = (GridPane) horizontalScaleBar.getParent();
         grid.getRowConstraints().get(0).setMaxHeight(horizontalScaleBar
                 .getBoundsInLocal().getHeight());
@@ -572,6 +583,12 @@ public class PdfEditorController {
                         });
             }
         }
+    }
+
+    public void handleSetUsePdfColor(ActionEvent actionEvent) {
+        fxFields.stream()
+                .filter(f -> f.isSelected && f.getPdfColor() != null)
+                .forEach(f -> f.setUsePdfColor(usePdfColorMenuItem.isSelected()));
     }
 
 /*

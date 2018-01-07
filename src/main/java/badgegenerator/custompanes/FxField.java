@@ -1,13 +1,11 @@
 package badgegenerator.custompanes;
 
 import badgegenerator.appfilesmanager.AssessableFonts;
+import com.itextpdf.kernel.color.DeviceCmyk;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.SVGPath;
@@ -40,25 +38,36 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     private static Line verticalGuide;                     // vertical line in the center of the screen
     private static Line horizontalGuide;                   // horizontal line in the center of the screen
 
-    private String columnId;
-    protected double imageToPdfRatio;
-    double maxAllowableWidth;
-    protected Font font;
-    private DoubleProperty fontSize;
-    private String fontPath;
-    private String alignment = "CENTER";
-    private Color color = Color.color(0,0,0);
-    TextField fontSizeField;
-    TextField fontNameField;
-    ColorPicker fontColorPicker;
-    List<Button> alignmentButtons;
-    CheckBox capsLockCheckBox;
-    private boolean capitalized;
-    private List<Line> horizontalGridLines = new ArrayList<>();
-    private List<Line> verticalGridLines = new ArrayList<>();
-    private double hGridLineStep;
-    private double vGridLineStep;
-    private boolean alignFieldWithGrid;
+    private String columnId;                        // name of the column in Excel from which this field was created
+    private DoubleProperty fontSize;                // font size of the text of this field
+    private String fontPath;                        // path to used font, to load font while pdf creation
+    private String alignment = "CENTER";            // alignment of this FxField
+    private Color color =
+            Color.color(0,0,0);    // color of text
+    private boolean capitalized;                    // indicates, whether text is capitalized
+    private List<Line> horizontalGridLines =
+            new ArrayList<>();                      // list of all horizontal gridLines
+    private List<Line> verticalGridLines =
+            new ArrayList<>();                      // list of all vertical gridLines
+    private double hGridLineStep;                   // distance between two subsequent horizontal gridLines
+    private double vGridLineStep;                   // distance between two subsequent vertical gridLines
+    private boolean alignFieldWithGrid;             // indicates, whether this field should be aligned
+                                                    // to grid while dragging
+
+    // Is added because pdf may have CMYK color, that changes visually while
+    // converting to rgb. Thus, original color also preserves.
+    private com.itextpdf.kernel.color.Color pdfColor;   // original color extracted from pdf
+    private boolean usePdfColor;                        // indicates, whether color extracted from pdf, should be used
+
+    double imageToPdfRatio;         // ratio of pdf size to JavaFX editor pane size
+    double maxAllowableWidth;       // width of editor window
+    Font font;                      // font of the text of this field
+    TextField fontSizeField;        // textField, that shows font size of this field multiplied by imageToPdfRatio
+    TextField fontNameField;        // textField, that shows font name of this field
+    ColorPicker fontColorPicker;    // colorPicker, that shows current color of this field
+    List<Button> alignmentButtons;  // buttons, that shows current alignment of this field
+    CheckBox capsLockCheckBox;      // checkBox, that is filled if field is capitalized
+    CheckMenuItem usePdfColorMenuItem;
 
     public FxField(String columnId,
                    double imageToPdfRatio,
@@ -331,9 +340,44 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         this.capsLockCheckBox = capsLockCheckBox;
     }
 
+    public void setUsePdfColorMenuItem(CheckMenuItem usePdfColorMenuItem) {
+        this.usePdfColorMenuItem = usePdfColorMenuItem;
+    }
+
     public void setFill(Color color) {
-        setFillImpl(color);
+        usePdfColor = false;
         this.color = color;
+        setFillImpl(color);
+        if (fontColorPicker != null) fontColorPicker.setValue(color);
+        if (usePdfColorMenuItem != null) usePdfColorMenuItem.setSelected(false);
+    }
+
+    public Color getFill() {
+        return color;
+    }
+
+    // allow customer indicate BadgeCreator to use color from pdf
+    public void setUsePdfColor(boolean usePdfColor) {
+        boolean value = pdfColor != null && usePdfColor;
+        this.usePdfColor = value;
+        if (value) {
+            float[] colorValue = pdfColor.getColorValue();
+            if (pdfColor instanceof DeviceCmyk) {
+                colorValue = com.itextpdf.kernel.color.Color.convertCmykToRgb((DeviceCmyk) pdfColor)
+                        .getColorValue();
+            }
+            Color color = Color.color(colorValue[0], colorValue[1], colorValue[2]);
+            setFillImpl(color);
+            this.color = color;
+            if (fontColorPicker != null) fontColorPicker.setValue(color);
+        }
+        if (usePdfColorMenuItem != null) usePdfColorMenuItem.setSelected(value);
+    }
+
+    // allow customer to set fill, not setting color was change to true
+    public void setFill(Color color, boolean colorWasChanged) {
+        setFill(color);
+        this.usePdfColor = colorWasChanged;
     }
 
     abstract void setFillImpl(Color color);
@@ -359,10 +403,6 @@ public abstract class FxField extends DraggablePane implements StyleableText {
 
     abstract void setAlignmentImpl(String alignment);
 
-    public Color getFill() {
-        return color;
-    }
-
     public String getAlignment() {
         return alignment;
     }
@@ -380,6 +420,7 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     }
 
     public void setCapitalized(boolean value) {
+        if (capitalized == value) return;
         double oldWidth = getPrefWidth();
         this.capitalized = value;
         setCapitalizedImpl(value);
@@ -476,5 +517,18 @@ public abstract class FxField extends DraggablePane implements StyleableText {
     @Override
     public int hashCode() {
         return columnId.hashCode();
+    }
+
+    public void setPdfColor(com.itextpdf.kernel.color.Color pdfColor) {
+        this.pdfColor = pdfColor;
+        usePdfColor = true;
+    }
+
+    public com.itextpdf.kernel.color.Color getPdfColor() {
+        return pdfColor;
+    }
+
+    public boolean usePdfColor() {
+        return usePdfColor;
     }
 }

@@ -62,7 +62,6 @@ public class FxFieldsSaver {
         Map<String, FxField> uniqueFontNames = new HashMap<>();
         for(FxField field : fields) {
             String fontName = field.getFont().getName();
-            System.out.println(fontName);
             if(!fontName.equals("Circe Light")
                     && !uniqueFontNames.containsKey(fontName)) {
                 uniqueFontNames.put(fontName, field);

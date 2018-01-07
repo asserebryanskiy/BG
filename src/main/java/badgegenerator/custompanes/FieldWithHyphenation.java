@@ -39,6 +39,7 @@ public class FieldWithHyphenation extends FxField {
         super(columnId, imageToPdfRatio, maxAllowableWidth);
         this.originalValue = value;
         words = value.split("\\s");
+        // font is computed while super()
         computeWordsWidth();
         // is needed because it may be that
         String longestInInput = Arrays.stream(words)
@@ -48,6 +49,7 @@ public class FieldWithHyphenation extends FxField {
                 longestWord : longestInInput;
         lines = new ArrayList<>();
         Text text = new Text(value);
+        // font is computed while super()
         text.setFont(font);
         lines.add(text);
         textFlow = new TextFlow(text);
@@ -129,9 +131,7 @@ public class FieldWithHyphenation extends FxField {
             if (longestLineWidth < lineWidth) longestLineWidth = lineWidth;
         }
 
-        if (longestLineWidth > getMinWidth()) {
-            setPrefWidth(longestLineWidth);
-        } else setPrefWidth(getMinWidth());
+        setPrefWidth(Math.max(getMinWidth(), longestLineWidth));
         numberOfLines.set(lines.size());
         setMaxHeight(computeMaxHeight());
     }
@@ -284,6 +284,10 @@ public class FieldWithHyphenation extends FxField {
         if(capsLockCheckBox != null) {
             capsLockCheckBox.setSelected(isCapitalized());
         }
+        if (usePdfColorMenuItem != null) {
+            usePdfColorMenuItem.setSelected(usePdfColor() && getPdfColor() != null);
+            usePdfColorMenuItem.setDisable(getPdfColor() == null);
+        }
     }
 
     public int getNumberOfLines() {
@@ -314,7 +318,7 @@ public class FieldWithHyphenation extends FxField {
             setPrefWidth(maxAllowableWidth);
             computeHyphenation();
         }
-        else setPrefWidth(longestLineWidth);
+        else setPrefWidth(Math.max(longestLineWidth, getMinWidth()));
         setTextFlowAligned();
     }
 
@@ -328,5 +332,9 @@ public class FieldWithHyphenation extends FxField {
 
     double getLongestLineWidth() {
         return longestLineWidth;
+    }
+
+    double getMaxAllowableWidth() {
+        return maxAllowableWidth;
     }
 }

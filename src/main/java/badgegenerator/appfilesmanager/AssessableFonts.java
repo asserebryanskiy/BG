@@ -6,9 +6,13 @@ import javafx.scene.text.Font;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -30,10 +34,26 @@ public class AssessableFonts {
         if(allAssessableFonts == null) {
             process();
         }
-        return allAssessableFonts.get(fontName);
+        String fontPath = allAssessableFonts.get(fontName);
+        // is needed because sime fonts has awkward names!
+        // e.g. Plumb-Regular instead of Plumb Regular
+        if (fontPath == null) {
+            fontPath = allAssessableFonts.keySet().stream()
+                    .filter(name -> name.equals(getJoinedWithDelimiter(fontName, "-"))
+                            || name.equals(getJoinedWithDelimiter(fontName, "_"))
+                            || name.equals(getJoinedWithDelimiter(fontName, "+")))
+                    .findAny()
+                    .orElse(null);
+        }
+        return fontPath;
     }
 
-    public static void process() {
+    private static String getJoinedWithDelimiter(String fontName, String delimiter) {
+        String[] words = fontName.split("\\s");
+        return Arrays.stream(words).collect(Collectors.joining(delimiter));
+    }
+
+    public synchronized static void process() {
         Stream<File> stream;
         if(PlatformUtil.isMac()) {
             File fontsDirectory1 = new File("/Library/Fonts");
@@ -65,7 +85,6 @@ public class AssessableFonts {
             }
         }
         allAssessableFonts = new HashMap<>();
-        Set<String> fxFonts = new HashSet<>(Font.getFontNames());
         stream.forEach(file -> {
             try {
                 String fileName = file.getName().toLowerCase();
