@@ -47,6 +47,8 @@ public class FileLoaderController implements Initializable{
     @FXML
     private Button btnBrowsePdf;
     @FXML
+    private Button btnBrowseEmptyPdf;
+    @FXML
     private Button btnLoadFields;
     @FXML
     private Button btnCreateNewFields;
@@ -66,7 +68,6 @@ public class FileLoaderController implements Initializable{
     private Text excelNotLoadedLabel;
     @FXML
     private Text emptyPdfNotLoadedLabel;
-
     @FXML
     private Text pdfNotLoadedLabel;
     private String pdfPath;
@@ -83,8 +84,9 @@ public class FileLoaderController implements Initializable{
         buttons.add(btnBrowseXlsx);
         buttons.add(btnCreateNewFields);
         buttons.add(btnLoadFields);
-        buttons.forEach(btn -> btn.setMinWidth(
-                Main.computeStringWidth(btn.getText(), btn.getFont()) + 20));
+        buttons.add(btnBrowseEmptyPdf);
+        buttons.forEach(btn -> btn.setMinWidth(Main
+                .computeStringWidth(btn.getText(), btn.getFont()) + 10));
         Task<Void> loadFontsTasks = new Task<Void>() {
             @Override
             protected Void call() throws Exception {

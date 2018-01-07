@@ -40,7 +40,6 @@ public class PdfFieldExtractor {
                 .collect(Collectors.toSet());
         fields = new HashMap<>(fieldNames.size());
         PdfDocument pdf = new PdfDocument(new PdfReader(pdfPath));
-        System.out.println(pdf.getFirstPage().getPageSize().getWidth() / 2);
         pdfHeight = pdf.getFirstPage().getPageSize().getHeight();
         widths = new ArrayList<>(fieldNames.size());
         xCoords = new ArrayList<>(fieldNames.size());
@@ -94,8 +93,6 @@ public class PdfFieldExtractor {
         int centerCounter = 0;
         int rightCounter = 0;
         int leftCounter = 0;
-        IntStream.range(0, fields.size())
-                .forEach(i -> System.out.println((xCoords.get(i) + widths.get(i) / 2)));
         for (int i = 1; i < fields.size(); i++) {
             float lxi = xCoords.get(i);                         // left x coord of i-th field
             float lxp = xCoords.get(i - 1);                         // left x coord of (i-1)th field
@@ -112,10 +109,6 @@ public class PdfFieldExtractor {
             if (cxi > cxp - OFFSET && cxi < cxp + OFFSET)
                 centerCounter++;
         }
-
-        System.out.println(leftCounter);
-        System.out.println(centerCounter);
-        System.out.println(rightCounter);
 
         int target = fields.size() - 1;
         String alignment;

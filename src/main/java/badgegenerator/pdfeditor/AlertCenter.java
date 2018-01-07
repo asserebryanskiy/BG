@@ -130,6 +130,7 @@ public class AlertCenter {
     private void preparePopup() {
         // set up popup
         popup = new Popup();
+        popup.setAutoHide(true);
 
         // set up popup content
         VBox popupRoot = new VBox(V_GAP);
