@@ -3,6 +3,7 @@ package badgegenerator.pdfcreator;
 import badgegenerator.appfilesmanager.LoggerManager;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 
@@ -63,12 +64,14 @@ public class CreateBadgeArchiveTask extends Task {
             badgeArchive.getOutputStream().close();
             return true;
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    String.format("Ошибка при создании бейджей%n%s", e.getMessage()));
-            alert.show();
+            e.printStackTrace();
             LoggerManager.initializeLogger(logger);
             logger.log(Level.SEVERE, "Error : " + e.getMessage(), e);
-            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Ошибка при создании бейджей");
+                alert.show();
+            });
             return false;
         }
     }
