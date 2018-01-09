@@ -23,6 +23,7 @@ public class PdfField {
     private float fontSize = 12;
     private String alignment;
     private boolean capitalized;
+    private float width;
 
     public PdfField(String name, float x, float y, float pdfHeight) throws IOException {
         this.name = name;
@@ -107,5 +108,13 @@ public class PdfField {
 
     public String getAlignment() {
         return alignment;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public float getWidth() {
+        return width;
     }
 }
