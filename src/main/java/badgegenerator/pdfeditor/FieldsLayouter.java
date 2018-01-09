@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
  * If something needs to be changed (e.g font size, coordinates, font) and user should
  * be notified about FieldsLayouter sends messages to the provided AlertCenter.
  */
-class FieldsLayouter {
+public class FieldsLayouter {
     private final String[] largestFields;           // largest values from every column from excel
     private final String[] longestWords;            // longest words from every column from excel
     private final String[] headings;                // headings from every column from excel
@@ -47,7 +47,7 @@ class FieldsLayouter {
     private final Map<String, PdfField> pdfFields;  // map of columnId and corresponding PdfField
     private final List<FxField> notFoundFxFields;   // fxFields, than weren't found neither in saves nor in pdf
 
-    FieldsLayouter(Pane fieldsParent,
+    public FieldsLayouter(Pane fieldsParent,
                    AlertCenter alertCenter,
                    ExcelReader excelReader,
                    String savesPath,
@@ -71,7 +71,7 @@ class FieldsLayouter {
         positionFields();
     }
 
-    List<FxField> getFxFields() {
+    public List<FxField> getFxFields() {
         return fxFields;
     }
 
