@@ -30,15 +30,17 @@ public class PdfFieldExtractor {
     private final Set<String> trimmedFieldNames;
     private final Set<String> originalFieldNames;
 
-    public PdfFieldExtractor(String pdfPath, Set<String> fieldNames)
-            throws IOException {
+    public PdfFieldExtractor(String pdfPath, Set<String> fieldNames) throws IOException {
+        this(new PdfDocument(new PdfReader(pdfPath)), fieldNames);
+    }
+
+    public PdfFieldExtractor(PdfDocument pdf, Set<String> fieldNames) {
         // initialize fields
         originalFieldNames = fieldNames;
         trimmedFieldNames = fieldNames.stream()
                 .map(this::getRidOfSpaces)
                 .collect(Collectors.toSet());
         fields = new HashMap<>(fieldNames.size());
-        PdfDocument pdf = new PdfDocument(new PdfReader(pdfPath));
         pdfHeight = pdf.getFirstPage().getPageSize().getHeight();
         widths = new ArrayList<>(fieldNames.size());
         xCoords = new ArrayList<>(fieldNames.size());
@@ -49,21 +51,6 @@ public class PdfFieldExtractor {
         FilteredEventListener listener = new FilteredEventListener();
         listener.attachEventListener(new LocationTextExtractionStrategy(), contentFilter);
         new PdfCanvasProcessor(listener).processPageContent(pdf.getFirstPage());
-
-        /*// builder error message if not all headings from excel were found in pdf
-        if (!this.trimmedFieldNames.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder();
-            errorMessage.append("Не удалось найти в pdf ");
-            int size = this.trimmedFieldNames.size();
-            if (size == 1) errorMessage.append("заголовок ");
-            else           errorMessage.append("заголовки: ");
-            for (String fieldName : trimmedFieldNames) {
-                fieldName = getOriginalText(fieldName);
-                errorMessage.append(fieldName).append(", ");
-            }
-            errorMessage.delete(errorMessage.length() - 2, errorMessage.length());
-            throw new WrongHeadingsException(errorMessage.toString());
-        }*/
 
         pdf.close();
         computeAlignment();
@@ -94,7 +81,7 @@ public class PdfFieldExtractor {
         int leftCounter = 0;
         for (int i = 1; i < fields.size(); i++) {
             float lxi = xCoords.get(i);                         // left x coord of i-th field
-            float lxp = xCoords.get(i - 1);                         // left x coord of (i-1)th field
+            float lxp = xCoords.get(i - 1);                     // left x coord of (i-1)th field
             if (lxi > lxp - OFFSET && lxi < lxp + OFFSET)
                 leftCounter++;
 
@@ -190,6 +177,7 @@ public class PdfFieldExtractor {
             field.setColor(renderInfo.getFillColor());
             field.setFont(renderInfo.getFont());
             field.setFontSize(renderInfo.getFontSize());
+            field.setWidth(renderInfo.getUnscaledWidth());
             // check if field should be capitalized
             if (columnId.toUpperCase().equals(columnId)) field.setCapitalized();
             fields.put(columnId, field);
