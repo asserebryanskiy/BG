@@ -138,9 +138,8 @@ public class FxFieldsLoaderController implements Initializable{
                 pdfRedactorWindow.setScene(
                         new Scene((Parent) launchPdfEditorTask.getValue()));
                 pdfRedactorWindow.setResizable(false);
-                pdfRedactorWindow.setX(pdfRedactorWindow.getX() - 200);
-                pdfRedactorWindow.setY(pdfRedactorWindow.getY() - 100);
                 pdfRedactorWindow.show();
+                pdfRedactorWindow.centerOnScreen();
             }
         });
         Thread thread = new Thread(launchPdfEditorTask);
