@@ -34,23 +34,7 @@ public class AssessableFonts {
         if(allAssessableFonts == null) {
             process();
         }
-        String fontPath = allAssessableFonts.get(fontName);
-        // is needed because sime fonts has awkward names!
-        // e.g. Plumb-Regular instead of Plumb Regular
-        if (fontPath == null) {
-            fontPath = allAssessableFonts.keySet().stream()
-                    .filter(name -> name.equals(getJoinedWithDelimiter(fontName, "-"))
-                            || name.equals(getJoinedWithDelimiter(fontName, "_"))
-                            || name.equals(getJoinedWithDelimiter(fontName, "+")))
-                    .findAny()
-                    .orElse(null);
-        }
-        return fontPath;
-    }
-
-    private static String getJoinedWithDelimiter(String fontName, String delimiter) {
-        String[] words = fontName.split("\\s");
-        return Arrays.stream(words).collect(Collectors.joining(delimiter));
+        return allAssessableFonts.get(fontName);
     }
 
     public synchronized static void process() {
@@ -94,13 +78,26 @@ public class AssessableFonts {
                         || fileName.endsWith(".pfm")
                         || fileName.endsWith(".ttc")) {
                     Font font = Font.loadFont(new FileInputStream(file), 10);
-                    String fontName = font.getName();
-                    allAssessableFonts.putIfAbsent(fontName, file.getAbsolutePath());
+                    if (font != null) {
+                        String fontName = getProperFontName(font.getName());
+                        allAssessableFonts.putIfAbsent(fontName, file.getAbsolutePath());
+                    } else {
+                        System.out.println("Failed loading font from file " + fileName);
+                    }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
         allAssessableFonts.putIfAbsent("Circe Light", null);
+    }
+
+    // is not private only for testing
+    static String getProperFontName(String initialFontName) {
+        String[] words = initialFontName.split("[-_+ ]");
+        return Arrays.stream(words)
+                .map(w -> String.valueOf(w.charAt(0)).toUpperCase() + w.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
     }
 }
