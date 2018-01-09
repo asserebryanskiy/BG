@@ -6,6 +6,7 @@ import badgegenerator.custompanes.FxField;
 import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.kernel.color.Color;
+import com.itextpdf.kernel.color.DeviceCmyk;
 import com.itextpdf.kernel.color.DeviceRgb;
 import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
@@ -76,14 +77,18 @@ public class FxToPdfFieldAdapter {
         }
 
         // color adaptation
-        if (!fxField.usePdfColor() || fxField.getPdfColor() == null) {
+        Color pdfColor = fxField.getPdfColor();
+        if (!fxField.usePdfColor() || pdfColor == null) {
             javafx.scene.paint.Color fxColor = fxField.getFill();
-            pdfColor = new DeviceRgb((float) fxColor.getRed(),
+            this.pdfColor = new DeviceRgb((float) fxColor.getRed(),
                     (float) fxColor.getGreen(),
                     (float) fxColor.getBlue());
         } else {
             System.out.println("Set pdf color");
-            pdfColor = fxField.getPdfColor();
+            float[] colorValue = pdfColor.getColorValue();
+            this.pdfColor = pdfColor instanceof DeviceCmyk ?
+                    new DeviceCmyk(colorValue[0], colorValue[1], colorValue[2], colorValue[3]) :
+                    new DeviceRgb(colorValue[0], colorValue[1], colorValue[2]);
         }
 
         leading = (float) ((getFontMetrics(fxField).getMaxAscent()
