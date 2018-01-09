@@ -385,6 +385,12 @@ public class PdfEditorController {
                     showProgressScreen(false);
                 }
             });
+            createBadgesArchiveTask.setOnFailed(e -> {
+                showProgressScreen(false);
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        "Не удалось создать бейджи.");
+                alert.show();
+            });
             createBadgesArchiveTask.setOnCancelled(e -> showProgressScreen(false));
             progressIndicator.progressProperty().bind(createBadgesArchiveTask.progressProperty());
             progressStatusLabel.textProperty().bind(createBadgesArchiveTask.messageProperty());
