@@ -26,13 +26,10 @@ import java.util.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Created by andreyserebryanskiy on 14/12/2017.
- */
 public class BadgeCreatorTest extends ApplicationTest {
-    ExcelReader excelReader;
-    BadgeCreator bc;
-    List<FxField> fxFields;
+    private ExcelReader excelReader;
+    private BadgeCreator bc;
+    private List<FxField> fxFields;
 
     @Test
     public void savesXOnLeftAligned() throws Exception {
