@@ -72,7 +72,7 @@ public class BadgeCreator {
     byte[] createBadgeInMemory(int i) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfDocument newPdf = new PdfDocument(new PdfWriter(out));
-        srcPdf.copyPagesTo(1,1,newPdf);
+        srcPdf.copyPagesTo(1,1, newPdf);
         PdfPage page = newPdf.getFirstPage();
         PdfCanvas pdfCanvas = new PdfCanvas(page);
 
