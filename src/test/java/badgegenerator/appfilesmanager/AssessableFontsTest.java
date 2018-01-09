@@ -31,7 +31,23 @@ public class AssessableFontsTest {
     }*/
 
     @Test
-    public void circeFontLoad() throws Exception {
+    public void circeFontIsAvailable() throws Exception {
         assertThat(fontNames.contains("Circe Light"), is(true));
+    }
+
+    @Test
+    public void containsPlumbRegularWithoutIllegalCharacter() throws Exception {
+        assertThat(fontNames.contains("Plumb Regular"), is(true));
+    }
+
+    @Test
+    public void splitsFontNameOnTwoWordsWithSpace() throws Exception {
+        String[] wrongFontNames = new String[]{"Plumb-Regular",
+                "Plumb_Regular", "Plumb+Regular", "Plumb-regular", "Plumb regular",
+                "Plumb_regular", "Plumb+regular", "plumb regular"};
+        for (String wrongFontName : wrongFontNames) {
+            assertThat(wrongFontName, AssessableFonts.getProperFontName(wrongFontName),
+                    is("Plumb Regular"));
+        }
     }
 }
