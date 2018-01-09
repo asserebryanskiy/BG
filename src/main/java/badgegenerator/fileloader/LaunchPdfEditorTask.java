@@ -55,7 +55,7 @@ public class LaunchPdfEditorTask extends Task {
         Parent root;
         try {
             PdfFieldExtractor extractor = new PdfFieldExtractor(pdfPath,
-                    new HashSet<>(Arrays.asList(excelReader.getHeadings())));;
+                    new HashSet<>(Arrays.asList(excelReader.getHeadings())));
             root = loader.load();
             PdfEditorController controller = loader.getController();
             updateMessage("Загружаю pdf");
