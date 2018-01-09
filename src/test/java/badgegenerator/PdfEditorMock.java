@@ -40,11 +40,11 @@ public class PdfEditorMock extends Application {
         Font.loadFont(lightStream, 13);
         lightStream.close();
 
-        String excelPath = getResourcePath("/excels/sts.xlsx");
+        String excelPath = getResourcePath("/excels/newYear.xlsx");
         ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        String fullPdfPath = getResourcePath("/pdfs/sts.pdf");
-        String emptyPdfPath = getResourcePath("/pdfs/stsEmpty.pdf");
+        String fullPdfPath = getResourcePath("/pdfs/newYear.pdf");
+        String emptyPdfPath = getResourcePath("/pdfs/newYearEmpty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
         PdfEditorController controller = loader.getController();
