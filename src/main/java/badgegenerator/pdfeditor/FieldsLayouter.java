@@ -358,7 +358,14 @@ public class FieldsLayouter {
                     .tooBigFontSizeInPdf(fxField, adapter.getFontSize(), excelReader));
             fxField.setMaxFontSize();
         }
-        fxField.setFill(adapter.getColor());
+        if (adapter.getColor() != null) {
+            fxField.setFill(adapter.getColor());
+        } else {
+            fxField.setFill(Color.BLACK);
+            String message = String.format("Произошла ошибка при считывании цвета для поля \"%s\". " +
+                    "Установлен черный цвет.", fxField.getText());
+            alertCenter.showNotification(message);
+        }
         fxField.setPdfColor(adapter.getPdfColor());
         fxField.setUsePdfColor(true);
         fxField.setCapitalized(adapter.isCapitalized());

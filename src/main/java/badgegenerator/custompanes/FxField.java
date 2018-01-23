@@ -1,7 +1,9 @@
 package badgegenerator.custompanes;
 
 import badgegenerator.appfilesmanager.AssessableFonts;
+import badgegenerator.appfilesmanager.LoggerManager;
 import com.itextpdf.kernel.color.DeviceCmyk;
+import com.itextpdf.kernel.color.DeviceGray;
 import com.sun.javafx.tk.Toolkit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -361,14 +363,26 @@ public abstract class FxField extends DraggablePane implements StyleableText {
         boolean value = pdfColor != null && usePdfColor;
         this.usePdfColor = value;
         if (value) {
-            float[] colorValue = pdfColor.getColorValue();
-            if (pdfColor instanceof DeviceCmyk) {
-                colorValue = com.itextpdf.kernel.color.Color.convertCmykToRgb((DeviceCmyk) pdfColor)
-                        .getColorValue();
+            try {
+                Color color;
+                float[] colorValue;
+                if (pdfColor instanceof DeviceGray) {
+                    float gray = pdfColor.getColorValue()[0];
+                    color = Color.color(gray, gray, gray);
+                } else if (pdfColor instanceof DeviceCmyk) {
+                    colorValue = com.itextpdf.kernel.color.Color.convertCmykToRgb((DeviceCmyk) pdfColor)
+                            .getColorValue();
+                    color = Color.color(colorValue[0], colorValue[1], colorValue[2]);
+                } else {
+                    colorValue = pdfColor.getColorValue();
+                    color = Color.color(colorValue[0], colorValue[1], colorValue[2]);
+                }
+                this.color = color;
+            } catch (Exception e) {
+                LoggerManager.initializeLogger(logger);
+                logger.log(Level.INFO, pdfColor.toString());
+                logger.log(Level.SEVERE, "error processing color", e);
             }
-            Color color = Color.color(colorValue[0], colorValue[1], colorValue[2]);
-            setFillImpl(color);
-            this.color = color;
             if (fontColorPicker != null) fontColorPicker.setValue(color);
         }
         if (usePdfColorMenuItem != null) usePdfColorMenuItem.setSelected(value);
