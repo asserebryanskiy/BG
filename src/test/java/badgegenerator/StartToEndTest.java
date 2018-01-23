@@ -62,6 +62,13 @@ public class StartToEndTest extends ApplicationTest{
         test(pdfName, excelName);
     }
 
+    @Test
+    public void grayColorBadges() throws Exception {
+        String pdfName = "/pdfs/grayColor.pdf";
+        String excelName = "/excels/grayColor.xlsx";
+        test(pdfName, excelName);
+    }
+
     @After
     public void tearDown() throws Exception {
         File dir = archive.getParentFile();

@@ -91,8 +91,9 @@ public class FxToPdfFieldAdapter {
             float[] colorValue = pdfColor.getColorValue();
             this.pdfColor = pdfColor instanceof DeviceCmyk ?
                     new DeviceCmyk(colorValue[0], colorValue[1], colorValue[2], colorValue[3]) :
-                    pdfColor instanceof DeviceGray ? new DeviceGray(colorValue[0]) :
-                    new DeviceRgb(colorValue[0], colorValue[1], colorValue[2]);
+                    pdfColor instanceof DeviceGray ?
+                            new DeviceRgb(colorValue[0], colorValue[0], colorValue[0]) :
+                            new DeviceRgb(colorValue[0], colorValue[1], colorValue[2]);
         }
 
         leading = (float) ((getFontMetrics(fxField).getMaxAscent()
