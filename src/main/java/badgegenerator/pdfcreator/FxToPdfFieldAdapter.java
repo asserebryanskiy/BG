@@ -7,6 +7,7 @@ import com.itextpdf.io.font.FontProgram;
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceCmyk;
+import com.itextpdf.kernel.color.DeviceGray;
 import com.itextpdf.kernel.color.DeviceRgb;
 import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
@@ -83,11 +84,14 @@ public class FxToPdfFieldAdapter {
             this.pdfColor = new DeviceRgb((float) fxColor.getRed(),
                     (float) fxColor.getGreen(),
                     (float) fxColor.getBlue());
-        } else {
+        }
+        // usePdfColor is true and pdfColor is not null
+        else {
             System.out.println("Set pdf color");
             float[] colorValue = pdfColor.getColorValue();
             this.pdfColor = pdfColor instanceof DeviceCmyk ?
                     new DeviceCmyk(colorValue[0], colorValue[1], colorValue[2], colorValue[3]) :
+                    pdfColor instanceof DeviceGray ? new DeviceGray(colorValue[0]) :
                     new DeviceRgb(colorValue[0], colorValue[1], colorValue[2]);
         }
 
