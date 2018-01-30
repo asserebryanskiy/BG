@@ -1,5 +1,6 @@
 package badgegenerator.pdfcreator;
 
+import badgegenerator.Main;
 import badgegenerator.custompanes.FieldWithHyphenation;
 import badgegenerator.custompanes.FxField;
 import com.itextpdf.io.font.PdfEncodings;
@@ -14,28 +15,32 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class BadgeCreator {
-//    private static Logger logger = Logger.getLogger(BadgeCreator.class.getSimpleName());
+    // temporal file that is created to avoid storing large files (>3 Gb) in memory
+    private static final String TEMP_FILE_FULL_NAME = Main.getAppFilesDirPath() + "/temp.pdf";
+    // offset to nivilate float point effects
+    private final float OFFSET = 0.5f;
 
-    private final float OFFSET = 0.5f; // offset to nivilate float point effects
     private final List<FxField> fxFields;
     private final ArrayList<FxToPdfFieldAdapter> adapters;
     private final List<String> headings;
     private float ratio;
     private String[][] participants;
 
-    private PdfDocument srcPdf;
-    private PdfDocument commonPdf;
-    private ByteArrayOutputStream commonPdfOutStream;
-    private Rectangle pageSize;
+    private PdfDocument srcPdf;     // src empty pdf with background
+    private PdfDocument commonPdf;  // pdf file where all badges arae stored
+    private FileOutputStream commonPdfOutStream;
+    private Rectangle pageSize;     // size of src pdf
 
-    private float sumOfShifts;
-    private int numberOfLines;
+    private float sumOfShifts;      // used to memorize space between two subsequent lines
+    private int numberOfLines;      // number of line in particular badge
+    // specifies, if lower lines should be layouted upper, if some line upper is missing
     private boolean compressFieldIfLineMissing;
 
     public BadgeCreator(List<FxField> fxFields,
@@ -44,8 +49,6 @@ public class BadgeCreator {
                  String[] headings,
                  double imageToPdfRatio,
                  boolean compressFieldIfLineMissing) throws IOException {
-        // in memory test
-//        LoggerManager.initializeLogger(logger);
         this.fxFields = fxFields;
         try {
             srcPdf = new PdfDocument(new PdfReader(srcPdfPath));
@@ -65,7 +68,7 @@ public class BadgeCreator {
         ratio = (float) imageToPdfRatio;
         this.compressFieldIfLineMissing = compressFieldIfLineMissing;
 
-        commonPdfOutStream = new ByteArrayOutputStream();
+        commonPdfOutStream = new FileOutputStream(TEMP_FILE_FULL_NAME);
         commonPdf = new PdfDocument(new PdfWriter(commonPdfOutStream));
     }
 
@@ -138,10 +141,17 @@ public class BadgeCreator {
         }
 
         newPdf.close();
+
+        // copy page to commonPdf
         PdfDocument temp = new PdfDocument(new PdfReader(
                 new ByteArrayInputStream(out.toByteArray())));
         temp.copyPagesTo(1,1,commonPdf);
+        // to avoid filling the Java heap with used objects
+        commonPdf.getPage(commonPdf.getNumberOfPages()).flush(true);
+        commonPdf.flushCopiedObjects(temp);
         temp.close();
+        out.close();
+
         numberOfLines = 0;
         return out.toByteArray();
     }
@@ -184,8 +194,10 @@ public class BadgeCreator {
      *
      * Should be called only after all badges were created.
      * */
-    byte[] createCommonBadge() {
+     String getCommonFilePath() throws IOException {
         commonPdf.close();
-        return commonPdfOutStream.toByteArray();
+        commonPdfOutStream.close();
+
+        return TEMP_FILE_FULL_NAME;
     }
 }

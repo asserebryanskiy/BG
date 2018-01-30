@@ -40,11 +40,11 @@ public class PdfEditorMock extends Application {
         Font.loadFont(lightStream, 13);
         lightStream.close();
 
-        String excelPath = getResourcePath("/excels/grayColor.xlsx");
+        String excelPath = getResourcePath("/excels/newYear.xlsx");
         ExcelReader excelReader = new ExcelReader(excelPath);
         excelReader.processFile();
-        String fullPdfPath = getResourcePath("/pdfs/grayColor.pdf");
-        String emptyPdfPath = getResourcePath("/pdfs/grayColorEmpty.pdf");
+        String fullPdfPath = getResourcePath("/pdfs/newYear.pdf");
+        String emptyPdfPath = getResourcePath("/pdfs/newYearEmpty.pdf");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PdfEditor.fxml"));
         Parent root = loader.load();
         PdfEditorController controller = loader.getController();
@@ -65,6 +65,7 @@ public class PdfEditorMock extends Application {
 
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
     }
 
     private String getResourcePath(String name) throws URISyntaxException {

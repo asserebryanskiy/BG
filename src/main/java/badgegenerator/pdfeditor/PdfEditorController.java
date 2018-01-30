@@ -9,6 +9,7 @@ import badgegenerator.fileloader.PdfField;
 import badgegenerator.fxfieldssaver.FxFieldsSaverController;
 import badgegenerator.helppopup.HelpPopUp;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
+import badgegenerator.pdfcreator.NotEnoughSpaceException;
 import com.sun.javafx.PlatformUtil;
 import com.sun.javafx.tk.Toolkit;
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
@@ -331,17 +332,29 @@ public class PdfEditorController {
 
         if(selectedDirectory != null) {
             showProgressScreen(true);
-            createBadgesArchiveTask = new CreateBadgeArchiveTask(fxFields,
-                    imageToPdfRatio,
-                    excelReader,
-                    pdfPath,
-                    selectedDirectory.getAbsolutePath() + ".zip",
-                    compressFieldIfLineMissing.get());
+            try {
+                createBadgesArchiveTask = new CreateBadgeArchiveTask(fxFields,
+                        imageToPdfRatio,
+                        excelReader,
+                        pdfPath,
+                        selectedDirectory.getAbsolutePath() + ".zip",
+                        compressFieldIfLineMissing.get());
+            } catch (NotEnoughSpaceException e) {
+                String available = getFormattedSpaceString(e.getAvailableSpace());
+                String needed = getFormattedSpaceString(e.getQuerySpace());
+                String message = String.format("Не достаточно места на диске. " +
+                        "Доступно %s, необходимо %s", available, needed);
+                Alert alert = new Alert(Alert.AlertType.WARNING, message);
+                alert.show();
+                showProgressScreen(false);
+                return;
+            }
             createBadgesArchiveTask.setOnSucceeded(event1 -> {
                 if (createBadgesArchiveTask.getValue().equals(true)) {
                     showProgressScreen(false);
 //                    Stage doneAlert = new Stage();
 
+                    // show popup with suggestion to open folder with archive
                     ButtonType yesBtn = new ButtonType("Да", ButtonBar.ButtonData.YES);
                     ButtonType noBtn = new ButtonType("Нет", ButtonBar.ButtonData.NO);
                     Alert doneAlert = new Alert(Alert.AlertType.INFORMATION,
@@ -368,28 +381,37 @@ public class PdfEditorController {
                                     "Не удалось открыть папку с архивом");
                             alert.show();
                             LoggerManager.initializeLogger(logger);
-                            logger.log(Level.SEVERE, "Ошибка при открытии папки с архивом", e);
+                            logger.log(Level.SEVERE, "Error opening folder with archive", e);
                             e.printStackTrace();
                         }
-                        /*if (Desktop.isDesktopSupported()) {
-                            try {
-                                String path = selectedDirectory.getAbsolutePath();
-                                Desktop.getDesktop().open(
-                                        new File(path.substring(0, path.lastIndexOf(File.separator))));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }*/
                     }
                 } else {
                     showProgressScreen(false);
                 }
             });
             createBadgesArchiveTask.setOnFailed(e -> {
+                Throwable ex = createBadgesArchiveTask.getException();
+                if (ex != null) {
+                    ex.printStackTrace();
+                    LoggerManager.initializeLogger(logger);
+                    logger.log(Level.SEVERE, "Error: not enough memory for JVM", ex);
+                    if (ex instanceof OutOfMemoryError) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                "Не удалось создать бейджи. Требуется слишком много памяти. \n" +
+                                        "Попробуйте создать бейджи по частям, " +
+                                        "разделив excel файл на несколько меньших.");
+                        alert.show();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                "Произошла неизвестная ошибка. Не удалось создать бейджи.");
+                        alert.show();
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Произошла неизвестная ошибка. Не удалось создать бейджи.");
+                    alert.show();
+                }
                 showProgressScreen(false);
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        "Не удалось создать бейджи.");
-                alert.show();
             });
             createBadgesArchiveTask.setOnCancelled(e -> showProgressScreen(false));
             progressIndicator.progressProperty().bind(createBadgesArchiveTask.progressProperty());
@@ -398,6 +420,20 @@ public class PdfEditorController {
             thread.setDaemon(true);
             thread.start();
         }
+    }
+
+    // returns formatted number of bytes
+    private String getFormattedSpaceString(long space) {
+        // Gb
+        if (space / 1_000_000_000 > 0)
+            return String.format("%.1f Гб", (float) (space / 1_000_000_000));
+        // Mb
+        if (space / 1_000_000 > 0)
+            return String.format("%.1f Mб", (float) (space / 1_000_000));
+        // Mb
+        if (space / 1_000 > 0)
+            return String.format("%.1f Кб", (float) (space / 1_000));
+        return String.format("%d байт", space);
     }
 
     private void showProgressScreen(boolean value) {

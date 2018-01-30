@@ -38,6 +38,7 @@ public class AssessableFonts {
     }
 
     public synchronized static void process() {
+        if (allAssessableFonts != null) return;
         Stream<File> stream;
         if(PlatformUtil.isMac()) {
             File fontsDirectory1 = new File("/Library/Fonts");

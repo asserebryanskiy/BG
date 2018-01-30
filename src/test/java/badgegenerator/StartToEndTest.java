@@ -3,6 +3,7 @@ package badgegenerator;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fileloader.PdfFieldExtractor;
 import badgegenerator.pdfcreator.CreateBadgeArchiveTask;
+import badgegenerator.pdfcreator.NotEnoughSpaceException;
 import badgegenerator.pdfeditor.AlertCenter;
 import badgegenerator.pdfeditor.FieldsLayouter;
 import com.itextpdf.kernel.geom.Rectangle;
@@ -76,7 +77,7 @@ public class StartToEndTest extends ApplicationTest{
         dir.delete();
     }
 
-    private void test(String pdfName, String excelName) throws IOException, URISyntaxException, InterruptedException {
+    private void test(String pdfName, String excelName) throws IOException, URISyntaxException, InterruptedException, NotEnoughSpaceException {
         InputStream lightStream = getClass().getResourceAsStream("/fonts/CRC35.OTF");
         Font.loadFont(lightStream, 13);
         lightStream.close();

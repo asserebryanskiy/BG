@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 public class CreateBadgeArchiveTask extends Task {
     private static Logger logger = Logger.getLogger(CreateBadgeArchiveTask.class.getSimpleName());
 
-    private final String targetDirectoryPath;
+    private final String archiveFullPath;
     private final List<FxField> fxFields;
     private final double imageToPdfRatio;
     private final ExcelReader excelReader;
@@ -29,13 +30,19 @@ public class CreateBadgeArchiveTask extends Task {
                            double imageToPdfRatio,
                            ExcelReader excelReader,
                            String pdfPath,
-                           String targetDirectoryPath,
-                           boolean compressFieldIfLineMissing) {
+                           String archiveFullPath,
+                           boolean compressFieldIfLineMissing) throws NotEnoughSpaceException {
+        // assert that there is enough space fro creating an archive
+        long estimatedArchiveSize = new File(pdfPath).length() * excelReader.getValues().length * 2;
+        long freeSpace = new File(archiveFullPath).getParentFile().getFreeSpace();
+        if (freeSpace < estimatedArchiveSize)
+            throw new NotEnoughSpaceException(estimatedArchiveSize, freeSpace);
+
         this.fxFields = fxFields;
         this.imageToPdfRatio = imageToPdfRatio;
         this.excelReader = excelReader;
         this.pdfPath = pdfPath;
-        this.targetDirectoryPath = targetDirectoryPath;
+        this.archiveFullPath = archiveFullPath;
         this.compressFieldIfLineMissing = compressFieldIfLineMissing;
     }
 
@@ -50,18 +57,22 @@ public class CreateBadgeArchiveTask extends Task {
                     excelReader.getHeadings(),
                     imageToPdfRatio,
                     compressFieldIfLineMissing);
-            BadgeArchive badgeArchive = new BadgeArchive(targetDirectoryPath, badgeCreator);
+            BadgeArchive badgeArchive = new BadgeArchive(archiveFullPath, badgeCreator);
             final int numberOfFiles = excelReader.getValues().length;
             for(int i = 0; i < numberOfFiles; i++) {
                 if(isCancelled()) break;
                 badgeArchive.createBadgeEntry(i);
-                updateProgress(i, numberOfFiles + 1);
+                // * 2 because firstly all badges are created and
+                // than one common file for all badges is created
+                updateProgress(i, numberOfFiles * 2 + 1);
                 updateMessage(String.format("Готов %d файл из %d", i, numberOfFiles));
             }
-            updateProgress(numberOfFiles, numberOfFiles + 1);
+            badgeArchive.progressCreatingCommonFileProperty().addListener((obs, old, newV) -> {
+                updateProgress(0.5 + newV.doubleValue() / 2, 1);
+            });
             updateMessage("Создаю общий файл");
             badgeArchive.createCommonBadge();
-            badgeArchive.getOutputStream().close();
+            badgeArchive.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();

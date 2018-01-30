@@ -66,6 +66,7 @@ public class LaunchPdfEditorTask extends Task {
             controller.setPdfPreview(createImageFromPdf(pdf), imageHeight);
             controller.setPdfPath(emptyPdfPath);
             controller.setExcelReader(excelReader);
+            // is mulltiplied by 2 because besides regular files the common file with all others is created
             controller.init(fxFieldsPath, extractor.getFields());
         } catch (Exception e) {
             Platform.runLater(() -> {
