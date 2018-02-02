@@ -1,29 +1,48 @@
 package badgegenerator.fileloader;
 
+import badgegenerator.appfilesmanager.AssessableFonts;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by andreyserebryanskiy on 06/12/2017.
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(AssessableFonts.class)
 public class PdfToFxAdapterTest {
+    @BeforeClass
+    public static void beforeAllTests() throws Exception {
+        PowerMockito.mockStatic(AssessableFonts.class);
+        when(AssessableFonts.getFontPath(any())).thenReturn(null);
+    }
+
     @Test
-    public void fontAdaptationTest() throws Exception {
-        Path excelPath = Paths.get(getClass()
-                .getResource("/excels/test.xlsx").toURI());
-        ExcelReader excelReader = new ExcelReader(excelPath.toFile().getAbsolutePath());
-        excelReader.processFile();
+    public void ifLoadedFontNameEndsWithMT_suffixIsRemoved() throws URISyntaxException, IOException {
+        String fieldName = "№";
         String pdfPath = Paths.get(getClass()
-                .getResource("/pdfs/threeFonts.pdf").toURI())
+                .getResource("/pdfs/raifFull.pdf").toURI())
                 .toFile()
                 .getAbsolutePath();
         PdfFieldExtractor extractor = new PdfFieldExtractor(pdfPath,
-                new HashSet<>(Arrays.asList(excelReader.getHeadings())));
+                new HashSet<>(Collections.singletonList(fieldName)));
 
-        extractor.getFields().values().forEach(f -> new PdfToFxAdapter(f, 1));
+        PdfField pdfField = extractor.getFields().get(fieldName);
+
+        assertThat(new PdfToFxAdapter(pdfField, 1).getFontName(), is("Arial Bold"));
     }
 }

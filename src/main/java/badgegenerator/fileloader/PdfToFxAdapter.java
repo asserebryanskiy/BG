@@ -11,6 +11,8 @@ import javafx.scene.paint.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static badgegenerator.util.Util.retrieveWordsFromCamelCase;
+
 /**
  * Created by andreyserebryanskiy on 06/12/2017.
  */
@@ -73,12 +75,18 @@ public class PdfToFxAdapter {
     // retrieves human-readable font name from pdfFontName
     private String getFontName(String s) {
         StringBuilder builder = new StringBuilder();
-        int styleIndex = s.indexOf('-');
+        String fontNameString = s.substring(s.indexOf('+') + 1);
+        // for some fonts like ArialMT
+        if (fontNameString.endsWith("MT")) fontNameString =
+                fontNameString.substring(0, fontNameString.length() - 2);
+        int styleIndex = fontNameString.indexOf('-');
         if (styleIndex == -1) {
-            return s.substring(s.indexOf('+') + 1);
+            return retrieveWordsFromCamelCase(fontNameString);
         }
-        String name  = s.substring(s.indexOf('+') + 1, styleIndex);
-        String style = s.substring(styleIndex + 1);
+        String name = fontNameString.substring(0, styleIndex);
+        name  = retrieveWordsFromCamelCase(name);
+        String style = retrieveWordsFromCamelCase(fontNameString.substring(styleIndex + 1));
+
         return builder.append(name).append(" ").append(style).toString();
     }
 
