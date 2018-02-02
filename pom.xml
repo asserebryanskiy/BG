@@ -7,6 +7,11 @@
     <groupId>com.andreyserebryanskiy</groupId>
     <artifactId>BG</artifactId>
     <version>1.5</version>
+
+    <properties>
+        <powermock.version>1.7.1</powermock.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -26,7 +31,7 @@
                     <mainClass>badgegenerator.Main</mainClass>
                     <vendor>company</vendor>
                     <appName>BG</appName>
-                    <bundler>EXE</bundler>
+                    <bundler>PKG</bundler>
                     <verbose>true</verbose>
                 </configuration>
                 <executions>
@@ -98,35 +103,55 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>2.8.9</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>testfx-core</artifactId>
             <version>4.0.6-alpha</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>testfx-junit</artifactId>
             <version>4.0.6-alpha</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.3</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jfxtras</groupId>
             <artifactId>openjfx-monocle</artifactId>
             <version>1.8.0_20</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito2</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

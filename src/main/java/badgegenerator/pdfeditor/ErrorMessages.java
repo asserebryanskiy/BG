@@ -165,4 +165,12 @@ public class ErrorMessages {
                 .append(String.format("%.1f.", field.getFontSize() / imageToPdfRatio));
         return builder.toString();
     }
+
+    public static String tooSmallFontSize(FxField fxField, double fontSize, double defaultFontSize) {
+        return String.format("Размер шрифта, извлеченный из pdf документа для поля %s " +
+                "был слишком маленьким (%.1f). Установлен стандартный размер шрифта: %.1f.",
+                fxField.getText(),
+                fontSize / fxField.getImageToPdfRatio(),
+                defaultFontSize);
+    }
 }

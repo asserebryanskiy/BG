@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static badgegenerator.pdfeditor.ErrorMessages.tooBigFontSizeInSave;
+import static badgegenerator.pdfeditor.ErrorMessages.tooSmallFontSize;
+
 /**
  * Lays out FxFields, Guides, ResizeableBorders and DistanceViewers on the provided
  * fieldsParent Pane.
@@ -35,6 +38,10 @@ import java.util.stream.IntStream;
  * be notified about FieldsLayouter sends messages to the provided AlertCenter.
  */
 public class FieldsLayouter {
+    private static final double LEAST_ALLOWED_FONT_SIZE = 5;    // if fontSize retrieved is smaller than this bound,
+                                                                // than default font size is set
+    public static final double DEFAULT_FONT_SIZE = 13;         // is set, if fontSize retrieved is too small
+
     private final String[] largestFields;           // largest values from every column from excel
     private final String[] longestWords;            // longest words from every column from excel
     private final String[] headings;                // headings from every column from excel
@@ -351,11 +358,16 @@ public class FieldsLayouter {
         } catch (IllegalFontSizeException e) {
             fxField.setMaxFontSize();
         }
+        double fontSize = adapter.getFontSize();
+        if (fontSize < LEAST_ALLOWED_FONT_SIZE) {
+            alertCenter.showNotification(tooSmallFontSize(fxField, fontSize, DEFAULT_FONT_SIZE));
+            fontSize = DEFAULT_FONT_SIZE * imageToPdfRatio;
+        }
         try {
-            fxField.setFontSize(adapter.getFontSize());
+            fxField.setFontSize(fontSize);
         } catch (IllegalFontSizeException e) {
             alertCenter.showNotification(ErrorMessages
-                    .tooBigFontSizeInPdf(fxField, adapter.getFontSize(), excelReader));
+                    .tooBigFontSizeInPdf(fxField, fontSize, excelReader));
             fxField.setMaxFontSize();
         }
         if (adapter.getColor() != null) {
@@ -420,8 +432,7 @@ public class FieldsLayouter {
         try {
             fxField.setFontSize(save.getFontSize());
         } catch (IllegalFontSizeException e) {
-            alertCenter.showNotification(ErrorMessages
-                    .tooBigFontSizeInSave(fxField, save.getFontSize(), excelReader));
+            alertCenter.showNotification(tooBigFontSizeInSave(fxField, save.getFontSize(), excelReader));
         }
         fxField.setFill(Color.color(save.getRed(), save.getGreen(), save.getBlue()));
         double x;
