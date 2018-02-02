@@ -81,10 +81,10 @@ public class PdfToFxAdapter {
                 fontNameString.substring(0, fontNameString.length() - 2);
         int styleIndex = fontNameString.indexOf('-');
         if (styleIndex == -1) {
-            return retrieveWordsFromCamelCase(fontNameString);
+            return fontNameString;
         }
         String name = fontNameString.substring(0, styleIndex);
-        name  = retrieveWordsFromCamelCase(name);
+//        name  = retrieveWordsFromCamelCase(name);
         String style = retrieveWordsFromCamelCase(fontNameString.substring(styleIndex + 1));
 
         return builder.append(name).append(" ").append(style).toString();
