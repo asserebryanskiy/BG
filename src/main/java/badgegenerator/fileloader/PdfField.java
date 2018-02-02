@@ -81,7 +81,7 @@ public class PdfField {
         float[] colorValue = color.getColorValue();
         return String.format("%s: x - %f, y - %f, color - %.0f-%.0f-%.0f, font - %s, fontSize - %f",
                 name, x, y, colorValue[0], colorValue[1], colorValue[2],
-                font.getFontProgram().getFontNames().getCidFontName(), fontSize);
+                font.getFontProgram().getFontNames().getFontName(), fontSize);
     }
 
     /*private void createDefaultFont() throws IOException {
