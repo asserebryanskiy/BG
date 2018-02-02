@@ -1,7 +1,7 @@
 package badgegenerator.pdfeditor;
 
 import badgegenerator.Main;
-import badgegenerator.appfilesmanager.AssessableFonts;
+import badgegenerator.PdfEditorMock;
 import badgegenerator.custompanes.FxField;
 import badgegenerator.fileloader.ExcelReader;
 import badgegenerator.fileloader.PdfFieldExtractor;
@@ -15,11 +15,6 @@ import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.IOException;
@@ -35,25 +30,24 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(AssessableFonts.class)
 public class FieldsLayouterTest extends ApplicationTest{
 
     private Pane fieldsParent;
     private static double width;
     private static double height;
 
-
-
     @BeforeClass
     public static void beforeAll() throws Exception {
-        InputStream lightStream = FieldsLayouterTest.class.getResourceAsStream("/fonts/CRC35.otf");
-        Font.loadFont(lightStream, 13);
-        lightStream.close();
+        InputStream lightStream = PdfEditorMock.class.getResourceAsStream("/fonts/CRC35.otf");
+        if (lightStream != null) {
+            Font.loadFont(lightStream, 13);
+            lightStream.close();
+        } else {
+            System.out.println("Stream is null!");
+        }
         String pdfPath = Paths.get(FieldsLayouterTest.class
                 .getResource("/pdfs/threeFonts.pdf").toURI())
                 .toFile()
@@ -67,8 +61,6 @@ public class FieldsLayouterTest extends ApplicationTest{
     public void setUp() throws Exception {
         fieldsParent = new Pane();
         fieldsParent.setMaxSize(width, height);
-        PowerMockito.mockStatic(AssessableFonts.class);
-        Mockito.when(AssessableFonts.getFontPath(any())).thenReturn(null);
     }
 
     @Test
@@ -150,7 +142,6 @@ public class FieldsLayouterTest extends ApplicationTest{
                 .findAny().get();
 
         assertThat(target.getLayoutX() + target.getPrefWidth(), is(rightX));
-        System.out.println(alertCenter.getNotifications());
 //        assertThat(alertCenter.getNotifications().contains("Не удалось найти в pdf поле \"Должность в компании\". Для него установлены стандартные параметры: черный цвет, 13,0 размер шрифта, шрифт Circe Light."),
 //                is(true));
     }
