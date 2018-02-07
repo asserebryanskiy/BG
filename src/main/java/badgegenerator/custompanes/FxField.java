@@ -125,14 +125,6 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                 } else line.setStrokeWidth(0.1);
             }
         }
-        if (verticalGuide != null) {
-            if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - GUIDE_OFFSET
-                    && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + GUIDE_OFFSET) {
-                verticalGuide.setVisible(true);
-                newX = verticalGuide.getStartX() - getPrefWidth() / 2;
-                setAlignment("CENTER");
-            } else verticalGuide.setVisible(false);
-        }
         if(guides != null) {
             for(Guide guide : guides) {
                 // to avoid permanent chasing of guide after a field
@@ -155,6 +147,14 @@ public abstract class FxField extends DraggablePane implements StyleableText {
                     } else guide.setVisible(false);
                 }
             }
+        }
+        if (verticalGuide != null) {
+            if(newX + getPrefWidth() / 2 > verticalGuide.getStartX() - GUIDE_OFFSET
+                    && newX + getPrefWidth() / 2 < verticalGuide.getStartX() + GUIDE_OFFSET) {
+                verticalGuide.setVisible(true);
+                newX = verticalGuide.getStartX() - getPrefWidth() / 2;
+                setAlignment("CENTER");
+            } else verticalGuide.setVisible(false);
         }
         return newX;
     }
