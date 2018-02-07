@@ -7,14 +7,16 @@ import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.sun.tools.javac.util.List;
 import javafx.scene.paint.Color;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -57,7 +59,7 @@ public class PdfColorProcessTest {
 
         PdfFieldExtractor extractor = new PdfFieldExtractor(
                 new PdfDocument(new PdfReader(new ByteArrayInputStream(os.toByteArray()))),
-                new HashSet<>(List.of("Test")));
+                new HashSet<>(Collections.singletonList("Test")));
         PdfToFxAdapter adapter = new PdfToFxAdapter(extractor.getFields().get("Test"), 1);
         return adapter.getColor();
     }

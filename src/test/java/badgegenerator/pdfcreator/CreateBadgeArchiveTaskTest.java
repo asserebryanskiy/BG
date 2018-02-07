@@ -11,6 +11,7 @@ import java.io.File;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 /**
@@ -20,7 +21,7 @@ public class CreateBadgeArchiveTaskTest {
 
     @Test
     public void whenCalledWithNotEnoughSpaceExceptionIsThrown() throws Exception {
-        String pdfPath = Util.getPath("/pdfs/raifFull.pdf");
+        String pdfPath = Util.getPathForResource("/pdfs/raifFull.pdf");
         String dirPath = System.getProperty("user.home") + "/Desktop";
         long freeSpace = new File(dirPath).getFreeSpace();
         long fileSize = new File(pdfPath).length();
@@ -32,8 +33,10 @@ public class CreateBadgeArchiveTaskTest {
             Task task = new CreateBadgeArchiveTask(null, 0,
                     excelReader, pdfPath, dirPath + "/archive.zip",
                     true);
+            // if exception was not thrown fail
+            fail();
         } catch (NotEnoughSpaceException e) {
-            assertThat((double) e.getAvailableSpace(), closeTo(freeSpace, 200000));
+            assertThat((double) e.getAvailableSpace(), closeTo(freeSpace, 1_000_000));
             assertThat(e.getQuerySpace(), is(fileSize * 2 * numberOfFiles));
         }
 
